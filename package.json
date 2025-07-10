@@ -1,0 +1,110 @@
+{
+  "dependencies": {
+    "electron-store": "^10.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "task-master-ai": "^0.19.0"
+  },
+  "name": "sebastian",
+  "version": "0.1.0",
+  "description": "Sebastian Electron-Vite-React Demo Application",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "build": "npm run build:clean && npm run build:renderer && npm run build:main && npm run build:preload",
+    "build:clean": "rimraf dist",
+    "build:renderer": "vite build",
+    "build:main": "tsc --project tsconfig.main.json",
+    "build:preload": "tsc --target es2020 --module es2020 --outDir dist/preload --moduleResolution node --esModuleInterop --skipLibCheck src/preload/*.ts",
+    "preview": "vite preview",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:win-msi": "npm run build && electron-builder --win --x64",
+    "dist:win-portable": "npm run build && electron-builder --win --portable",
+    "pack": "npm run build && electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaekyungCho2140/sebastian.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JaekyungCho2140/sebastian/issues"
+  },
+  "homepage": "https://github.com/JaekyungCho2140/sebastian#readme",
+  "devDependencies": {
+    "@types/electron-store": "^1.3.1",
+    "@types/node": "^24.0.12",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "concurrently": "^9.2.0",
+    "cross-env": "^7.0.3",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.3"
+  },
+  "build": {
+    "appId": "com.sebastian.app",
+    "productName": "Sebastian",
+    "copyright": "Copyright © 2025 Sebastian Development Team",
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json",
+      "!node_modules",
+      "!src",
+      "!.taskmaster",
+      "!.claude",
+      "!*.md",
+      "!build"
+    ],
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "msi": {
+      "oneClick": false,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sebastian",
+      "warningsAsErrors": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sebastian"
+    }
+  }
+}

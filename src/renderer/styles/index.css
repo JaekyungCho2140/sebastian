@@ -1,0 +1,170 @@
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Main Grid Layout */
+.app-container {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr;
+  width: 100%;
+  height: 100vh;
+  max-width: 640px;
+  max-height: 480px;
+  gap: 0;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  place-items: center;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  margin: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.version-display {
+  text-align: right;
+  font-size: 11px;
+  color: #adb5bd;
+}
+
+/* Button Styles */
+.success-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Exact dimensions as specified */
+  width: 200px;
+  height: 100px;
+  min-width: 200px;
+  min-height: 100px;
+  max-width: 200px;
+  max-height: 100px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Prevent button from shrinking or growing */
+  flex-shrink: 0;
+  flex-grow: 0;
+  /* Text wrapping and alignment */
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.success-button:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.success-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.success-button:focus {
+  outline: 2px solid #20c997;
+  outline-offset: 2px;
+}
+
+.success-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Loading state styling */
+.success-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.success-button.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: button-loading 1s linear infinite;
+}
+
+@keyframes button-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments for the fixed window size */
+@media (max-width: 640px) {
+  .main-content {
+    margin: 8px;
+  }
+  
+  .success-button {
+    width: 180px;
+    height: 80px;
+    font-size: 14px;
+  }
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
