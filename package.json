@@ -62,7 +62,6 @@
     "productName": "Sebastian",
     "copyright": "Copyright © 2025 Jaekyung Cho",
     "icon": "src/assets/icons/icon.ico",
-    "appUserModelId": "com.sebastian.app",
     "directories": {
       "buildResources": "build",
       "output": "release"
@@ -99,7 +98,8 @@
           ]
         }
       ],
-      "artifactName": "${productName}-${version}-Setup.${ext}"
+      "artifactName": "${productName}-${version}-Setup.${ext}",
+      "appUserModelId": "com.sebastian.app"
     },
     "msi": {
       "oneClick": false,
