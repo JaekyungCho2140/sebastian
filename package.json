@@ -60,8 +60,9 @@
   "build": {
     "appId": "com.sebastian.app",
     "productName": "Sebastian",
-    "copyright": "Copyright © 2025 Sebastian Development Team",
+    "copyright": "Copyright © 2025 Jaekyung Cho",
     "icon": "src/assets/icons/icon.ico",
+    "appUserModelId": "com.sebastian.app",
     "directories": {
       "buildResources": "build",
       "output": "release"
@@ -69,12 +70,16 @@
     "files": [
       "dist/**/*",
       "package.json",
+      "node_modules/electron-store/**/*",
       "!node_modules",
       "!src",
       "!.taskmaster",
       "!.claude",
       "!*.md",
       "!build"
+    ],
+    "asarUnpack": [
+      "**/node_modules/electron-store/**/*"
     ],
     "extraResources": [
       {
@@ -102,7 +107,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Sebastian",
-      "warningsAsErrors": false
+      "warningsAsErrors": false,
+      "upgradeCode": "12345678-1234-1234-1234-123456789012"
     },
     "nsis": {
       "oneClick": false,
