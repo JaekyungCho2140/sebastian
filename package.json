@@ -98,8 +98,7 @@
           ]
         }
       ],
-      "artifactName": "${productName}-${version}-Setup.${ext}",
-      "appUserModelId": "com.sebastian.app"
+      "artifactName": "${productName}-${version}-Setup.${ext}"
     },
     "msi": {
       "oneClick": false,
