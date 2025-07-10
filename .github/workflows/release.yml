@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  release:
-    types: [published]
 
 jobs:
   build-windows:
@@ -50,12 +48,36 @@ jobs:
           }
         shell: powershell
         
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Sebastian v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Sebastian v${{ steps.get_version.outputs.VERSION }}
+            
+            ### 변경사항
+            - 자동 빌드된 Windows MSI 설치 파일
+            
+            ### 설치 방법
+            1. `Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi` 파일 다운로드
+            2. 파일 실행하여 설치 진행
+            
+            ### 시스템 요구사항
+            - Windows 10 이상
+            - x64 아키텍처
+          draft: false
+          prerelease: false
+          
       - name: Upload MSI to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find_msi.outputs.MSI_PATH }}
           asset_name: Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi
           asset_content_type: application/octet-stream
