@@ -56,16 +56,17 @@ jobs:
           $releaseNotes = @"
           ## Sebastian v${{ steps.get_version.outputs.VERSION }}
 
-          ### 변경사항
-          - 자동 빌드된 Windows MSI 설치 파일
+          ### Changes
+          - Automatically built Windows MSI installer
+          - Fixed electron-builder compatibility issues
 
-          ### 설치 방법
-          1. ``Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi`` 파일 다운로드
-          2. 파일 실행하여 설치 진행
+          ### Installation
+          1. Download ``Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi`` file
+          2. Run the file to start installation
 
-          ### 시스템 요구사항
-          - Windows 10 이상
-          - x64 아키텍처
+          ### System Requirements
+          - Windows 10 or later
+          - x64 architecture
           "@
           
           gh release create "v${{ steps.get_version.outputs.VERSION }}" --title "Sebastian v${{ steps.get_version.outputs.VERSION }}" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
