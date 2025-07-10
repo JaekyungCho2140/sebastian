@@ -53,7 +53,7 @@ export function setupIpcHandlers(): void {
   
   // Initialize update service
   updateService = new UpdateService(stateManager, {
-    githubRepo: 'jkcho/sebastian', // Replace with your actual GitHub repo
+    githubRepo: 'JaekyungCho2140/sebastian', // Replace with your actual GitHub repo
     checkInterval: 24 * 60 * 60 * 1000, // 24 hours
     maxRetries: 3,
     retryDelay: 5000,

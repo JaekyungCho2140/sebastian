@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Package MSI installer
+        run: npm run dist:win-msi
+        
+      - name: Get version from tag
+        id: get_version
+        run: |
+          $version = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        shell: powershell
+        
+      - name: Find MSI file
+        id: find_msi
+        run: |
+          $msiFile = Get-ChildItem -Path "release" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if ($msiFile) {
+            echo "MSI_PATH=$($msiFile.FullName)" >> $env:GITHUB_OUTPUT
+            echo "MSI_NAME=$($msiFile.Name)" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "No MSI file found"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Upload MSI to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.find_msi.outputs.MSI_PATH }}
+          asset_name: Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi
+          asset_content_type: application/octet-stream
+          
+      - name: Upload MSI as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sebastian-msi-installer
+          path: ${{ steps.find_msi.outputs.MSI_PATH }}
+          retention-days: 30
