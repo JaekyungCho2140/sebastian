@@ -3,14 +3,14 @@ name: CI
 on:
   push:
     branches: [ main, develop ]
-    paths-ignore:
-      - 'package.json'  # 버전 업데이트 커밋 제외
   pull_request:
     branches: [ main, develop ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Skip CI for version bump commits
+    if: "!contains(github.event.head_commit.message, 'npm version')"
     
     steps:
       - name: Checkout repository
@@ -33,6 +33,8 @@ jobs:
 
   build-test:
     runs-on: windows-latest
+    # Skip CI for version bump commits
+    if: "!contains(github.event.head_commit.message, 'npm version')"
     
     steps:
       - name: Checkout repository

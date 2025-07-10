@@ -49,24 +49,26 @@ jobs:
         shell: powershell
         
       - name: Create GitHub Release and Upload MSI
+        shell: powershell
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v${{ steps.get_version.outputs.VERSION }} \
-            --title "Sebastian v${{ steps.get_version.outputs.VERSION }}" \
-            --notes "## Sebastian v${{ steps.get_version.outputs.VERSION }}
+          $releaseNotes = @"
+          ## Sebastian v${{ steps.get_version.outputs.VERSION }}
 
           ### 변경사항
           - 자동 빌드된 Windows MSI 설치 파일
 
           ### 설치 방법
-          1. \`Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi\` 파일 다운로드
+          1. ``Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi`` 파일 다운로드
           2. 파일 실행하여 설치 진행
 
           ### 시스템 요구사항
           - Windows 10 이상
-          - x64 아키텍처" \
-            "${{ steps.find_msi.outputs.MSI_PATH }}"
+          - x64 아키텍처
+          "@
+          
+          gh release create "v${{ steps.get_version.outputs.VERSION }}" --title "Sebastian v${{ steps.get_version.outputs.VERSION }}" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
           
       - name: Upload MSI as artifact
         uses: actions/upload-artifact@v4
