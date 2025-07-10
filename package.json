@@ -6,7 +6,7 @@
     "task-master-ai": "^0.19.0"
   },
   "name": "sebastian",
-  "version": "0.1.9.01",
+  "version": "0.1.9.02",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
@@ -102,12 +102,15 @@
     },
     "msi": {
       "oneClick": false,
-      "perMachine": false,
+      "perMachine": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Sebastian",
       "warningsAsErrors": false,
-      "upgradeCode": "12345678-1234-1234-1234-123456789012"
+      "upgradeCode": "757E765C-C1E3-40E3-841E-2ADD52310561",
+      "properties": {
+        "AppUserModelId": "com.sebastian.app"
+      }
     },
     "nsis": {
       "oneClick": false,
