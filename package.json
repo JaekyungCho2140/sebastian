@@ -36,7 +36,7 @@
     "url": "git+https://github.com/JaekyungCho2140/sebastian.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Jaekyung Cho",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
@@ -61,6 +61,7 @@
     "appId": "com.sebastian.app",
     "productName": "Sebastian",
     "copyright": "Copyright © 2025 Sebastian Development Team",
+    "icon": "src/assets/icons/icon.ico",
     "directories": {
       "buildResources": "build",
       "output": "release"
