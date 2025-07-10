@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [ main, develop ]
+    paths-ignore:
+      - 'package.json'  # 버전 업데이트 커밋 제외
   pull_request:
     branches: [ main, develop ]
 
