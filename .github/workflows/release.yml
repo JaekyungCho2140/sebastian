@@ -22,11 +22,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # CI 성공 여부 확인
+  # CI 성공 여부 확인 (태그 푸시 시에만 필요)
   verify-ci:
     name: Verify CI Status
     runs-on: ubuntu-latest
-    if: ${{ !inputs.skip_ci_check }}
+    if: ${{ !inputs.skip_ci_check && startsWith(github.ref, 'refs/tags/') }}
     outputs:
       ci-passed: ${{ steps.check-ci.outputs.passed }}
       
@@ -104,7 +104,7 @@ jobs:
     name: Build and Release
     needs: [verify-ci]
     runs-on: windows-latest
-    if: always() && (needs.verify-ci.outputs.ci-passed == 'true' || inputs.skip_ci_check)
+    if: always() && (needs.verify-ci.outputs.ci-passed == 'true' || inputs.skip_ci_check || !startsWith(github.ref, 'refs/tags/'))
     
     steps:
       - name: Checkout repository
