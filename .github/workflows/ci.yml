@@ -147,80 +147,10 @@ jobs:
           fi
           
           echo "✅ All CI checks passed successfully"
-          echo "🚀 Ready for release deployment"
+          echo "🎉 CI workflow completed - ready for manual release"
 
       - name: Create status indicator
         run: |
           echo "CI_STATUS=success" >> $GITHUB_ENV
           echo "BUILD_CACHE_KEY=${{ needs.code-quality.outputs.build-cache-key }}" >> $GITHUB_ENV
 
-  # CI 성공 시 자동 릴리즈 트리거
-  trigger-release:
-    name: Trigger Release
-    needs: [code-quality, build-verification]
-    runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Get current version and increment
-        id: version
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          echo "Current version: $CURRENT_VERSION"
-          
-          # 패치 버전 자동 증가
-          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_PATCH=$((patch + 1))
-          NEW_VERSION="$major.$minor.$NEW_PATCH"
-          
-          echo "New version: $NEW_VERSION"
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          
-      - name: Update package.json version
-        run: |
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-          
-      - name: Commit version update
-        run: |
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json
-          git commit -m "chore: 버전 ${{ steps.version.outputs.version }}로 업데이트"
-          
-      - name: Create and push tag
-        run: |
-          git tag "v${{ steps.version.outputs.version }}"
-          git push origin main
-          git push origin "v${{ steps.version.outputs.version }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          
-      - name: Trigger Release Workflow
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            const response = await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'release.yml',
-              ref: 'main',
-              inputs: {
-                version: '${{ steps.version.outputs.version }}',
-                skip_ci_check: 'true'
-              }
-            });
-            console.log('✅ Release workflow triggered successfully');
-            console.log('Version:', '${{ steps.version.outputs.version }}');
