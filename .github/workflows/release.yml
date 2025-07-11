@@ -4,53 +4,107 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 0.1.12)'
+        required: true
+        type: string
+      skip_ci_check:
+        description: 'Skip CI success check (not recommended)'
+        required: false
+        type: boolean
+        default: false
+
+# 동시 실행 방지
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  # 태그 푸시 시 CI 테스트 먼저 실행
-  test:
+  # CI 성공 여부 확인
+  verify-ci:
+    name: Verify CI Status
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    if: ${{ !inputs.skip_ci_check }}
+    outputs:
+      ci-passed: ${{ steps.check-ci.outputs.passed }}
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Run tests
-        run: npm test
-
-  build-test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Wait for CI completion
+        id: wait-ci
+        uses: actions/github-script@v7
         with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Build
-        run: npm run build
-        
-      - name: Test build
-        run: npm run test:build
+          script: |
+            // 현재 커밋의 CI 워크플로우 실행 상태 확인
+            const { data: workflows } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci.yml',
+              head_sha: context.sha,
+              per_page: 1
+            });
+            
+            if (workflows.workflow_runs.length === 0) {
+              console.log('No CI workflow found for this commit');
+              return false;
+            }
+            
+            const ciRun = workflows.workflow_runs[0];
+            console.log(`CI Status: ${ciRun.status}, Conclusion: ${ciRun.conclusion}`);
+            
+            // CI가 아직 실행 중인 경우 대기
+            if (ciRun.status !== 'completed') {
+              console.log('CI is still running, waiting...');
+              // 최대 10분 대기
+              let attempts = 0;
+              const maxAttempts = 60; // 10초 * 60 = 10분
+              
+              while (attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 10000)); // 10초 대기
+                
+                const { data: updatedRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: 'ci.yml',
+                  head_sha: context.sha,
+                  per_page: 1
+                });
+                
+                if (updatedRuns.workflow_runs.length > 0) {
+                  const updatedRun = updatedRuns.workflow_runs[0];
+                  if (updatedRun.status === 'completed') {
+                    console.log(`CI completed with conclusion: ${updatedRun.conclusion}`);
+                    return updatedRun.conclusion === 'success';
+                  }
+                }
+                attempts++;
+              }
+              
+              console.log('CI did not complete within timeout');
+              return false;
+            }
+            
+            return ciRun.conclusion === 'success';
 
-  # 테스트 통과 후 릴리스 빌드
-  build-windows:
-    needs: [test, build-test]
+      - name: Check CI result
+        id: check-ci
+        run: |
+          if [ "${{ steps.wait-ci.outputs.result }}" = "true" ]; then
+            echo "✅ CI passed successfully"
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ CI failed or did not complete"
+            echo "passed=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  # 릴리즈 빌드 및 배포
+  build-and-release:
+    name: Build and Release
+    needs: [verify-ci]
     runs-on: windows-latest
+    if: always() && (needs.verify-ci.outputs.ci-passed == 'true' || inputs.skip_ci_check)
     
     steps:
       - name: Checkout repository
@@ -68,56 +122,142 @@ jobs:
       - name: Build application
         run: npm run build
         
-      - name: Package MSI installer
+      - name: Create MSI installer
         run: npm run dist:win-msi
         
-      - name: Get version from tag
+      - name: Get version
         id: get_version
         run: |
-          $version = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ inputs.version }}"
+          } else {
+            $version = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          }
           echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Release version: $version"
         shell: powershell
         
-      - name: Find MSI file
+      - name: Find and verify MSI file
         id: find_msi
         run: |
           $msiFile = Get-ChildItem -Path "release" -Filter "*.msi" -Recurse | Select-Object -First 1
           if ($msiFile) {
-            echo "MSI_PATH=$($msiFile.FullName)" >> $env:GITHUB_OUTPUT
-            echo "MSI_NAME=$($msiFile.Name)" >> $env:GITHUB_OUTPUT
+            $fullPath = $msiFile.FullName
+            $fileName = $msiFile.Name
+            $fileSize = [math]::Round($msiFile.Length / 1MB, 2)
+            
+            echo "MSI_PATH=$fullPath" >> $env:GITHUB_OUTPUT
+            echo "MSI_NAME=$fileName" >> $env:GITHUB_OUTPUT
+            echo "MSI_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
+            
+            echo "✅ MSI file created successfully:"
+            echo "   📁 File: $fileName"
+            echo "   📏 Size: $fileSize MB"
+            echo "   📂 Path: $fullPath"
+            
+            # MSI 파일 무결성 검사
+            if ($msiFile.Length -lt 10MB) {
+              echo "⚠️  Warning: MSI file size is unusually small"
+            }
           } else {
-            echo "No MSI file found"
+            echo "❌ No MSI file found in release directory"
+            echo "📁 Release directory contents:"
+            Get-ChildItem -Path "release" -Recurse | ForEach-Object { echo "   $($_.FullName)" }
             exit 1
           }
         shell: powershell
         
-      - name: Create GitHub Release and Upload MSI
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         shell: powershell
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $msiSize = "${{ steps.find_msi.outputs.MSI_SIZE }}"
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm UTC"
+          
           $releaseNotes = @"
-          ## Sebastian v${{ steps.get_version.outputs.VERSION }}
-
-          ### Changes
-          - Automatically built Windows MSI installer
-          - Fixed electron-store packaging with complete dependency unpacking
-          - All tests passed before release
-
-          ### Installation
-          1. Download ``Sebastian-${{ steps.get_version.outputs.VERSION }}-Setup.msi`` file
-          2. Run the file to start installation
-
-          ### System Requirements
-          - Windows 10 or later
-          - x64 architecture
+          ## Sebastian v$version
+          
+          ### 📦 Release Information
+          - **Build Date**: $buildDate
+          - **Installer Size**: $msiSize MB
+          - **Platform**: Windows x64
+          - **Build Source**: ${{ github.sha }}
+          
+          ### ✨ Features
+          - Windows MSI installer with complete dependency packaging
+          - Fixed electron-store compatibility issues
+          - Optimized UI/UX improvements
+          
+          ### 📥 Installation
+          1. Download the ``Sebastian-$version-Setup.msi`` file below
+          2. Run the installer and follow the setup wizard
+          3. Launch Sebastian from Start Menu or Desktop shortcut
+          
+          ### 💻 System Requirements
+          - **OS**: Windows 10 (1903) or later
+          - **Architecture**: x64 (64-bit)
+          - **Memory**: 4GB RAM minimum
+          - **Storage**: 200MB available space
+          
+          ### 🔧 Technical Details
+          - Built with Electron 37.2.0
+          - React 19.1.0 + TypeScript 5.8.3
+          - Vite 7.0.3 build system
           "@
           
-          gh release create "v${{ steps.get_version.outputs.VERSION }}" --title "Sebastian v${{ steps.get_version.outputs.VERSION }}" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
+          $tagName = if ("${{ github.event_name }}" -eq "workflow_dispatch") { "v$version" } else { "${{ github.ref_name }}" }
           
-      - name: Upload MSI as artifact
+          try {
+            gh release create $tagName --title "Sebastian v$version" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
+            echo "✅ GitHub Release created successfully: $tagName"
+          } catch {
+            echo "❌ Failed to create GitHub Release: $_"
+            exit 1
+          }
+          
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: sebastian-msi-installer
-          path: ${{ steps.find_msi.outputs.MSI_PATH }}
-          retention-days: 30
+          name: sebastian-v${{ steps.get_version.outputs.VERSION }}-installer
+          path: |
+            ${{ steps.find_msi.outputs.MSI_PATH }}
+            release/**/*.msi
+          retention-days: 90
+          
+      - name: Release summary
+        run: |
+          echo "🎉 Release completed successfully!"
+          echo ""
+          echo "📋 Release Summary:"
+          echo "   Version: ${{ steps.get_version.outputs.VERSION }}"
+          echo "   MSI File: ${{ steps.find_msi.outputs.MSI_NAME }}"
+          echo "   File Size: ${{ steps.find_msi.outputs.MSI_SIZE }} MB"
+          echo "   Trigger: ${{ github.event_name }}"
+          echo ""
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.VERSION }}"
+        shell: bash
+
+  # 실패 알림
+  notify-failure:
+    name: Notify Failure
+    needs: [verify-ci, build-and-release]
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+      - name: Create failure summary
+        run: |
+          echo "❌ Release workflow failed!"
+          echo ""
+          echo "📊 Job Results:"
+          echo "   CI Verification: ${{ needs.verify-ci.result }}"
+          echo "   Build and Release: ${{ needs.build-and-release.result }}"
+          echo ""
+          echo "🔧 Troubleshooting steps:"
+          echo "1. Check CI workflow status"
+          echo "2. Verify build dependencies"
+          echo "3. Check GitHub token permissions"
+          echo "4. Review error logs above"
