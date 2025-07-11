@@ -1,0 +1,125 @@
+name: Manual Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub Release after build'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    name: Build Windows MSI
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Create MSI installer
+        run: npm run dist:win-msi
+        
+      - name: Get version
+        id: get_version
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Build version: $version"
+        shell: powershell
+        
+      - name: Find MSI file
+        id: find_msi
+        run: |
+          $msiFile = Get-ChildItem -Path "release" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if ($msiFile) {
+            $fullPath = $msiFile.FullName
+            $fileName = $msiFile.Name
+            $fileSize = [math]::Round($msiFile.Length / 1MB, 2)
+            
+            echo "MSI_PATH=$fullPath" >> $env:GITHUB_OUTPUT
+            echo "MSI_NAME=$fileName" >> $env:GITHUB_OUTPUT
+            echo "MSI_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
+            
+            echo "✅ MSI file found: $fileName ($fileSize MB)"
+          } else {
+            echo "❌ No MSI file found"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sebastian-v${{ steps.get_version.outputs.VERSION }}-msi
+          path: ${{ steps.find_msi.outputs.MSI_PATH }}
+          retention-days: 30
+          
+      - name: Create GitHub Release
+        if: ${{ inputs.create_release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $msiSize = "${{ steps.find_msi.outputs.MSI_SIZE }}"
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm UTC"
+          
+          $releaseNotes = @"
+          ## Sebastian v$version
+          
+          ### 📦 Release Information
+          - **Build Date**: $buildDate
+          - **Installer Size**: $msiSize MB
+          - **Platform**: Windows x64
+          - **Build Source**: ${{ github.sha }}
+          
+          ### 📥 Installation
+          1. Download the Sebastian-$version-Setup.msi file below
+          2. Run the installer and follow the setup wizard
+          3. Launch Sebastian from Start Menu or Desktop shortcut
+          
+          ### 💻 System Requirements
+          - **OS**: Windows 10 (1903) or later
+          - **Architecture**: x64 (64-bit)
+          - **Memory**: 4GB RAM minimum
+          - **Storage**: 200MB available space
+          "@
+          
+          $tagName = "v$version"
+          
+          try {
+            gh release create $tagName --title "Sebastian v$version" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
+            echo "✅ GitHub Release created: $tagName"
+          } catch {
+            echo "❌ Failed to create GitHub Release: $_"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Build Summary
+        run: |
+          echo "🎉 Build completed successfully!"
+          echo ""
+          echo "📋 Build Summary:"
+          echo "   Version: ${{ steps.get_version.outputs.VERSION }}"
+          echo "   MSI File: ${{ steps.find_msi.outputs.MSI_NAME }}"
+          echo "   File Size: ${{ steps.find_msi.outputs.MSI_SIZE }} MB"
+          echo ""
+          if ("${{ inputs.create_release }}" -eq "true") {
+            echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.VERSION }}"
+          }
+          echo "📎 Artifact: sebastian-v${{ steps.get_version.outputs.VERSION }}-msi"
+        shell: bash
