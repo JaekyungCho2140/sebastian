@@ -71,6 +71,7 @@ jobs:
       - name: Create GitHub Release
         if: ${{ inputs.create_release }}
         env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           $version = "${{ steps.get_version.outputs.VERSION }}"
@@ -100,6 +101,20 @@ jobs:
           
           $tagName = "v$version"
           
+          # Check if release already exists
+          $existingRelease = gh release view $tagName 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            echo "🔄 Release $tagName already exists. Deleting and recreating..."
+            try {
+              gh release delete $tagName --yes
+              echo "✅ Existing release deleted"
+            } catch {
+              echo "❌ Failed to delete existing release: $_"
+              exit 1
+            }
+          }
+          
+          # Create new release
           try {
             gh release create $tagName --title "Sebastian v$version" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
             echo "✅ GitHub Release created: $tagName"
