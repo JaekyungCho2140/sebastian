@@ -62,23 +62,26 @@
     "productName": "Sebastian",
     "copyright": "Copyright © 2025 Jaekyung Cho",
     "icon": "src/assets/icons/icon.ico",
+    "asar": true,
+    "electronUpdaterCompatibility": ">=2.16",
+    "nativeRebuilder": "sequential",
     "directories": {
       "buildResources": "build",
       "output": "release"
     },
     "files": [
       "dist/**/*",
-      "package.json",
-      "node_modules/electron-store/**/*",
-      "!node_modules",
-      "!src",
-      "!.taskmaster",
-      "!.claude",
-      "!*.md",
-      "!build"
+      "package.json"
     ],
     "asarUnpack": [
-      "node_modules/electron-store/**/*"
+      "node_modules/electron-store/**/*",
+      "node_modules/conf/**/*",
+      "node_modules/env-paths/**/*",
+      "node_modules/pkg-up/**/*",
+      "node_modules/write-file-atomic/**/*",
+      "node_modules/find-up/**/*",
+      "node_modules/locate-path/**/*",
+      "node_modules/path-exists/**/*"
     ],
     "extraResources": [
       {
