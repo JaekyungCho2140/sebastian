@@ -206,3 +206,21 @@ jobs:
           git push origin "v${{ steps.version.outputs.version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          
+      - name: Trigger Release Workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release.yml',
+              ref: 'main',
+              inputs: {
+                version: '${{ steps.version.outputs.version }}',
+                skip_ci_check: 'true'
+              }
+            });
+            console.log('✅ Release workflow triggered successfully');
+            console.log('Version:', '${{ steps.version.outputs.version }}');
