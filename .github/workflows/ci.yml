@@ -160,6 +160,8 @@ jobs:
     needs: [code-quality, build-verification]
     runs-on: ubuntu-latest
     if: success() && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
@@ -203,4 +205,4 @@ jobs:
           git push origin main
           git push origin "v${{ steps.version.outputs.version }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
