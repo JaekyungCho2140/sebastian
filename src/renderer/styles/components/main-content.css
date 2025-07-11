@@ -1,0 +1,15 @@
+/* Main Content Specific Styles */
+
+.success-button-container {
+  position: absolute;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+}
+
+/* Responsive adjustments for button container */
+@media (max-width: 640px) {
+  .success-button-container {
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+  }
+}

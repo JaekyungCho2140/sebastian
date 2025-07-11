@@ -35,12 +35,12 @@ const SuccessButton: React.FC = () => {
       onKeyDown={handleKeyDown}
       disabled={isLoading}
       type="button"
-      aria-label={isLoading ? '처리 중입니다...' : 'Success Demo 실행'}
+      aria-label={isLoading ? '처리 중입니다...' : '성공 테스트 실행'}
       aria-busy={isLoading}
       tabIndex={0}
       role="button"
     >
-      {isLoading ? '처리 중...' : 'Success Demo'}
+      {isLoading ? '처리 중...' : '성공 테스트'}
     </button>
   )
 }

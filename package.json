@@ -6,7 +6,7 @@
     "task-master-ai": "^0.19.0"
   },
   "name": "sebastian",
-  "version": "0.1.9-05",
+  "version": "0.1.11",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
@@ -111,7 +111,7 @@
       "shortcutName": "Sebastian",
       "warningsAsErrors": false,
       "upgradeCode": "757E765C-C1E3-40E3-841E-2ADD52310561",
-      "additionalWixArgs": ["-dAppUserModelId=com.sebastian.app"]
+      "additionalWixArgs": []
     },
     "nsis": {
       "oneClick": false,

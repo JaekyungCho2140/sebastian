@@ -23,9 +23,6 @@ const Footer: React.FC = () => {
 
   return (
     <div className="footer-content">
-      <div>
-        <span>Sebastian Application</span>
-      </div>
       <div className="version-display">
         {isLoading ? '로딩 중...' : `v${version}`}
       </div>
