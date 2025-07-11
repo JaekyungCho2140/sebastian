@@ -162,7 +162,7 @@ jobs:
           } else {
             echo "❌ No MSI file found in release directory"
             echo "📁 Release directory contents:"
-            Get-ChildItem -Path "release" -Recurse | ForEach-Object { echo "   $($_.FullName)" }
+            Get-ChildItem -Path "release" -Recurse | ForEach-Object { Write-Host "   $($_.FullName)" }
             exit 1
           }
         shell: powershell
@@ -192,7 +192,7 @@ jobs:
           - Optimized UI/UX improvements
           
           ### 📥 Installation
-          1. Download the ``Sebastian-$version-Setup.msi`` file below
+          1. Download the Sebastian-$version-Setup.msi file below
           2. Run the installer and follow the setup wizard
           3. Launch Sebastian from Start Menu or Desktop shortcut
           
