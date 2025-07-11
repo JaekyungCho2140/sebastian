@@ -56,9 +56,9 @@ jobs:
             // CI가 아직 실행 중인 경우 대기
             if (ciRun.status !== 'completed') {
               console.log('CI is still running, waiting...');
-              // 최대 10분 대기
+              // 최대 15분 대기
               let attempts = 0;
-              const maxAttempts = 60; // 10초 * 60 = 10분
+              const maxAttempts = 90; // 10초 * 90 = 15분
               
               while (attempts < maxAttempts) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // 10초 대기
