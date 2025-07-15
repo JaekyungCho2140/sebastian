@@ -98,7 +98,7 @@ jobs:
           fi
           echo "✅ Renderer built successfully"
           
-          if [ ! -f "dist/preload/preload/index.js" ]; then
+          if [ ! -f "dist/preload/index.js" ]; then
             echo "❌ Preload script build failed"
             exit 1
           fi
