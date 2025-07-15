@@ -95,6 +95,8 @@ const TestErrorButton: React.FC = () => {
         // Trigger an error via IPC that will be handled by main process
         if (window.electronAPI?.reportError) {
           await window.electronAPI.reportError({
+            title: 'Test Main Process Error',
+            message: 'Test Main Process Error: IPC error reporting verification',
             error: new Error('Test Main Process Error: IPC error reporting verification'),
             errorType: 'main-process',
             severity: 'high',

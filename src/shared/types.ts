@@ -4,6 +4,7 @@ export interface AppState {
   version: string
   isUpdateAvailable: boolean
   lastUpdateCheck: number
+  ignoredVersion?: string
   userPreferences: {
     theme: 'light' | 'dark'
     language: 'ko' | 'en'
@@ -15,7 +16,24 @@ export interface UpdateInfo {
   releaseDate: string
   downloadUrl: string
   changelog: string
+  downloadSize?: number
 }
+
+export interface UpdateProgress {
+  stage: 'downloading' | 'installing' | 'complete'
+  progress: number // 0-100
+  message: string
+  downloadSize?: number
+  downloadedSize?: number
+  speed?: number // bytes per second
+}
+
+export interface UpdateDialogData {
+  updateInfo: UpdateInfo
+  isUpdateAvailable: boolean
+}
+
+export type UpdateAction = 'now' | 'later' | 'ignore'
 
 // IPC Channel constants
 export const IPC_CHANNELS = {
@@ -30,7 +48,15 @@ export const IPC_CHANNELS = {
   SHOW_ERROR_DIALOG: 'show-error-dialog',
   RESTART_APP: 'restart-app',
   UPDATE_AVAILABLE: 'update-available',
-  UPDATE_DOWNLOADED: 'update-downloaded'
+  UPDATE_DOWNLOADED: 'update-downloaded',
+  SHOW_UPDATE_DIALOG: 'show-update-dialog',
+  UPDATE_NOW: 'update-now',
+  UPDATE_LATER: 'update-later',
+  IGNORE_UPDATE: 'ignore-update',
+  DOWNLOAD_UPDATE: 'download-update',
+  INSTALL_UPDATE: 'install-update',
+  UPDATE_PROGRESS: 'update-progress',
+  UPDATE_ERROR: 'update-error'
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]
@@ -57,6 +83,11 @@ export interface IpcRequests {
   [IPC_CHANNELS.CLOSE_WINDOW]: void
   [IPC_CHANNELS.REPORT_ERROR]: RendererErrorReport
   [IPC_CHANNELS.RESTART_APP]: void
+  [IPC_CHANNELS.UPDATE_NOW]: void
+  [IPC_CHANNELS.UPDATE_LATER]: void
+  [IPC_CHANNELS.IGNORE_UPDATE]: string // version to ignore
+  [IPC_CHANNELS.DOWNLOAD_UPDATE]: void
+  [IPC_CHANNELS.INSTALL_UPDATE]: void
 }
 
 export interface IpcResponses {
@@ -69,6 +100,11 @@ export interface IpcResponses {
   [IPC_CHANNELS.CLOSE_WINDOW]: void
   [IPC_CHANNELS.REPORT_ERROR]: string | null // Returns error report ID
   [IPC_CHANNELS.RESTART_APP]: void
+  [IPC_CHANNELS.UPDATE_NOW]: void
+  [IPC_CHANNELS.UPDATE_LATER]: void
+  [IPC_CHANNELS.IGNORE_UPDATE]: void
+  [IPC_CHANNELS.DOWNLOAD_UPDATE]: void
+  [IPC_CHANNELS.INSTALL_UPDATE]: void
 }
 
 // Events that can be sent from main to renderer
@@ -76,6 +112,9 @@ export interface IpcEvents {
   [IPC_CHANNELS.UPDATE_AVAILABLE]: UpdateInfo
   [IPC_CHANNELS.UPDATE_DOWNLOADED]: void
   [IPC_CHANNELS.SHOW_ERROR_DIALOG]: ErrorDialogData
+  [IPC_CHANNELS.SHOW_UPDATE_DIALOG]: UpdateDialogData
+  [IPC_CHANNELS.UPDATE_PROGRESS]: UpdateProgress
+  [IPC_CHANNELS.UPDATE_ERROR]: string
 }
 
 // Error types for IPC communication
@@ -171,11 +210,54 @@ export interface ErrorDialogData {
   stack?: string
   timestamp?: number
   severity?: ErrorSeverity
+  errorType?: string
+  context?: any
+  url?: string
 }
 
 // Window object extensions
 declare global {
   interface Window {
     showErrorDialog?: (errorData: ErrorDialogData) => void
+    electronAPI: {
+      // System
+      getVersion: () => Promise<string>
+      isAvailable: () => boolean
+      
+      // Dialog
+      showSuccessDialog: () => Promise<void>
+      
+      // Updates
+      checkForUpdates: () => Promise<UpdateInfo | null>
+      updateNow: () => Promise<void>
+      updateLater: () => Promise<void>
+      ignoreUpdate: (version: string) => Promise<void>
+      downloadUpdate: () => Promise<void>
+      installUpdate: () => Promise<void>
+      
+      // State
+      getAppState: () => Promise<AppState>
+      setAppState: (state: Partial<AppState>) => Promise<void>
+      
+      // Window
+      minimizeWindow: () => Promise<void>
+      closeWindow: () => Promise<void>
+      
+      // Error reporting
+      reportError: (errorData: ErrorDialogData) => Promise<void>
+      
+      // App control
+      restartApp: () => Promise<void>
+      
+      // Event listeners
+      on: (channel: string, callback: (...args: any[]) => void) => void
+      removeAllListeners: (channel: string) => void
+      onUpdateAvailable: (callback: (updateInfo: UpdateInfo) => void) => void
+      onUpdateDownloaded: (callback: () => void) => void
+      onShowErrorDialog: (callback: (errorData: ErrorDialogData) => void) => void
+      onUpdateProgress: (callback: (progress: UpdateProgress) => void) => void
+      onUpdateError: (callback: (error: string) => void) => void
+      onShowUpdateDialog: (callback: (data: UpdateDialogData) => void) => void
+    }
   }
 }

@@ -206,6 +206,133 @@ export function setupIpcHandlers(): void {
     }, 100)
   })
 
+  // Update now handler
+  createHandler(IPC_CHANNELS.UPDATE_NOW, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    // This will be handled by the update manager
+    console.log('Update now requested')
+  })
+
+  // Update later handler
+  createHandler(IPC_CHANNELS.UPDATE_LATER, async () => {
+    console.log('Update later requested')
+  })
+
+  // Ignore update handler
+  createHandler(IPC_CHANNELS.IGNORE_UPDATE, async (version: string) => {
+    console.log('Ignoring update version:', version)
+    // Store ignored version in state
+    stateManager.setState({ ignoredVersion: version })
+  })
+
+  // Download update handler
+  createHandler(IPC_CHANNELS.DOWNLOAD_UPDATE, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      const updateInfo = updateService.getCurrentDownloadInfo()
+      if (!updateInfo) {
+        throw new IpcError('No update information available', 'NO_UPDATE_INFO')
+      }
+      
+      await updateService.downloadUpdate(updateInfo)
+    } catch (error) {
+      console.error('Download failed:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Download failed',
+        'DOWNLOAD_FAILED'
+      )
+    }
+  })
+
+  // Install update handler
+  createHandler(IPC_CHANNELS.INSTALL_UPDATE, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      // Use the current install path
+      const installPath = updateService.getCurrentInstallPath()
+      if (!installPath) {
+        throw new IpcError('No file to install', 'NO_FILE_TO_INSTALL')
+      }
+      
+      await updateService.installUpdate(installPath)
+      
+      // Schedule app restart after successful installation
+      setTimeout(() => {
+        app.relaunch()
+        app.exit(0)
+      }, 2000) // 2 second delay to show completion message
+      
+    } catch (error) {
+      console.error('Installation failed:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Installation failed',
+        'INSTALLATION_FAILED'
+      )
+    }
+  })
+
+  // Setup update service event listeners
+  if (updateService) {
+    updateService.on('updateAvailable', (updateInfo: UpdateInfo) => {
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_AVAILABLE, updateInfo)
+      })
+    })
+
+    updateService.on('downloadProgress', (progress) => {
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, progress)
+      })
+    })
+
+    updateService.on('installProgress', (progress) => {
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, progress)
+      })
+    })
+
+    updateService.on('downloadComplete', (data) => {
+      console.log('Download completed:', data)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_DOWNLOADED)
+      })
+    })
+
+    updateService.on('installComplete', (data) => {
+      console.log('Installation completed:', data)
+    })
+
+    updateService.on('updateError', (error) => {
+      console.error('Update error:', error)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_ERROR, error.error)
+      })
+    })
+
+    updateService.on('downloadError', (error) => {
+      console.error('Download error:', error)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_ERROR, error.error)
+      })
+    })
+
+    updateService.on('installError', (error) => {
+      console.error('Installation error:', error)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_ERROR, error.error)
+      })
+    })
+  }
+
   console.log('IPC handlers initialized')
 }
 

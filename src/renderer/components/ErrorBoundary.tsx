@@ -45,6 +45,8 @@ class ErrorBoundary extends Component<Props, State> {
       // electronAPI가 사용 가능한지 확인
       if (window.electronAPI && window.electronAPI.reportError) {
         await window.electronAPI.reportError({
+          title: 'React Component Error',
+          message: error.message || 'An error occurred in a React component',
           error,
           errorType: 'react-component',
           severity: 'high',

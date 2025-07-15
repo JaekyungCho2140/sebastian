@@ -109,7 +109,14 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({
 
   return (
     <div className="error-dialog-overlay" onClick={onClose}>
-      <div className="error-dialog" onClick={(e) => e.stopPropagation()}>
+      <div 
+        className="error-dialog" 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="error-dialog-title"
+        aria-describedby="error-dialog-message"
+      >
         <div className="error-dialog-header">
           <div className="error-dialog-title">
             <span 
@@ -118,7 +125,7 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({
             >
               {getSeverityIcon(errorData.severity)}
             </span>
-            <h2>{errorData.title}</h2>
+            <h2 id="error-dialog-title">{errorData.title}</h2>
           </div>
           <button 
             className="error-dialog-close"
@@ -131,7 +138,7 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({
 
         <div className="error-dialog-content">
           <div className="error-message">
-            <p>{errorData.message}</p>
+            <p id="error-dialog-message">{errorData.message}</p>
           </div>
 
           {errorData.timestamp && (

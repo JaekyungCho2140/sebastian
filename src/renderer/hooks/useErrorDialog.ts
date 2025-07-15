@@ -32,6 +32,8 @@ export const useErrorDialog = (): UseErrorDialogReturn => {
       // electronAPI가 사용 가능한지 확인
       if (window.electronAPI && window.electronAPI.reportError) {
         await window.electronAPI.reportError({
+          title: data.title,
+          message: data.message,
           error: data.error || new Error(data.message),
           errorType: 'javascript',
           severity: data.severity || 'medium',

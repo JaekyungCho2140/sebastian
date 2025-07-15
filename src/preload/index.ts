@@ -9,7 +9,9 @@ import {
   AppState,
   UpdateInfo,
   RendererErrorReport,
-  ErrorDialogData
+  ErrorDialogData,
+  UpdateProgress,
+  UpdateDialogData
 } from '../shared/types'
 
 // Configure renderer logging
@@ -52,9 +54,20 @@ function safeOn<T extends keyof IpcEvents>(
   ipcRenderer.on(channel, wrappedCallback)
 }
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
-contextBridge.exposeInMainWorld('electronAPI', {
+
+// Generic event listener methods
+function safeRemoveListener<T extends keyof IpcEvents>(
+  channel: T,
+  callback: (data: IpcEvents[T]) => void
+): void {
+  const wrappedCallback = (event: Electron.IpcRendererEvent, data: IpcEvents[T]) => {
+    callback(data)
+  }
+  ipcRenderer.removeListener(channel, wrappedCallback)
+}
+
+// Add generic event listener methods to the API
+const electronAPI = {
   // System information
   getVersion: () => safeInvoke(IPC_CHANNELS.GET_VERSION),
   
@@ -78,7 +91,37 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // App restart
   restartApp: () => safeInvoke(IPC_CHANNELS.RESTART_APP),
   
-  // Event listeners
+  // Update methods
+  updateNow: () => safeInvoke(IPC_CHANNELS.UPDATE_NOW),
+  updateLater: () => safeInvoke(IPC_CHANNELS.UPDATE_LATER),
+  ignoreUpdate: (version: string) => safeInvoke(IPC_CHANNELS.IGNORE_UPDATE, version),
+  downloadUpdate: () => safeInvoke(IPC_CHANNELS.DOWNLOAD_UPDATE),
+  installUpdate: () => safeInvoke(IPC_CHANNELS.INSTALL_UPDATE),
+  
+  // Generic invoke method
+  invoke: <T extends keyof IpcRequests>(
+    channel: T,
+    ...args: IpcRequests[T] extends void ? [] : [IpcRequests[T]]
+  ) => safeInvoke(channel, ...args),
+  
+  // Generic event listener methods
+  on: <T extends keyof IpcEvents>(channel: T, callback: (data: IpcEvents[T]) => void) => {
+    safeOn(channel, callback)
+  },
+  
+  removeListener: <T extends keyof IpcEvents>(channel: T, callback: (data: IpcEvents[T]) => void) => {
+    safeRemoveListener(channel, callback)
+  },
+  
+  // Remove all listeners for a channel
+  removeAllListeners: (channel: string) => {
+    ipcRenderer.removeAllListeners(channel)
+  },
+  
+  // Utility to check if API is available
+  isAvailable: () => true,
+  
+  // Specific event listeners for convenience
   onUpdateAvailable: (callback: (updateInfo: UpdateInfo) => void) => {
     safeOn(IPC_CHANNELS.UPDATE_AVAILABLE, callback)
   },
@@ -91,33 +134,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     safeOn(IPC_CHANNELS.SHOW_ERROR_DIALOG, callback)
   },
   
-  // Remove listeners
-  removeAllListeners: (channel: string) => {
-    ipcRenderer.removeAllListeners(channel)
+  onUpdateProgress: (callback: (progress: UpdateProgress) => void) => {
+    safeOn(IPC_CHANNELS.UPDATE_PROGRESS, callback)
   },
   
-  // Utility to check if API is available
-  isAvailable: () => true
-})
-
-// Types for the exposed API
-declare global {
-  interface Window {
-    electronAPI: {
-      getVersion: () => Promise<string>
-      showSuccessDialog: () => Promise<void>
-      checkForUpdates: () => Promise<UpdateInfo | null>
-      getAppState: () => Promise<AppState>
-      setAppState: (state: Partial<AppState>) => Promise<void>
-      minimizeWindow: () => Promise<void>
-      closeWindow: () => Promise<void>
-      reportError: (errorReport: RendererErrorReport) => Promise<string | null>
-      restartApp: () => Promise<void>
-      onUpdateAvailable: (callback: (updateInfo: UpdateInfo) => void) => void
-      onUpdateDownloaded: (callback: () => void) => void
-      onShowErrorDialog: (callback: (errorData: ErrorDialogData) => void) => void
-      removeAllListeners: (channel: string) => void
-      isAvailable: () => boolean
-    }
+  onUpdateError: (callback: (error: string) => void) => {
+    safeOn(IPC_CHANNELS.UPDATE_ERROR, callback)
+  },
+  
+  onShowUpdateDialog: (callback: (data: UpdateDialogData) => void) => {
+    safeOn(IPC_CHANNELS.SHOW_UPDATE_DIALOG, callback)
   }
 }
+
+// Re-export the API from the contextBridge setup
+contextBridge.exposeInMainWorld('electronAPI', electronAPI)
+
+// Types are defined in shared/types.ts

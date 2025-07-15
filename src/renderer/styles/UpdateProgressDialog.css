@@ -1,0 +1,389 @@
+/* Update Progress Dialog Styles */
+
+/* CSS Variables for Update Progress Dialog */
+:root {
+  --progress-primary: #3b82f6;
+  --progress-success: #10b981;
+  --progress-warning: #f59e0b;
+  --progress-cancel: #ef4444;
+  --progress-cancel-hover: #dc2626;
+  
+  --progress-bg: #e5e7eb;
+  --progress-fill: var(--progress-primary);
+  --progress-text: #374151;
+  
+  --dialog-bg: #ffffff;
+  --dialog-border: #e5e7eb;
+  --dialog-shadow: rgba(0, 0, 0, 0.1);
+  --dialog-overlay-bg: rgba(0, 0, 0, 0.6);
+  
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  --border-radius: 8px;
+  --dialog-max-width: 500px;
+  --dialog-max-height: 70vh;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --dialog-bg: #1f2937;
+    --dialog-border: #374151;
+    --dialog-shadow: rgba(0, 0, 0, 0.3);
+    --dialog-overlay-bg: rgba(0, 0, 0, 0.8);
+    
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    
+    --progress-bg: #374151;
+    --progress-text: #d1d5db;
+  }
+}
+
+/* Dialog Overlay */
+.update-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--dialog-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Dialog Container */
+.update-progress-dialog {
+  background-color: var(--dialog-bg);
+  border: 1px solid var(--dialog-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0 20px 25px -5px var(--dialog-shadow), 0 10px 10px -5px var(--dialog-shadow);
+  max-width: var(--dialog-max-width);
+  max-height: var(--dialog-max-height);
+  width: 90vw;
+  margin: 20px;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dialog Header */
+.update-progress-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--dialog-border);
+}
+
+.update-progress-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.update-progress-title .progress-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.update-progress-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+/* Dialog Content */
+.update-progress-content {
+  padding: 20px 24px;
+}
+
+.progress-stage {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.stage-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Progress Bar Container */
+.progress-container {
+  margin-bottom: 20px;
+}
+
+.progress-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 12px;
+  background-color: var(--progress-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--progress-fill) 0%, #60a5fa 100%);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Download Details */
+.download-details {
+  margin-top: 16px;
+}
+
+.download-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.download-size,
+.download-speed {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.estimated-time {
+  text-align: center;
+}
+
+.time-remaining {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Install Details */
+.install-details {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.install-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Complete Details */
+.complete-details {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.complete-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--progress-success);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Dialog Actions */
+.update-progress-actions {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--dialog-border);
+  display: flex;
+  justify-content: center;
+}
+
+.dialog-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-width: 100px;
+  text-align: center;
+}
+
+.dialog-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dialog-button.cancel {
+  background-color: transparent;
+  color: var(--progress-cancel);
+  border-color: var(--progress-cancel);
+}
+
+.dialog-button.cancel:hover:not(:disabled) {
+  background-color: var(--progress-cancel);
+  color: white;
+}
+
+/* Success state styling */
+.update-progress-dialog.complete .progress-fill {
+  background: linear-gradient(90deg, var(--progress-success) 0%, #34d399 100%);
+}
+
+.update-progress-dialog.complete .progress-icon {
+  color: var(--progress-success);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .update-progress-dialog {
+    width: 95vw;
+    margin: 10px;
+    max-height: 80vh;
+  }
+  
+  .update-progress-header {
+    padding: 16px 20px 12px;
+  }
+  
+  .update-progress-content {
+    padding: 16px 20px;
+  }
+  
+  .update-progress-actions {
+    padding: 12px 20px 16px;
+  }
+  
+  .update-progress-title h2 {
+    font-size: 16px;
+  }
+  
+  .download-info {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  
+  .progress-bar-wrapper {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .progress-percentage {
+    text-align: center;
+    min-width: auto;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .update-progress-overlay,
+  .update-progress-dialog,
+  .progress-fill,
+  .progress-fill::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus management */
+.dialog-button:focus {
+  outline: 2px solid var(--progress-primary);
+  outline-offset: 2px;
+}
+
+/* Loading pulse animation for indeterminate progress */
+.progress-bar.indeterminate .progress-fill {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Error state styling */
+.update-progress-dialog.error .progress-fill {
+  background: linear-gradient(90deg, var(--progress-cancel) 0%, #f87171 100%);
+}
+
+.update-progress-dialog.error .progress-icon {
+  color: var(--progress-cancel);
+}
+
+/* Warning state styling */
+.update-progress-dialog.warning .progress-fill {
+  background: linear-gradient(90deg, var(--progress-warning) 0%, #fbbf24 100%);
+}
+
+.update-progress-dialog.warning .progress-icon {
+  color: var(--progress-warning);
+}

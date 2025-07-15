@@ -1,14 +1,14 @@
 {
-  "timestamp": "2025-07-15T07:20:10.735Z",
+  "timestamp": "2025-07-15T10:16:03.456Z",
   "version": "0.2.0",
   "platform": "linux",
   "nodeVersion": "v22.17.0",
-  "totalDuration": 2237,
+  "totalDuration": 2464,
   "results": [
     {
       "name": "Basic Infrastructure Tests",
       "status": "PASS",
-      "duration": 2107,
+      "duration": 1999,
       "message": "Test suite passed",
       "details": "🧪 LocalErrorReporter 통합 테스트 시작\n\n✅ ErrorReport 타입 구조 검증\n✅ LocalErrorReporter 클래스 파일 존재\n✅ 유틸리티 모듈들 존재 확인\n✅ 모듈 임포트 및 기본 인스턴스 생성\n✅ 에러 리포팅 설정 검증\n✅ 기본 데이터 마스킹 패턴 검증\n✅ 로그 로테이션 로직 구현 확인\n✅ TypeScript 컴파일 호환성\n\n📊 테스트 결과:\n   통과: 8/8\n   실패: 0/8\n\n🎉 모든 테스트 통과!\n"
     },
@@ -22,32 +22,32 @@
     {
       "name": "Report Error Functionality",
       "status": "PASS",
-      "duration": 2,
+      "duration": 3,
       "message": "Test suite passed"
     },
     {
       "name": "Error Scenarios Validation",
-      "status": "FAIL",
-      "duration": 90,
-      "message": "Test suite failed"
+      "status": "PASS",
+      "duration": 409,
+      "message": "Test suite passed"
     },
     {
       "name": "Dialog Automation Tests",
-      "status": "FAIL",
-      "duration": 15,
-      "message": "Test suite failed"
+      "status": "PASS",
+      "duration": 17,
+      "message": "Test suite passed"
     },
     {
       "name": "File System & Log Rotation",
       "status": "PASS",
-      "duration": 4,
+      "duration": 18,
       "message": "Test suite passed"
     }
   ],
   "summary": {
     "total": 6,
-    "passed": 4,
-    "failed": 2,
-    "successRate": "66.7"
+    "passed": 6,
+    "failed": 0,
+    "successRate": "100.0"
   }
 }

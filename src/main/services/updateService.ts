@@ -1,7 +1,11 @@
 import { EventEmitter } from 'events'
 import { net } from 'electron'
-import { AppState, UpdateInfo, IpcError } from '../../shared/types'
+import { AppState, UpdateInfo, IpcError, UpdateProgress } from '../../shared/types'
 import { StateManager } from '../state-manager'
+import { UpdateDownloader, DownloadOptions } from './updateDownloader'
+import { UpdateInstaller, InstallOptions } from './updateInstaller'
+import { join } from 'path'
+import { app } from 'electron'
 
 export interface UpdateServiceOptions {
   githubRepo: string
@@ -52,6 +56,11 @@ export class UpdateService extends EventEmitter {
   private circuitBreakerOpen = false
   private circuitBreakerResetTime = 0
   private lastSuccessfulCheck = 0
+  private downloader: UpdateDownloader
+  private installer: UpdateInstaller
+  private downloadPath: string
+  private currentDownloadInfo?: UpdateInfo
+  private currentInstallPath?: string
 
   constructor(stateManager: StateManager, options: UpdateServiceOptions) {
     super()
@@ -64,6 +73,10 @@ export class UpdateService extends EventEmitter {
       requestTimeout: options.requestTimeout || 30000, // 30 seconds
       proxySettings: options.proxySettings
     }
+    
+    this.downloader = new UpdateDownloader()
+    this.installer = new UpdateInstaller()
+    this.downloadPath = join(app.getPath('temp'), 'sebastian-updates')
     
     this.setupEventListeners()
   }
@@ -86,6 +99,31 @@ export class UpdateService extends EventEmitter {
         isUpdateAvailable: false,
         lastUpdateCheck: Date.now()
       })
+    })
+
+    // Download event listeners
+    this.downloader.on('progress', (progress: UpdateProgress) => {
+      this.emit('downloadProgress', progress)
+    })
+
+    this.downloader.on('downloadRetry', (retryInfo: any) => {
+      console.log('Download retry:', retryInfo)
+      this.emit('downloadRetry', retryInfo)
+    })
+
+    this.downloader.on('downloadCancelled', (cancelInfo: any) => {
+      console.log('Download cancelled:', cancelInfo)
+      this.emit('downloadCancelled', cancelInfo)
+    })
+
+    // Install event listeners
+    this.installer.on('progress', (progress: UpdateProgress) => {
+      this.emit('installProgress', progress)
+    })
+
+    this.installer.on('installationCancelled', () => {
+      console.log('Installation cancelled')
+      this.emit('installationCancelled')
     })
   }
 
@@ -112,6 +150,8 @@ export class UpdateService extends EventEmitter {
       this.checkTimer = undefined
     }
     
+    this.downloader.cleanup()
+    this.installer.cleanup()
     this.removeAllListeners()
   }
 
@@ -157,11 +197,13 @@ export class UpdateService extends EventEmitter {
     const hasUpdate = this.compareVersions(currentVersion, latestRelease.tag_name)
     
     if (hasUpdate) {
+      const downloadAsset = this.getDownloadAsset(latestRelease)
       const updateInfo: UpdateInfo = {
         version: latestRelease.tag_name,
         releaseDate: latestRelease.published_at,
         downloadUrl: this.getDownloadUrl(latestRelease),
-        changelog: latestRelease.body
+        changelog: latestRelease.body,
+        downloadSize: downloadAsset?.size
       }
       
       this.emit('updateAvailable', updateInfo)
@@ -274,7 +316,7 @@ export class UpdateService extends EventEmitter {
     return false // Versions are equal
   }
 
-  private getDownloadUrl(release: GitHubRelease): string {
+  private getDownloadAsset(release: GitHubRelease): GitHubAsset | undefined {
     // Look for MSI file first, then exe, then any Windows asset
     const windowsAssets = release.assets.filter(asset => 
       asset.name.toLowerCase().includes('win') || 
@@ -285,11 +327,16 @@ export class UpdateService extends EventEmitter {
     if (windowsAssets.length > 0) {
       // Prefer MSI over exe
       const msiAsset = windowsAssets.find(asset => asset.name.toLowerCase().includes('msi'))
-      return msiAsset?.browser_download_url || windowsAssets[0].browser_download_url
+      return msiAsset || windowsAssets[0]
     }
     
     // Fallback to first asset
-    return release.assets[0]?.browser_download_url || ''
+    return release.assets[0]
+  }
+
+  private getDownloadUrl(release: GitHubRelease): string {
+    const asset = this.getDownloadAsset(release)
+    return asset?.browser_download_url || ''
   }
 
   private onCheckSuccess(): void {
@@ -382,5 +429,141 @@ export class UpdateService extends EventEmitter {
 
   public isCircuitBreakerOpen(): boolean {
     return this.circuitBreakerOpen
+  }
+
+  public async downloadUpdate(updateInfo: UpdateInfo): Promise<string> {
+    if (!updateInfo.downloadUrl) {
+      throw new Error('No download URL available')
+    }
+
+    this.currentDownloadInfo = updateInfo
+    
+    // Extract filename from URL
+    const url = new URL(updateInfo.downloadUrl)
+    const filename = url.pathname.split('/').pop() || `sebastian-${updateInfo.version}.msi`
+    const filePath = join(this.downloadPath, filename)
+
+    const downloadOptions: DownloadOptions = {
+      url: updateInfo.downloadUrl,
+      filePath,
+      expectedSize: updateInfo.downloadSize,
+      timeout: 10 * 60 * 1000, // 10 minutes
+      retries: 3,
+      retryDelay: 5000
+    }
+
+    try {
+      const result = await this.downloader.downloadUpdate(downloadOptions)
+      
+      if (result.success) {
+        this.emit('downloadComplete', { 
+          updateInfo, 
+          filePath: result.filePath,
+          fileSize: result.actualSize 
+        })
+        return result.filePath!
+      } else {
+        throw new Error(result.error || 'Download failed')
+      }
+    } catch (error) {
+      this.emit('downloadError', { 
+        updateInfo, 
+        error: error instanceof Error ? error.message : 'Download failed' 
+      })
+      throw error
+    }
+  }
+
+  public cancelDownload(): void {
+    if (this.currentDownloadInfo?.downloadUrl) {
+      this.downloader.cancelDownload(this.currentDownloadInfo.downloadUrl)
+      this.currentDownloadInfo = undefined
+    }
+  }
+
+  public isDownloading(): boolean {
+    return this.currentDownloadInfo ? 
+      this.downloader.isDownloading(this.currentDownloadInfo.downloadUrl) : 
+      false
+  }
+
+  public getCurrentDownloadInfo(): UpdateInfo | undefined {
+    return this.currentDownloadInfo
+  }
+
+  public async installUpdate(msiPath: string, options?: Partial<InstallOptions>): Promise<void> {
+    if (!msiPath) {
+      throw new Error('No MSI file path provided')
+    }
+
+    this.currentInstallPath = msiPath
+
+    const installOptions: InstallOptions = {
+      msiPath,
+      silentInstall: true,
+      elevatePermissions: true,
+      timeout: 10 * 60 * 1000, // 10 minutes
+      createDesktopShortcut: true,
+      createStartMenuShortcut: true,
+      ...options
+    }
+
+    try {
+      const result = await this.installer.installUpdate(installOptions)
+      
+      if (result.success) {
+        this.emit('installComplete', { 
+          msiPath, 
+          installPath: result.installPath,
+          duration: result.duration,
+          exitCode: result.exitCode 
+        })
+      } else {
+        throw new Error(result.error || 'Installation failed')
+      }
+    } catch (error) {
+      this.emit('installError', { 
+        msiPath, 
+        error: error instanceof Error ? error.message : 'Installation failed' 
+      })
+      throw error
+    } finally {
+      this.currentInstallPath = undefined
+    }
+  }
+
+  public cancelInstallation(): void {
+    this.installer.cancelInstallation()
+    this.currentInstallPath = undefined
+  }
+
+  public isInstalling(): boolean {
+    return this.installer.isInstalling()
+  }
+
+  public getCurrentInstallPath(): string | undefined {
+    return this.currentInstallPath
+  }
+
+  public async openInstallationLog(): Promise<void> {
+    await this.installer.openInstallationLog()
+  }
+
+  public async downloadAndInstall(updateInfo: UpdateInfo): Promise<void> {
+    try {
+      // First download the update
+      const downloadedFilePath = await this.downloadUpdate(updateInfo)
+      
+      // Then install it
+      await this.installUpdate(downloadedFilePath)
+      
+      this.emit('updateComplete', { updateInfo, filePath: downloadedFilePath })
+    } catch (error) {
+      this.emit('updateError', { 
+        updateInfo, 
+        error: error instanceof Error ? error.message : 'Update failed' 
+      })
+      throw error
+    }
   }
 }

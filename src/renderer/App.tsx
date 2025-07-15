@@ -2,10 +2,14 @@ import React, { useEffect } from 'react'
 import MainContent from './components/MainContent'
 import Footer from './components/Footer'
 import ErrorDialog from './components/ErrorDialog'
+import UpdateDialog from './components/UpdateDialog'
+import UpdateProgressDialog from './components/UpdateProgressDialog'
 import { useErrorDialog, createErrorDialogData } from './hooks/useErrorDialog'
+import { useUpdateManager } from './hooks/useUpdateManager'
 
 const App: React.FC = () => {
   const { isOpen, errorData, showError, closeDialog, reportError, restartApp } = useErrorDialog()
+  const updateManager = useUpdateManager()
 
   // 전역 에러 핸들러 설정
   useEffect(() => {
@@ -68,6 +72,27 @@ const App: React.FC = () => {
         onClose={closeDialog}
         onReport={reportError}
         onRestart={restartApp}
+      />
+      
+      <UpdateDialog
+        isOpen={updateManager.isShowingUpdateDialog}
+        updateData={updateManager.updateInfo ? {
+          updateInfo: updateManager.updateInfo,
+          isUpdateAvailable: updateManager.isUpdateAvailable
+        } : null}
+        onClose={updateManager.hideUpdateDialog}
+        onUpdateNow={updateManager.updateNow}
+        onUpdateLater={updateManager.updateLater}
+        onIgnoreUpdate={updateManager.ignoreUpdate}
+      />
+      
+      <UpdateProgressDialog
+        isOpen={updateManager.isDownloading || updateManager.isInstalling}
+        progress={updateManager.downloadProgress}
+        onCancel={updateManager.isDownloading ? () => {
+          // TODO: Implement cancel download
+        } : undefined}
+        canCancel={updateManager.isDownloading && !updateManager.isInstalling}
       />
     </div>
   )
