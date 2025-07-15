@@ -134,9 +134,16 @@ export class UpdateService extends EventEmitter {
     const state = await this.stateManager.getState()
     const timeSinceLastCheck = Date.now() - state.lastUpdateCheck
     
-    if (timeSinceLastCheck > this.options.checkInterval) {
-      await this.checkForUpdates()
-    }
+    console.log('=== UPDATE SERVICE DEBUG ===')
+    console.log('Current version:', state.version)
+    console.log('Last update check:', new Date(state.lastUpdateCheck))
+    console.log('Time since last check (ms):', timeSinceLastCheck)
+    console.log('Check interval (ms):', this.options.checkInterval)
+    console.log('Should check for updates:', timeSinceLastCheck > this.options.checkInterval)
+    
+    // Force update check for debugging (remove in production)
+    console.log('Forcing update check for debugging...')
+    await this.checkForUpdates()
     
     // Set up periodic checking
     this.scheduleNextCheck()
@@ -223,6 +230,9 @@ export class UpdateService extends EventEmitter {
     return new Promise((resolve, reject) => {
       const url = `https://api.github.com/repos/${this.options.githubRepo}/releases/latest`
       
+      console.log('=== GITHUB API DEBUG ===')
+      console.log('Fetching from URL:', url)
+      
       const request = net.request({
         method: 'GET',
         url: url
@@ -260,13 +270,23 @@ export class UpdateService extends EventEmitter {
           try {
             const release = JSON.parse(responseData) as GitHubRelease
             
+            console.log('Parsed release:', {
+              tag_name: release.tag_name,
+              name: release.name,
+              published_at: release.published_at,
+              draft: release.draft,
+              prerelease: release.prerelease
+            })
+            
             // Filter out draft and pre-release versions
             if (release.draft || release.prerelease) {
+              console.log('Skipping draft/prerelease version')
               resolve(null)
             } else {
               resolve(release)
             }
           } catch (parseError) {
+            console.error('JSON parse error:', parseError)
             reject(new Error('Failed to parse GitHub API response'))
           }
         })
@@ -296,23 +316,44 @@ export class UpdateService extends EventEmitter {
   }
 
   private compareVersions(current: string, latest: string): boolean {
+    console.log('=== VERSION COMPARISON DEBUG ===')
+    console.log('Current version (raw):', current)
+    console.log('Latest version (raw):', latest)
+    
     // Remove 'v' prefix if present
     const currentClean = current.replace(/^v/, '')
     const latestClean = latest.replace(/^v/, '')
     
+    console.log('Current version (clean):', currentClean)
+    console.log('Latest version (clean):', latestClean)
+    
     const currentParts = currentClean.split('.').map(Number)
     const latestParts = latestClean.split('.').map(Number)
+    
+    console.log('Current parts:', currentParts)
+    console.log('Latest parts:', latestParts)
     
     // Ensure both arrays have the same length
     const maxLength = Math.max(currentParts.length, latestParts.length)
     while (currentParts.length < maxLength) currentParts.push(0)
     while (latestParts.length < maxLength) latestParts.push(0)
     
+    console.log('Normalized current parts:', currentParts)
+    console.log('Normalized latest parts:', latestParts)
+    
     for (let i = 0; i < maxLength; i++) {
-      if (latestParts[i] > currentParts[i]) return true
-      if (latestParts[i] < currentParts[i]) return false
+      console.log(`Comparing part ${i}: ${latestParts[i]} > ${currentParts[i]}`)
+      if (latestParts[i] > currentParts[i]) {
+        console.log('Update available: true')
+        return true
+      }
+      if (latestParts[i] < currentParts[i]) {
+        console.log('Update available: false (latest is older)')
+        return false
+      }
     }
     
+    console.log('Update available: false (versions are equal)')
     return false // Versions are equal
   }
 

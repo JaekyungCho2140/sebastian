@@ -76,14 +76,37 @@ export class StateManager {
         }
       }
 
-      // 폴백 2: 하드코딩된 버전 (최후의 수단)
-      console.warn('Could not find version from any source, using hardcoded version')
-      return '0.1.16'
+      // 폴백 2: 현재 디렉토리의 package.json에서 직접 읽기 (최후의 수단)
+      try {
+        const rootPackageJson = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'))
+        if (rootPackageJson.version) {
+          console.log('Found version in root package.json:', rootPackageJson.version)
+          return rootPackageJson.version
+        }
+      } catch (rootError) {
+        console.log('Could not read root package.json:', rootError.message)
+      }
+
+      // 폴백 3: 절대 최후의 수단 - 동적으로 현재 package.json에서 읽기
+      console.warn('Could not find version from any source, attempting to use default')
+      
+      // 빌드 시점의 package.json 버전을 사용하도록 개선
+      // 이는 빌드 프로세스에서 자동으로 설정되어야 함
+      const buildTimeVersion = process.env.SEBASTIAN_VERSION || '0.1.21'
+      console.log('Using build-time version from env:', buildTimeVersion)
+      return buildTimeVersion
     } catch (error) {
       console.error('Failed to read version:', error)
       console.error('App path:', app.isPackaged ? app.getAppPath() : process.cwd())
       console.error('Is packaged:', app.isPackaged)
-      return '0.1.16'
+      
+      // 오류 시에도 동적으로 처리
+      try {
+        const rootPackageJson = JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json'), 'utf8'))
+        return rootPackageJson.version || '0.1.0'
+      } catch {
+        return '0.1.0'
+      }
     }
   }
 
