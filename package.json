@@ -7,7 +7,7 @@
     "task-master-ai": "^0.19.0"
   },
   "name": "sebastian",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "build:clean": "rimraf dist",
     "build:renderer": "vite build",
     "build:main": "tsc --project tsconfig.main.json",
-    "build:preload": "tsc --target es2020 --module es2020 --outDir dist/preload --moduleResolution node --esModuleInterop --skipLibCheck src/preload/index.ts",
+    "build:preload": "tsc --target es2020 --module es2020 --outDir dist --moduleResolution node --esModuleInterop --skipLibCheck src/preload/index.ts",
     "preview": "vite preview",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win",
