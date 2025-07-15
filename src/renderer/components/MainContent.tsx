@@ -14,7 +14,7 @@ const MainContent: React.FC = () => {
         </div>
       </div>
       <div className="text-center">
-        <h1 className="mb-4 font-semibold">Sebastian</h1>
+        <h1 className="mb-4 font-semibold">Sebastian+++</h1>
       </div>
     </div>
   )
