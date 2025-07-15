@@ -84,7 +84,7 @@ export class StateManager {
           return rootPackageJson.version
         }
       } catch (rootError) {
-        console.log('Could not read root package.json:', rootError.message)
+        console.log('Could not read root package.json:', rootError instanceof Error ? rootError.message : String(rootError))
       }
 
       // 폴백 3: 절대 최후의 수단 - 동적으로 현재 package.json에서 읽기
