@@ -15,8 +15,7 @@
   },
   "include": [
     "src/renderer/**/*",
-    "src/preload/**/*",
-    "src/shared/**/*"
+    "src/preload/**/*"
   ],
   "exclude": [
     "src/main/**/*",
