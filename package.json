@@ -1,12 +1,13 @@
 {
   "dependencies": {
+    "electron-log": "^5.4.1",
     "electron-store": "^10.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "task-master-ai": "^0.19.0"
   },
   "name": "sebastian",
-  "version": "0.1.15",
+  "version": "0.1.6",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
@@ -25,7 +26,15 @@
     "dist:win-portable": "npm run build && electron-builder --win --portable",
     "pack": "npm run build && electron-builder --dir",
     "postinstall": "electron-builder install-app-deps",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/end-to-end-test.js",
+    "test:integration": "node tests/error-reporter.test.js",
+    "test:schema": "node tests/schema-compatibility.test.js",
+    "test:report-error": "node tests/report-error-test.js",
+    "test:scenarios": "node tests/error-scenarios-test.js",
+    "test:dialog": "node tests/dialog-automation-test.js",
+    "test:filesystem": "node tests/filesystem-rotation-test.js",
+    "test:e2e": "node tests/end-to-end-test.js",
+    "test:all": "npm run test:integration && npm run test:schema && npm run test:report-error && npm run test:scenarios && npm run test:dialog && npm run test:filesystem",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
