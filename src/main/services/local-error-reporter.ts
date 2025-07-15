@@ -115,7 +115,7 @@ export class LocalErrorReporter {
     const cpu = cpus()[0]
     
     return {
-      platform: platform(),
+      platform: platform(), // Windows platform
       arch: arch(),
       osVersion: release(),
       nodeVersion: process.versions.node,

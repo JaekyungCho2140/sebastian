@@ -222,18 +222,9 @@ app.on('window-all-closed', async () => {
   // Cleanup services before quitting
   await cleanup()
   
-  // On macOS, keep the app running even when all windows are closed
-  if (process.platform !== 'darwin') {
-    log.info('Quitting application')
-    app.quit()
-  }
-})
-
-// On macOS, re-create window when dock icon is clicked
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
+  // Windows: quit the application when all windows are closed
+  log.info('Quitting application')
+  app.quit()
 })
 
 // Security: Prevent new window creation

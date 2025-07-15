@@ -55,11 +55,7 @@ jobs:
   build-verification:
     name: Build Verification
     needs: code-quality
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    runs-on: windows-latest
     
     steps:
       - name: Checkout repository
@@ -105,20 +101,19 @@ jobs:
           echo "✅ Preload script built successfully"
         shell: bash
         
-      - name: Test electron packaging (Ubuntu only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Test electron packaging
         run: |
           echo "Testing electron packaging without installer creation..."
           npm run pack
           
-          if [ ! -d "release" ]; then
+          if (!(Test-Path "release")) {
             echo "❌ Packaging failed: release directory not found"
             exit 1
-          fi
+          }
           echo "✅ Electron packaging successful"
+        shell: powershell
         
-      - name: Upload build artifacts (Ubuntu only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ needs.code-quality.outputs.build-cache-key }}

@@ -1,66 +1,135 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import log from 'electron-log/renderer'
-import { 
-  IPC_CHANNELS, 
-  IpcRequests, 
-  IpcResponses, 
-  IpcEvents,
-  IpcErrorResponse,
-  AppState,
-  UpdateInfo,
-  RendererErrorReport,
-  ErrorDialogData,
-  UpdateProgress,
-  UpdateDialogData
-} from '../shared/types'
 
-// Configure renderer logging
-log.transports.console.level = 'debug'
+// IPC Channel constants - copied from shared/types to avoid module dependency in preload
+const IPC_CHANNELS = {
+  GET_VERSION: 'get-version',
+  SHOW_SUCCESS_DIALOG: 'show-success-dialog',
+  CHECK_FOR_UPDATES: 'check-for-updates',
+  GET_APP_STATE: 'get-app-state',
+  SET_APP_STATE: 'set-app-state',
+  MINIMIZE_WINDOW: 'minimize-window',
+  CLOSE_WINDOW: 'close-window',
+  REPORT_ERROR: 'report-error',
+  SHOW_ERROR_DIALOG: 'show-error-dialog',
+  RESTART_APP: 'restart-app',
+  UPDATE_AVAILABLE: 'update-available',
+  UPDATE_DOWNLOADED: 'update-downloaded',
+  UPDATE_NOW: 'update-now',
+  UPDATE_LATER: 'update-later',
+  IGNORE_UPDATE: 'ignore-update',
+  DOWNLOAD_UPDATE: 'download-update',
+  INSTALL_UPDATE: 'install-update',
+  UPDATE_PROGRESS: 'update-progress',
+  UPDATE_ERROR: 'update-error',
+  SHOW_UPDATE_DIALOG: 'show-update-dialog'
+} as const
 
-log.info('Preload script loaded')
+// Basic type interfaces for preload context
+interface IpcErrorResponse {
+  error: true
+  code: string
+  message: string
+}
+
+interface AppState {
+  version: string
+  isUpdateAvailable: boolean
+  lastUpdateCheck: number
+  ignoredVersion?: string
+  userPreferences: {
+    theme: 'light' | 'dark'
+    language: 'ko' | 'en'
+  }
+}
+
+interface UpdateInfo {
+  version: string
+  releaseDate: string
+  downloadUrl: string
+  changelog: string
+  downloadSize?: number
+}
+
+interface RendererErrorReport {
+  message: string
+  stack?: string
+  componentStack?: string
+  errorBoundary?: string
+  errorInfo?: any
+  userAgent?: string
+  timestamp: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  type: 'javascript' | 'promise' | 'network' | 'ui' | 'user'
+  context?: Record<string, any>
+  userId?: string
+  sessionId?: string
+}
+
+interface ErrorDialogData {
+  title: string
+  message: string
+  details?: string
+  showRestartButton?: boolean
+  errorId?: string
+}
+
+interface UpdateProgress {
+  stage: 'downloading' | 'installing' | 'complete'
+  progress: number
+  message: string
+  downloadSize?: number
+  downloadedSize?: number
+  speed?: number
+}
+
+interface UpdateDialogData {
+  updateInfo: UpdateInfo
+  isUpdateAvailable: boolean
+}
+
+console.log('Preload script loaded')
 
 // Type-safe IPC invoke wrapper
-async function safeInvoke<T extends keyof IpcRequests>(
-  channel: T,
-  ...args: IpcRequests[T] extends void ? [] : [IpcRequests[T]]
-): Promise<IpcResponses[T]> {
+async function safeInvoke(
+  channel: string,
+  ...args: any[]
+): Promise<any> {
   try {
-    log.debug(`IPC invoke: ${channel}`)
+    console.log(`IPC invoke: ${channel}`)
     const result = await ipcRenderer.invoke(channel, ...args)
     
     // Check if result is an error response
     if (result && typeof result === 'object' && result.error === true) {
       const errorResponse = result as IpcErrorResponse
-      log.error(`IPC Error [${errorResponse.code}]: ${errorResponse.message}`)
+      console.error(`IPC Error [${errorResponse.code}]: ${errorResponse.message}`)
       throw new Error(`IPC Error [${errorResponse.code}]: ${errorResponse.message}`)
     }
     
-    log.debug(`IPC invoke success: ${channel}`)
+    console.log(`IPC invoke success: ${channel}`)
     return result
   } catch (error) {
-    log.error(`IPC invoke failed for channel "${channel}":`, error)
+    console.error(`IPC invoke failed for channel "${channel}":`, error)
     throw error
   }
 }
 
 // Event listener wrapper with type safety
-function safeOn<T extends keyof IpcEvents>(
-  channel: T,
-  callback: (data: IpcEvents[T]) => void
+function safeOn(
+  channel: string,
+  callback: (data: any) => void
 ): void {
-  const wrappedCallback = (event: Electron.IpcRendererEvent, data: IpcEvents[T]) => {
+  const wrappedCallback = (event: Electron.IpcRendererEvent, data: any) => {
     callback(data)
   }
   ipcRenderer.on(channel, wrappedCallback)
 }
 
-
 // Generic event listener methods
-function safeRemoveListener<T extends keyof IpcEvents>(
-  channel: T,
-  callback: (data: IpcEvents[T]) => void
+function safeRemoveListener(
+  channel: string,
+  callback: (data: any) => void
 ): void {
-  const wrappedCallback = (event: Electron.IpcRendererEvent, data: IpcEvents[T]) => {
+  const wrappedCallback = (event: Electron.IpcRendererEvent, data: any) => {
     callback(data)
   }
   ipcRenderer.removeListener(channel, wrappedCallback)
@@ -99,17 +168,14 @@ const electronAPI = {
   installUpdate: () => safeInvoke(IPC_CHANNELS.INSTALL_UPDATE),
   
   // Generic invoke method
-  invoke: <T extends keyof IpcRequests>(
-    channel: T,
-    ...args: IpcRequests[T] extends void ? [] : [IpcRequests[T]]
-  ) => safeInvoke(channel, ...args),
+  invoke: (channel: string, ...args: any[]) => safeInvoke(channel, ...args),
   
   // Generic event listener methods
-  on: <T extends keyof IpcEvents>(channel: T, callback: (data: IpcEvents[T]) => void) => {
+  on: (channel: string, callback: (data: any) => void) => {
     safeOn(channel, callback)
   },
   
-  removeListener: <T extends keyof IpcEvents>(channel: T, callback: (data: IpcEvents[T]) => void) => {
+  removeListener: (channel: string, callback: (data: any) => void) => {
     safeRemoveListener(channel, callback)
   },
   

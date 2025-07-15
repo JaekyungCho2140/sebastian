@@ -24,18 +24,6 @@ export class DataMasking {
       replacement: 'C:\\Users\\[USER]',
       description: 'Windows user directory paths'
     },
-    {
-      name: 'unix-home-path',
-      pattern: /\/home\/[^\/]+/gi,
-      replacement: '/home/[USER]',
-      description: 'Unix/Linux home directory paths'
-    },
-    {
-      name: 'mac-user-path',
-      pattern: /\/Users\/[^\/]+/gi,
-      replacement: '/Users/[USER]',
-      description: 'macOS user directory paths'
-    },
     
     // Email addresses
     {
