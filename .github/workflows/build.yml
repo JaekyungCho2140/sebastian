@@ -102,8 +102,18 @@ jobs:
           $tagName = "v$version"
           
           # Check if release already exists
-          $existingRelease = gh release view $tagName 2>$null
-          if ($LASTEXITCODE -eq 0) {
+          $releaseExists = $false
+          try {
+            $existingRelease = gh release view $tagName --json tagName 2>$null
+            if ($LASTEXITCODE -eq 0) {
+              $releaseExists = $true
+            }
+          } catch {
+            # Release doesn't exist, which is fine
+            $releaseExists = $false
+          }
+          
+          if ($releaseExists) {
             echo "🔄 Release $tagName already exists. Deleting and recreating..."
             try {
               gh release delete $tagName --yes
@@ -112,6 +122,8 @@ jobs:
               echo "❌ Failed to delete existing release: $_"
               exit 1
             }
+          } else {
+            echo "✅ Release $tagName does not exist. Creating new release..."
           }
           
           # Create new release
