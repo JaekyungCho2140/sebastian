@@ -89,4 +89,4 @@ tasks/
 .taskmaster/
 
 # test scripts
-tests/
+# tests/
