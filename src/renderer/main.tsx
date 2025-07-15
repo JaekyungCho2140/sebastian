@@ -1,7 +1,10 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import ErrorBoundary from './components/ErrorBoundary'
 import './styles/main.css'
+import './styles/ErrorDialog.css'
+import './styles/components/TestErrorButton.css'
 
 const container = document.getElementById('root')
 if (!container) throw new Error('Failed to find the root element')
@@ -10,6 +13,8 @@ const root = createRoot(container)
 
 root.render(
   <React.StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>
 )

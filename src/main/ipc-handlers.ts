@@ -1,4 +1,4 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import { 
   IPC_CHANNELS, 
   IpcRequests, 
@@ -6,10 +6,13 @@ import {
   IpcErrorResponse,
   AppState,
   UpdateInfo,
-  IpcError 
+  IpcError,
+  RendererErrorReport,
+  ErrorDialogData
 } from '../shared/types'
 import { getStateManager } from './state-manager'
 import { UpdateService } from './services/updateService'
+import { LocalErrorReporter } from './services/local-error-reporter'
 
 // Error handler wrapper
 function createErrorResponse(error: unknown, channel?: string): IpcErrorResponse {
@@ -47,9 +50,19 @@ function createHandler<T extends keyof IpcRequests>(
 // Update service instance
 let updateService: UpdateService | null = null
 
+// Error reporter instance
+let errorReporter: LocalErrorReporter | null = null
+
 // Initialize IPC handlers
 export function setupIpcHandlers(): void {
   const stateManager = getStateManager()
+  
+  // Initialize error reporter
+  errorReporter = new LocalErrorReporter({
+    reportingLevel: 'medium',
+    maxFiles: 100,
+    maxAge: 30
+  })
   
   // Initialize update service
   updateService = new UpdateService(stateManager, {
@@ -138,7 +151,69 @@ export function setupIpcHandlers(): void {
     }
   })
 
+  // Error reporting handler
+  createHandler(IPC_CHANNELS.REPORT_ERROR, async (errorReport: RendererErrorReport) => {
+    if (!errorReporter) {
+      throw new IpcError('Error reporter not initialized', 'ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      // Convert renderer error report to main process error report
+      const error = errorReport.error instanceof Error 
+        ? errorReport.error 
+        : new Error(String(errorReport.error))
+      
+      // Add renderer-specific context
+      const context = {
+        ...errorReport.context,
+        sessionId: errorReporter.getSessionId(),
+        url: errorReport.url,
+        customData: {
+          processType: 'renderer',
+          line: errorReport.line,
+          column: errorReport.column,
+          stack: errorReport.stack,
+          ...errorReport.context?.customData
+        }
+      }
+      
+      const reportId = await errorReporter.captureError(
+        error,
+        errorReport.errorType,
+        'renderer',
+        errorReport.severity || 'medium',
+        context
+      )
+      
+      return reportId
+    } catch (error) {
+      console.error('Failed to process renderer error report:', error)
+      throw new IpcError(
+        'Failed to process error report', 
+        'ERROR_REPORT_PROCESSING_FAILED'
+      )
+    }
+  })
+
+  // App restart handler
+  createHandler(IPC_CHANNELS.RESTART_APP, async () => {
+    console.log('Restarting application...')
+    
+    // Small delay to ensure response is sent back
+    setTimeout(() => {
+      app.relaunch()
+      app.exit(0)
+    }, 100)
+  })
+
   console.log('IPC handlers initialized')
+}
+
+// Show error dialog in renderer process
+export function showErrorDialog(errorData: ErrorDialogData): void {
+  BrowserWindow.getAllWindows().forEach(window => {
+    window.webContents.send(IPC_CHANNELS.SHOW_ERROR_DIALOG, errorData)
+  })
 }
 
 // Get current app state (for use by other modules)

@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sebastian.app/schemas/error-config.json",
+  "title": "Sebastian Error Reporting Configuration",
+  "description": "Configuration schema for Sebastian error reporting system",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "maxBreadcrumbs",
+    "maxFileSize",
+    "maxFiles",
+    "maxAge",
+    "maxTotalSize",
+    "enableDataMasking",
+    "reportingLevel",
+    "enableSystemInfo"
+  ],
+  "properties": {
+    "maxBreadcrumbs": {
+      "type": "integer",
+      "description": "Maximum number of breadcrumbs to keep",
+      "minimum": 10,
+      "maximum": 500,
+      "default": 50
+    },
+    "maxFileSize": {
+      "type": "integer",
+      "description": "Maximum size of individual error report file in bytes",
+      "minimum": 1024,
+      "maximum": 50485760,
+      "default": 5242880
+    },
+    "maxFiles": {
+      "type": "integer",
+      "description": "Maximum number of error report files to keep",
+      "minimum": 10,
+      "maximum": 1000,
+      "default": 100
+    },
+    "maxAge": {
+      "type": "integer",
+      "description": "Maximum age of error reports in days",
+      "minimum": 1,
+      "maximum": 365,
+      "default": 30
+    },
+    "maxTotalSize": {
+      "type": "integer",
+      "description": "Maximum total size of all error reports in bytes",
+      "minimum": 10485760,
+      "maximum": 1073741824,
+      "default": 52428800
+    },
+    "enableDataMasking": {
+      "type": "boolean",
+      "description": "Enable automatic masking of sensitive data",
+      "default": true
+    },
+    "sensitiveDataPatterns": {
+      "type": "array",
+      "description": "Regular expression patterns for identifying sensitive data",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "maxItems": 50,
+      "default": [
+        "/home/[^/]+/",
+        "/Users/[^/]+/",
+        "C:\\\\Users\\\\[^\\\\]+\\\\",
+        "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"
+      ]
+    },
+    "reportingLevel": {
+      "type": "string",
+      "description": "Minimum severity level to report",
+      "enum": ["low", "medium", "high", "critical"],
+      "default": "medium"
+    },
+    "enableSystemInfo": {
+      "type": "boolean",
+      "description": "Include system information in error reports",
+      "default": true
+    },
+    "customMaskingRules": {
+      "type": "array",
+      "description": "Custom data masking rules",
+      "items": {
+        "type": "object",
+        "required": ["name", "pattern", "replacement"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Rule name",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Regular expression pattern",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "replacement": {
+            "type": "string",
+            "description": "Replacement text",
+            "maxLength": 100
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this rule is enabled",
+            "default": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "maxItems": 20
+    },
+    "excludeErrorTypes": {
+      "type": "array",
+      "description": "Error types to exclude from reporting",
+      "items": {
+        "type": "string",
+        "enum": [
+          "javascript",
+          "promise-rejection",
+          "react-component",
+          "main-process",
+          "ipc",
+          "filesystem",
+          "network"
+        ]
+      },
+      "maxItems": 7,
+      "uniqueItems": true
+    },
+    "excludeProcessTypes": {
+      "type": "array",
+      "description": "Process types to exclude from reporting",
+      "items": {
+        "type": "string",
+        "enum": ["main", "renderer", "preload"]
+      },
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "notificationSettings": {
+      "type": "object",
+      "description": "Settings for error notifications",
+      "properties": {
+        "enableDesktopNotifications": {
+          "type": "boolean",
+          "description": "Enable desktop notifications for critical errors",
+          "default": false
+        },
+        "criticalErrorsOnly": {
+          "type": "boolean",
+          "description": "Only show notifications for critical errors",
+          "default": true
+        },
+        "maxNotificationsPerSession": {
+          "type": "integer",
+          "description": "Maximum notifications per session",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

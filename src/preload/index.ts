@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
+import log from 'electron-log/renderer'
 import { 
   IPC_CHANNELS, 
   IpcRequests, 
@@ -6,8 +7,15 @@ import {
   IpcEvents,
   IpcErrorResponse,
   AppState,
-  UpdateInfo 
+  UpdateInfo,
+  RendererErrorReport,
+  ErrorDialogData
 } from '../shared/types'
+
+// Configure renderer logging
+log.transports.console.level = 'debug'
+
+log.info('Preload script loaded')
 
 // Type-safe IPC invoke wrapper
 async function safeInvoke<T extends keyof IpcRequests>(
@@ -15,17 +23,20 @@ async function safeInvoke<T extends keyof IpcRequests>(
   ...args: IpcRequests[T] extends void ? [] : [IpcRequests[T]]
 ): Promise<IpcResponses[T]> {
   try {
+    log.debug(`IPC invoke: ${channel}`)
     const result = await ipcRenderer.invoke(channel, ...args)
     
     // Check if result is an error response
     if (result && typeof result === 'object' && result.error === true) {
       const errorResponse = result as IpcErrorResponse
+      log.error(`IPC Error [${errorResponse.code}]: ${errorResponse.message}`)
       throw new Error(`IPC Error [${errorResponse.code}]: ${errorResponse.message}`)
     }
     
+    log.debug(`IPC invoke success: ${channel}`)
     return result
   } catch (error) {
-    console.error(`IPC invoke failed for channel "${channel}":`, error)
+    log.error(`IPC invoke failed for channel "${channel}":`, error)
     throw error
   }
 }
@@ -61,6 +72,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   minimizeWindow: () => safeInvoke(IPC_CHANNELS.MINIMIZE_WINDOW),
   closeWindow: () => safeInvoke(IPC_CHANNELS.CLOSE_WINDOW),
   
+  // Error reporting
+  reportError: (errorReport: RendererErrorReport) => safeInvoke(IPC_CHANNELS.REPORT_ERROR, errorReport),
+  
+  // App restart
+  restartApp: () => safeInvoke(IPC_CHANNELS.RESTART_APP),
+  
   // Event listeners
   onUpdateAvailable: (callback: (updateInfo: UpdateInfo) => void) => {
     safeOn(IPC_CHANNELS.UPDATE_AVAILABLE, callback)
@@ -68,6 +85,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   onUpdateDownloaded: (callback: () => void) => {
     safeOn(IPC_CHANNELS.UPDATE_DOWNLOADED, callback)
+  },
+  
+  onShowErrorDialog: (callback: (errorData: ErrorDialogData) => void) => {
+    safeOn(IPC_CHANNELS.SHOW_ERROR_DIALOG, callback)
   },
   
   // Remove listeners
@@ -90,8 +111,11 @@ declare global {
       setAppState: (state: Partial<AppState>) => Promise<void>
       minimizeWindow: () => Promise<void>
       closeWindow: () => Promise<void>
+      reportError: (errorReport: RendererErrorReport) => Promise<string | null>
+      restartApp: () => Promise<void>
       onUpdateAvailable: (callback: (updateInfo: UpdateInfo) => void) => void
       onUpdateDownloaded: (callback: () => void) => void
+      onShowErrorDialog: (callback: (errorData: ErrorDialogData) => void) => void
       removeAllListeners: (channel: string) => void
       isAvailable: () => boolean
     }

@@ -5,8 +5,11 @@
  * 2. Base styles and Reset
  * 3. Layout Components
  * 4. UI Components
- * 5. Utilities
+ * 5. Error Boundary
+ * 6. Utilities
  */
+
+@import './ErrorBoundary.css';
 
 /* 1. CSS Custom Properties */
 @import './variables.css';
@@ -16,6 +19,7 @@
 
 /* 3. Layout Components */
 @import './components/layout.css';
+@import './components/main-content.css';
 @import './components/grid.css';
 
 /* 4. UI Components */
@@ -56,7 +60,7 @@
   
   /* Text handling */
   text-align: center;
-  white-space: nowrap;
+  white-space: pre-line;
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
@@ -123,12 +127,12 @@
 /* Responsive adjustments for the fixed window size */
 @media (max-width: 640px) {
   .success-button {
-    width: 180px;
-    height: 80px;
-    min-width: 180px;
-    min-height: 80px;
-    max-width: 180px;
-    max-height: 80px;
+    width: var(--button-width);
+    height: var(--button-height);
+    min-width: var(--button-width);
+    min-height: var(--button-height);
+    max-width: var(--button-width);
+    max-height: var(--button-height);
     font-size: var(--font-size-base);
   }
 }

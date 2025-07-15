@@ -88,3 +88,5 @@ tasks.json
 tasks/
 .taskmaster/
 
+# test scripts
+tests/

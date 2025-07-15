@@ -43,20 +43,47 @@ export class StateManager {
     try {
       // 먼저 Electron의 app.getVersion()을 사용 (package.json에서 자동으로 읽음)
       const electronVersion = app.getVersion()
-      if (electronVersion && electronVersion !== '1.0.0') {
+      console.log('Electron version from app.getVersion():', electronVersion)
+      
+      if (electronVersion && electronVersion.trim() !== '' && electronVersion !== '1.0.0') {
         return electronVersion
       }
 
-      // 폴백: 직접 package.json 읽기
-      // 개발 환경에서는 process.cwd(), 패키징된 앱에서는 app.getAppPath() 사용
-      const appPath = app.isPackaged ? app.getAppPath() : process.cwd()
-      const packageJsonPath = join(appPath, 'package.json')
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'))
-      return packageJson.version || '1.0.0'
+      // 폴백 1: 여러 경로에서 package.json 찾기
+      const possiblePaths = [
+        // 개발 환경
+        join(process.cwd(), 'package.json'),
+        // 패키징된 앱 - 다양한 경로 시도
+        join(app.getAppPath(), 'package.json'),
+        join(app.getAppPath(), '..', 'package.json'),
+        join(app.getAppPath(), '..', '..', 'package.json'),
+        // 리소스 경로
+        join(process.resourcesPath, 'package.json'),
+        join(process.resourcesPath, '..', 'package.json')
+      ]
+
+      for (const packageJsonPath of possiblePaths) {
+        try {
+          console.log('Trying to read package.json from:', packageJsonPath)
+          const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'))
+          if (packageJson.version && packageJson.version !== '1.0.0') {
+            console.log('Found version in package.json:', packageJson.version)
+            return packageJson.version
+          }
+        } catch (pathError) {
+          console.log('Path not found:', packageJsonPath)
+          continue
+        }
+      }
+
+      // 폴백 2: 하드코딩된 버전 (최후의 수단)
+      console.warn('Could not find version from any source, using hardcoded version')
+      return '0.1.16'
     } catch (error) {
-      console.error('Failed to read version from package.json:', error)
+      console.error('Failed to read version:', error)
       console.error('App path:', app.isPackaged ? app.getAppPath() : process.cwd())
-      return '1.0.0'
+      console.error('Is packaged:', app.isPackaged)
+      return '0.1.16'
     }
   }
 

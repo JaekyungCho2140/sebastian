@@ -1,15 +1,38 @@
 /* Main Content Specific Styles */
 
+.button-row-container {
+  position: absolute !important;
+  top: var(--spacing-md) !important;
+  left: var(--spacing-md) !important;
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  z-index: 10;
+  transform: none !important;
+  margin: 0 !important;
+}
+
 .success-button-container {
-  position: absolute;
-  top: var(--spacing-md);
-  left: var(--spacing-md);
+  /* No additional positioning needed - flex handles it */
+}
+
+.test-error-container {
+  /* No additional positioning needed - flex handles it */
 }
 
 /* Responsive adjustments for button container */
 @media (max-width: 640px) {
-  .success-button-container {
+  .button-row-container {
     top: var(--spacing-sm);
     left: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-row-container {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

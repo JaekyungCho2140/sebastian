@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sebastian.app/schemas/error-report.json",
+  "title": "Sebastian Error Report",
+  "description": "Comprehensive error report structure for Sebastian application",
+  "type": "object",
+  "version": "1.0.0",
+  "required": [
+    "id",
+    "timestamp",
+    "severity",
+    "errorType",
+    "processType",
+    "message",
+    "systemInfo",
+    "schemaVersion"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the error report",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "timestamp": {
+      "type": "integer",
+      "description": "Unix timestamp in milliseconds when the error occurred",
+      "minimum": 0
+    },
+    "severity": {
+      "type": "string",
+      "description": "Error severity level",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "errorType": {
+      "type": "string",
+      "description": "Type of error that occurred",
+      "enum": [
+        "javascript",
+        "promise-rejection",
+        "react-component",
+        "main-process",
+        "ipc",
+        "filesystem",
+        "network"
+      ]
+    },
+    "processType": {
+      "type": "string",
+      "description": "Process where the error occurred",
+      "enum": ["main", "renderer", "preload"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Error message",
+      "minLength": 1,
+      "maxLength": 10000
+    },
+    "stack": {
+      "type": "string",
+      "description": "Error stack trace",
+      "maxLength": 50000
+    },
+    "systemInfo": {
+      "type": "object",
+      "description": "System information at time of error",
+      "required": [
+        "platform",
+        "arch",
+        "osVersion",
+        "nodeVersion",
+        "electronVersion",
+        "appVersion"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "description": "Operating system platform"
+        },
+        "arch": {
+          "type": "string",
+          "description": "System architecture"
+        },
+        "osVersion": {
+          "type": "string",
+          "description": "Operating system version"
+        },
+        "nodeVersion": {
+          "type": "string",
+          "description": "Node.js version"
+        },
+        "electronVersion": {
+          "type": "string",
+          "description": "Electron version"
+        },
+        "appVersion": {
+          "type": "string",
+          "description": "Application version"
+        },
+        "totalMemory": {
+          "type": "number",
+          "description": "Total system memory in bytes",
+          "minimum": 0
+        },
+        "freeMemory": {
+          "type": "number",
+          "description": "Free system memory in bytes",
+          "minimum": 0
+        },
+        "cpuModel": {
+          "type": "string",
+          "description": "CPU model information"
+        },
+        "cpuCount": {
+          "type": "integer",
+          "description": "Number of CPU cores",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "context": {
+      "type": "object",
+      "description": "Additional error context",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "User identifier (if available)"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session identifier",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "url": {
+          "type": "string",
+          "description": "URL where error occurred (for renderer process)",
+          "format": "uri"
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "User agent string"
+        },
+        "viewport": {
+          "type": "object",
+          "description": "Viewport dimensions",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": ["width", "height"],
+          "additionalProperties": false
+        },
+        "customData": {
+          "type": "object",
+          "description": "Custom application-specific data",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "breadcrumbs": {
+      "type": "array",
+      "description": "User action breadcrumbs leading to error",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "category", "message", "level"],
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "description": "Unix timestamp in milliseconds",
+            "minimum": 0
+          },
+          "category": {
+            "type": "string",
+            "description": "Breadcrumb category",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "message": {
+            "type": "string",
+            "description": "Breadcrumb message",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "level": {
+            "type": "string",
+            "description": "Log level",
+            "enum": ["debug", "info", "warning", "error"]
+          },
+          "data": {
+            "type": "object",
+            "description": "Additional breadcrumb data",
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for categorizing errors",
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      }
+    },
+    "fingerprint": {
+      "type": "string",
+      "description": "Error fingerprint for grouping similar errors",
+      "maxLength": 100
+    },
+    "schemaVersion": {
+      "type": "string",
+      "description": "Schema version for compatibility",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

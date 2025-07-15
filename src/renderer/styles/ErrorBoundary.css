@@ -1,0 +1,126 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.error-boundary-content {
+  max-width: 500px;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  padding: 40px 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e5e9;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.error-boundary-content h2 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.error-boundary-content p {
+  margin: 0 0 30px 0;
+  color: #7f8c8d;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.retry-button, .reload-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.retry-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.retry-button:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+.reload-button {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.reload-button:hover {
+  background-color: #7f8c8d;
+  transform: translateY(-1px);
+}
+
+.error-details {
+  text-align: left;
+  margin-top: 20px;
+  border: 1px solid #e74c3c;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.error-details summary {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+.error-details summary:hover {
+  background-color: #c0392b;
+}
+
+.error-stack {
+  padding: 15px;
+  background-color: #fdf2f2;
+}
+
+.error-stack h4 {
+  margin: 0 0 8px 0;
+  color: #e74c3c;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.error-stack pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 0 0 15px 0;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #2c3e50;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-stack pre:last-child {
+  margin-bottom: 0;
+}
