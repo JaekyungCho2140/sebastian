@@ -72,7 +72,7 @@ export const useUpdateManager = (): UpdateManagerState & UpdateManagerActions =>
 
     try {
       setState(prev => ({ ...prev, isDownloading: true, error: null }))
-      await window.electronAPI.downloadUpdate()
+      await window.electronAPI.downloadUpdate(state.updateInfo)
     } catch (error) {
       console.error('Failed to download update:', error)
       setState(prev => ({ 
@@ -81,7 +81,7 @@ export const useUpdateManager = (): UpdateManagerState & UpdateManagerActions =>
         isDownloading: false
       }))
     }
-  }, [state.updateInfo?.downloadUrl])
+  }, [state.updateInfo])
 
   // Install update
   const installUpdate = useCallback(async () => {

@@ -86,7 +86,7 @@ export interface IpcRequests {
   [IPC_CHANNELS.UPDATE_NOW]: void
   [IPC_CHANNELS.UPDATE_LATER]: void
   [IPC_CHANNELS.IGNORE_UPDATE]: string // version to ignore
-  [IPC_CHANNELS.DOWNLOAD_UPDATE]: void
+  [IPC_CHANNELS.DOWNLOAD_UPDATE]: UpdateInfo | void
   [IPC_CHANNELS.INSTALL_UPDATE]: void
 }
 
@@ -232,7 +232,7 @@ declare global {
       updateNow: () => Promise<void>
       updateLater: () => Promise<void>
       ignoreUpdate: (version: string) => Promise<void>
-      downloadUpdate: () => Promise<void>
+      downloadUpdate: (updateInfo?: UpdateInfo) => Promise<void>
       installUpdate: () => Promise<void>
       
       // State

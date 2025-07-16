@@ -164,7 +164,7 @@ const electronAPI = {
   updateNow: () => safeInvoke(IPC_CHANNELS.UPDATE_NOW),
   updateLater: () => safeInvoke(IPC_CHANNELS.UPDATE_LATER),
   ignoreUpdate: (version: string) => safeInvoke(IPC_CHANNELS.IGNORE_UPDATE, version),
-  downloadUpdate: () => safeInvoke(IPC_CHANNELS.DOWNLOAD_UPDATE),
+  downloadUpdate: (updateInfo?: UpdateInfo) => safeInvoke(IPC_CHANNELS.DOWNLOAD_UPDATE, updateInfo),
   installUpdate: () => safeInvoke(IPC_CHANNELS.INSTALL_UPDATE),
   
   // Generic invoke method

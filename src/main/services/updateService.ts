@@ -213,6 +213,9 @@ export class UpdateService extends EventEmitter {
         downloadSize: downloadAsset?.size
       }
       
+      // Store the update info for later download
+      this.currentDownloadInfo = updateInfo
+      
       this.emit('updateAvailable', updateInfo)
       return { hasUpdate: true, updateInfo }
     } else {

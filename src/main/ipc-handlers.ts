@@ -229,13 +229,17 @@ export function setupIpcHandlers(): void {
   })
 
   // Download update handler
-  createHandler(IPC_CHANNELS.DOWNLOAD_UPDATE, async () => {
+  createHandler(IPC_CHANNELS.DOWNLOAD_UPDATE, async (event, updateInfo?: UpdateInfo) => {
     if (!updateService) {
       throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
     }
     
     try {
-      const updateInfo = updateService.getCurrentDownloadInfo()
+      // Use provided updateInfo or fallback to stored info
+      if (!updateInfo) {
+        updateInfo = updateService.getCurrentDownloadInfo()
+      }
+      
       if (!updateInfo) {
         throw new IpcError('No update information available', 'NO_UPDATE_INFO')
       }
