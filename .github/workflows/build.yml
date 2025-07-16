@@ -35,6 +35,8 @@ jobs:
         run: npm run build
         
       - name: Create NSIS installer
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run dist:win-nsis
         
       - name: Get version

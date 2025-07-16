@@ -128,6 +128,11 @@
         "en_US"
       ],
       "warningsAsErrors": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "JaekyungCho2140",
+      "repo": "sebastian"
     }
   }
 }
