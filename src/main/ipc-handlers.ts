@@ -267,13 +267,36 @@ export function setupIpcHandlers(): void {
         throw new IpcError('No file to install', 'NO_FILE_TO_INSTALL')
       }
       
-      await updateService.installUpdate(installPath)
+      // Close current app before installation to avoid file locking issues
+      console.log('Closing current app before installation...')
       
-      // Schedule app restart after successful installation
-      setTimeout(() => {
-        app.relaunch()
-        app.exit(0)
-      }, 2000) // 2 second delay to show completion message
+      // Start installation in a separate process and then quit
+      setTimeout(async () => {
+        try {
+          if (!updateService) {
+            console.error('Update service not available for installation')
+            app.relaunch()
+            app.exit(0)
+            return
+          }
+          
+          await updateService.installUpdate(installPath)
+          
+          // After successful installation, restart with new version
+          setTimeout(() => {
+            app.relaunch()
+            app.exit(0)
+          }, 1000)
+        } catch (installError) {
+          console.error('Installation failed after app close:', installError)
+          // Restart the current app if installation fails
+          app.relaunch()
+          app.exit(0)
+        }
+      }, 1000)
+      
+      // Quit the current app to release file locks
+      app.quit()
       
     } catch (error) {
       console.error('Installation failed:', error)

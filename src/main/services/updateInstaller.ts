@@ -193,6 +193,10 @@ export class UpdateInstaller extends EventEmitter {
     if (options.silentInstall) {
       args.push('/quiet')
       args.push('/norestart')
+      
+      // Add installation log for debugging
+      args.push('/l*v')
+      args.push('"C:\\temp\\sebastian-install.log"')
     }
 
     // Installation path
@@ -238,7 +242,7 @@ export class UpdateInstaller extends EventEmitter {
       case 1602:
         return 'User cancelled the installation'
       case 1603:
-        return 'Fatal error during installation'
+        return 'Fatal error during installation. This often occurs when the application is running. Please close Sebastian and try again, or check the installation log at C:\\temp\\sebastian-install.log'
       case 1618:
         return 'Another installation is already in progress'
       case 1619:
