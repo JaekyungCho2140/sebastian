@@ -500,6 +500,7 @@ export class UpdateService extends EventEmitter {
       const result = await this.downloader.downloadUpdate(downloadOptions)
       
       if (result.success) {
+        this.currentInstallPath = result.filePath!
         this.emit('downloadComplete', { 
           updateInfo, 
           filePath: result.filePath,
