@@ -8,11 +8,21 @@ import {
   UpdateInfo,
   IpcError,
   RendererErrorReport,
-  ErrorDialogData
+  ErrorDialogData,
+  TimeoutUserAction,
+  InstallationTimeoutStatus,
+  RecoveryActionRequest,
+  RecoveryActionResult,
+  ErrorLogExportRequest,
+  SupportInformation,
+  SelfDiagnosticReport,
+  HelpTopic,
+  HelpSearchResult
 } from '../shared/types'
 import { getStateManager } from './state-manager'
 import { UpdateService } from './services/updateService'
 import { LocalErrorReporter } from './services/local-error-reporter'
+import { InstallOptions, UpdateInstaller } from './services/updateInstaller'
 
 // Error handler wrapper
 function createErrorResponse(error: unknown, channel?: string): IpcErrorResponse {
@@ -52,6 +62,231 @@ let updateService: UpdateService | null = null
 
 // Error reporter instance
 let errorReporter: LocalErrorReporter | null = null
+
+// NSIS installation process manager
+async function initiateNsisInstallation(installPath: string, customOptions?: Partial<InstallOptions>): Promise<void> {
+  console.log('Initiating NSIS installation with enhanced progress monitoring...')
+  
+  if (!updateService) {
+    throw new Error('Update service not available')
+  }
+  
+  const installationStartTime = Date.now()
+  
+  // Phase 1: Resource cleanup and preparation (2 seconds)
+  console.log('Phase 1: Cleaning up resources...')
+  
+  // Close all windows gracefully
+  const windows = BrowserWindow.getAllWindows()
+  windows.forEach(window => {
+    window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+      stage: 'preparing',
+      progress: 5,
+      message: 'Initializing installation process...',
+      phase: 'preparation',
+      timestamp: Date.now()
+    })
+    window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_PHASE, {
+      phase: 'preparation',
+      message: 'Preparing for NSIS installation - cleaning up resources',
+      timestamp: Date.now()
+    })
+  })
+  
+  // Progress update: Closing windows
+  await new Promise(resolve => setTimeout(resolve, 500))
+  windows.forEach(window => {
+    window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+      stage: 'preparing',
+      progress: 15,
+      message: 'Closing application windows...',
+      phase: 'resource-cleanup',
+      timestamp: Date.now()
+    })
+  })
+  
+  // Allow time for renderer processes to clean up
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  // Phase 2: Service shutdown (1 second)
+  console.log('Phase 2: Shutting down services...')
+  
+  windows.forEach(window => {
+    window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+      stage: 'preparing',
+      progress: 30,
+      message: 'Shutting down services...',
+      phase: 'service-shutdown',
+      timestamp: Date.now()
+    })
+  })
+  
+  // Stop update service and clean up resources
+  await updateService.stop()
+  
+  // Additional cleanup time
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  // Phase 3: File system preparation (500ms)
+  console.log('Phase 3: Preparing file system...')
+  
+  windows.forEach(window => {
+    window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+      stage: 'preparing',
+      progress: 50,
+      message: 'Preparing file system...',
+      phase: 'filesystem-prep',
+      timestamp: Date.now(),
+      estimatedTimeRemaining: 2000
+    })
+    window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_PHASE, {
+      phase: 'filesystem-prep',
+      message: 'Releasing file handles and preparing for installation',
+      timestamp: Date.now()
+    })
+  })
+  
+  // Ensure all file handles are released
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  // Phase 4: Start installation process
+  console.log('Phase 4: Starting NSIS installation...')
+  
+  windows.forEach(window => {
+    window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+      stage: 'installing',
+      progress: 0,
+      message: 'Starting installation...',
+      phase: 'installation-start',
+      timestamp: Date.now(),
+      estimatedTimeRemaining: 60000
+    })
+    window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_PHASE, {
+      phase: 'installation-start',
+      message: 'Launching NSIS installer with enhanced monitoring',
+      timestamp: Date.now()
+    })
+  })
+
+  // Set up progress monitoring interval
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - installationStartTime
+    const estimatedTotal = 65000 // 65 seconds estimated total
+    const progressPercentage = Math.min((elapsed / estimatedTotal) * 100, 95)
+    
+    windows.forEach(window => {
+      window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+        stage: 'installing',
+        progress: progressPercentage,
+        message: `Installing Sebastian... (${Math.round(progressPercentage)}%)`,
+        phase: 'installation-progress',
+        timestamp: Date.now(),
+        estimatedTimeRemaining: Math.max(estimatedTotal - elapsed, 0)
+      })
+    })
+  }, 2000) // Update every 2 seconds
+  
+  // Start installation with proper error handling
+  setTimeout(async () => {
+    try {
+      if (!updateService) {
+        console.error('Update service not available for installation')
+        clearInterval(progressInterval)
+        handleInstallationFailure()
+        return
+      }
+      
+      // Run NSIS installation with optimized parameters
+      const installOptions = {
+        silentInstall: true,
+        elevatePermissions: true,
+        timeout: 15 * 60 * 1000, // 15 minutes timeout
+        createDesktopShortcut: true,
+        createStartMenuShortcut: true,
+        // NSIS specific optimizations
+        installPath: undefined, // Let NSIS choose default location
+        // User preferences from app state
+        ...getInstallationPreferences(),
+        // Custom options from caller
+        ...customOptions
+      }
+      
+      console.log('NSIS installation options:', installOptions)
+      
+      await updateService.installUpdate(installPath, installOptions)
+      
+      // Clear progress interval
+      clearInterval(progressInterval)
+      
+      // Installation successful - restart with new version
+      console.log('NSIS installation completed successfully')
+      
+      windows.forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: 'Installation completed successfully!',
+          phase: 'installation-complete',
+          timestamp: Date.now()
+        })
+        window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_COMPLETE, {
+          success: true,
+          message: 'Sebastian has been updated successfully',
+          timestamp: Date.now()
+        })
+      })
+      
+      setTimeout(() => {
+        app.relaunch()
+        app.exit(0)
+      }, 1000)
+      
+    } catch (installError) {
+      clearInterval(progressInterval)
+      console.error('NSIS installation failed:', installError)
+      handleInstallationFailure()
+    }
+  }, 1000)
+  
+  // Gracefully quit current app
+  setTimeout(() => {
+    app.quit()
+  }, 1500)
+}
+
+// Get installation preferences from app state
+function getInstallationPreferences(): Partial<InstallOptions> {
+  const stateManager = getStateManager()
+  const state = stateManager.getState()
+  
+  // Default preferences
+  const defaultPreferences = {
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    silentInstall: true,
+    elevatePermissions: true
+  }
+  
+  // You can extend this to read from user preferences
+  // For now, we'll use sensible defaults with potential for customization
+  return {
+    ...defaultPreferences,
+    // Custom preferences based on app state could be added here
+    // For example, if user has specific language preferences:
+    // installerLanguage: state.userPreferences.language === 'ko' ? 'Korean' : 'English'
+  }
+}
+
+// Handle installation failure with proper recovery
+function handleInstallationFailure(): void {
+  console.log('Handling installation failure - restarting current app')
+  
+  // Small delay to ensure logging
+  setTimeout(() => {
+    app.relaunch()
+    app.exit(1)
+  }, 1000)
+}
 
 // Initialize IPC handlers
 export function setupIpcHandlers(): void {
@@ -255,7 +490,7 @@ export function setupIpcHandlers(): void {
   })
 
   // Install update handler
-  createHandler(IPC_CHANNELS.INSTALL_UPDATE, async () => {
+  createHandler(IPC_CHANNELS.INSTALL_UPDATE, async (customOptions?: Partial<InstallOptions> | void) => {
     if (!updateService) {
       throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
     }
@@ -267,42 +502,401 @@ export function setupIpcHandlers(): void {
         throw new IpcError('No file to install', 'NO_FILE_TO_INSTALL')
       }
       
-      // Close current app before installation to avoid file locking issues
-      console.log('Closing current app before installation...')
+      console.log('Starting NSIS installation process...')
+      console.log('Custom installation options:', customOptions)
       
-      // Start installation in a separate process and then quit
-      setTimeout(async () => {
-        try {
-          if (!updateService) {
-            console.error('Update service not available for installation')
-            app.relaunch()
-            app.exit(0)
-            return
-          }
-          
-          await updateService.installUpdate(installPath)
-          
-          // After successful installation, restart with new version
-          setTimeout(() => {
-            app.relaunch()
-            app.exit(0)
-          }, 1000)
-        } catch (installError) {
-          console.error('Installation failed after app close:', installError)
-          // Restart the current app if installation fails
-          app.relaunch()
-          app.exit(0)
-        }
-      }, 1000)
+      // Notify all windows about installation start
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'preparing',
+          progress: 0,
+          message: 'Preparing for installation...',
+          phase: 'resource-cleanup'
+        })
+      })
       
-      // Quit the current app to release file locks
-      app.quit()
+      // Start graceful shutdown sequence for NSIS installation
+      await initiateNsisInstallation(installPath, customOptions || undefined)
       
     } catch (error) {
       console.error('Installation failed:', error)
       throw new IpcError(
         error instanceof Error ? error.message : 'Installation failed',
         'INSTALLATION_FAILED'
+      )
+    }
+  })
+
+  // Cancel installation handler
+  createHandler(IPC_CHANNELS.CANCEL_INSTALLATION, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      updateService.cancelInstallation()
+      
+      // Notify all windows about cancellation
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 0,
+          message: 'Installation cancelled by user'
+        })
+      })
+      
+    } catch (error) {
+      console.error('Failed to cancel installation:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to cancel installation',
+        'CANCEL_INSTALLATION_FAILED'
+      )
+    }
+  })
+
+  // Get installation status handler
+  createHandler(IPC_CHANNELS.GET_INSTALLATION_STATUS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    return {
+      isInstalling: updateService.isInstalling(),
+      currentInstallPath: updateService.getCurrentInstallPath(),
+      isDownloading: updateService.isDownloading(),
+      currentDownloadInfo: updateService.getCurrentDownloadInfo()
+    }
+  })
+
+  // Retry installation handler
+  createHandler(IPC_CHANNELS.RETRY_INSTALLATION, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      const installPath = updateService.getCurrentInstallPath()
+      if (!installPath) {
+        throw new IpcError('No file to install', 'NO_FILE_TO_INSTALL')
+      }
+      
+      console.log('Retrying NSIS installation...')
+      
+      // Notify all windows about retry
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'preparing',
+          progress: 0,
+          message: 'Retrying installation...',
+          phase: 'retry'
+        })
+      })
+      
+      // Start installation retry
+      await initiateNsisInstallation(installPath)
+      
+    } catch (error) {
+      console.error('Installation retry failed:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Installation retry failed',
+        'INSTALLATION_RETRY_FAILED'
+      )
+    }
+  })
+
+  // Force cancel installation handler
+  createHandler(IPC_CHANNELS.FORCE_CANCEL_INSTALLATION, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      // Force cancel with immediate termination
+      updateService.forceCancelInstallation()
+      
+      // Notify all windows about force cancellation
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 0,
+          message: 'Installation force cancelled'
+        })
+      })
+      
+    } catch (error) {
+      console.error('Failed to force cancel installation:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to force cancel installation',
+        'FORCE_CANCEL_INSTALLATION_FAILED'
+      )
+    }
+  })
+
+  // Get timeout status handler
+  createHandler(IPC_CHANNELS.GET_TIMEOUT_STATUS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    return updateService.getTimeoutStatus()
+  })
+
+  // Handle timeout user action
+  createHandler(IPC_CHANNELS.TIMEOUT_USER_ACTION, async (action: TimeoutUserAction) => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Processing timeout user action:', action)
+      updateService.handleTimeoutUserAction(action)
+      
+      // Notify all windows about user action
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'installing',
+          progress: 0,
+          message: `User selected: ${action.action}`,
+          phase: 'user-action'
+        })
+      })
+      
+    } catch (error) {
+      console.error('Failed to process timeout user action:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to process timeout user action',
+        'TIMEOUT_USER_ACTION_FAILED'
+      )
+    }
+  })
+
+  // Execute recovery action handler
+  createHandler(IPC_CHANNELS.EXECUTE_RECOVERY_ACTION, async (request: RecoveryActionRequest) => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Executing recovery action:', request)
+      const result = await updateService.executeRecoveryAction(request)
+      
+      // Notify all windows about recovery action result
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'installing',
+          progress: 0,
+          message: `Recovery action: ${result.message}`,
+          phase: 'recovery-action'
+        })
+      })
+      
+      return result
+    } catch (error) {
+      console.error('Failed to execute recovery action:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to execute recovery action',
+        'RECOVERY_ACTION_FAILED'
+      )
+    }
+  })
+
+  // Get recovery options handler
+  createHandler(IPC_CHANNELS.GET_RECOVERY_OPTIONS, async (correlationId: string) => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Getting recovery options for correlation ID:', correlationId)
+      return updateService.getRecoveryOptions(correlationId)
+    } catch (error) {
+      console.error('Failed to get recovery options:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get recovery options',
+        'GET_RECOVERY_OPTIONS_FAILED'
+      )
+    }
+  })
+
+  // Get system snapshot handler
+  createHandler(IPC_CHANNELS.GET_SYSTEM_SNAPSHOT, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Getting system snapshot...')
+      return await updateService.getSystemSnapshot()
+    } catch (error) {
+      console.error('Failed to get system snapshot:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get system snapshot',
+        'GET_SYSTEM_SNAPSHOT_FAILED'
+      )
+    }
+  })
+
+  // Export error logs handler
+  createHandler(IPC_CHANNELS.EXPORT_ERROR_LOGS, async (request: ErrorLogExportRequest) => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Exporting error logs:', request)
+      const filePath = await updateService.exportErrorLogs(request)
+      
+      // Notify all windows about log export
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: `Error logs exported to: ${filePath}`,
+          phase: 'log-export'
+        })
+      })
+      
+      return filePath
+    } catch (error) {
+      console.error('Failed to export error logs:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to export error logs',
+        'EXPORT_ERROR_LOGS_FAILED'
+      )
+    }
+  })
+
+  // Get support info handler
+  createHandler(IPC_CHANNELS.GET_SUPPORT_INFO, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Getting support info...')
+      return updateService.getSupportInfo()
+    } catch (error) {
+      console.error('Failed to get support info:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get support info',
+        'GET_SUPPORT_INFO_FAILED'
+      )
+    }
+  })
+
+  // Perform self diagnostics handler
+  createHandler(IPC_CHANNELS.PERFORM_SELF_DIAGNOSTICS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Performing self diagnostics...')
+      return updateService.performSelfDiagnostics()
+    } catch (error) {
+      console.error('Failed to perform self diagnostics:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to perform self diagnostics',
+        'PERFORM_SELF_DIAGNOSTICS_FAILED'
+      )
+    }
+  })
+
+  // Get help topics handler
+  createHandler(IPC_CHANNELS.GET_HELP_TOPICS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Getting help topics...')
+      return updateService.getHelpTopics()
+    } catch (error) {
+      console.error('Failed to get help topics:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get help topics',
+        'GET_HELP_TOPICS_FAILED'
+      )
+    }
+  })
+
+  // Search help handler
+  createHandler(IPC_CHANNELS.SEARCH_HELP, async (query: string) => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Searching help with query:', query)
+      return updateService.searchHelp(query)
+    } catch (error) {
+      console.error('Failed to search help:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to search help',
+        'SEARCH_HELP_FAILED'
+      )
+    }
+  })
+
+  // Export detailed error analysis handler
+  createHandler(IPC_CHANNELS.EXPORT_DETAILED_ERROR_ANALYSIS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Exporting detailed error analysis...')
+      const analysis = updateService.exportDetailedErrorAnalysis()
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+      const filename = `sebastian-error-analysis-${timestamp}.txt`
+      const filepath = require('path').join(require('electron').app.getPath('temp'), filename)
+      
+      require('fs').writeFileSync(filepath, analysis, 'utf-8')
+      
+      // Notify all windows about analysis export
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: `Error analysis exported to: ${filepath}`,
+          phase: 'analysis-export'
+        })
+      })
+      
+      return filepath
+    } catch (error) {
+      console.error('Failed to export detailed error analysis:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to export detailed error analysis',
+        'EXPORT_DETAILED_ERROR_ANALYSIS_FAILED'
+      )
+    }
+  })
+
+  // Compress logs handler
+  createHandler(IPC_CHANNELS.COMPRESS_LOGS, async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Compressing logs...')
+      updateService.compressLogs()
+      
+      // Notify all windows about log compression
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: 'Logs compressed successfully',
+          phase: 'log-compression'
+        })
+      })
+    } catch (error) {
+      console.error('Failed to compress logs:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to compress logs',
+        'COMPRESS_LOGS_FAILED'
       )
     }
   })
@@ -335,7 +929,14 @@ export function setupIpcHandlers(): void {
     })
 
     updateService.on('installComplete', (data) => {
-      console.log('Installation completed:', data)
+      console.log('NSIS installation completed:', data)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_COMPLETE, {
+          installPath: data.installPath,
+          duration: data.duration,
+          exitCode: data.exitCode
+        })
+      })
     })
 
     updateService.on('updateError', (error) => {
@@ -353,9 +954,57 @@ export function setupIpcHandlers(): void {
     })
 
     updateService.on('installError', (error) => {
-      console.error('Installation error:', error)
+      console.error('NSIS installation error:', error)
       BrowserWindow.getAllWindows().forEach(window => {
-        window.webContents.send(IPC_CHANNELS.UPDATE_ERROR, error.error)
+        window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_FAILED, {
+          error: error.error,
+          exitCode: error.exitCode,
+          isRetryable: error.isRetryable
+        })
+        
+        // Send enhanced error dialog data if available
+        if (error.errorDetails) {
+          window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_ERROR, {
+            title: 'Installation Error',
+            message: error.errorDetails.userMessage,
+            errorDetails: error.errorDetails,
+            recoveryOptions: error.recoveryOptions,
+            supportInfo: {
+              version: require('../../package.json').version,
+              platform: require('os').platform(),
+              supportEmail: 'support@sebastian.dev',
+              documentationUrl: 'https://github.com/sebastian/docs',
+              githubIssueUrl: 'https://github.com/sebastian/issues',
+              troubleshootingGuideUrl: 'https://github.com/sebastian/troubleshooting'
+            },
+            showTechnicalDetails: true,
+            allowReporting: true
+          })
+        }
+      })
+    })
+
+    // Enhanced NSIS installation logging
+    updateService.on('installationLog', (logEntry) => {
+      console.log('NSIS installation log:', logEntry)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_LOG, logEntry)
+      })
+    })
+
+    // Installation timeout events
+    updateService.on('timeout', (timeoutNotification) => {
+      console.log('Installation timeout:', timeoutNotification)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.INSTALLATION_TIMEOUT, timeoutNotification)
+      })
+    })
+
+    // User action required events
+    updateService.on('userActionRequired', (actionRequest) => {
+      console.log('User action required:', actionRequest)
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('user-action-required', actionRequest)
       })
     })
   }

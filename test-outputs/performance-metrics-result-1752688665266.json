@@ -1,0 +1,712 @@
+{
+  "timestamp": "2025-07-16T17:57:45.265Z",
+  "totalTestTime": 11746,
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "manual": 5
+  },
+  "results": {
+    "passed": [
+      "다운로드 속도 벤치마크",
+      "메모리 사용량 모니터링",
+      "애플리케이션 시작 시간 측정",
+      "설치 시간 벤치마크",
+      "성능 벤치마크 종합"
+    ],
+    "failed": [],
+    "manual": [],
+    "metrics": {
+      "downloadSpeed": {
+        "average": "16.25",
+        "results": [
+          {
+            "name": "GitHub API",
+            "url": "https://api.github.com/repos/JaekyungCho2140/sebastian/releases",
+            "success": false,
+            "error": "HTTP 403: Forbidden"
+          },
+          {
+            "name": "Package.json",
+            "url": "https://raw.githubusercontent.com/JaekyungCho2140/sebastian/main/package.json",
+            "size": 4616,
+            "duration": 284,
+            "speedMbps": "0.13",
+            "speedKBps": "16.25",
+            "success": true
+          },
+          {
+            "name": "Large File Simulation",
+            "url": "https://httpbin.org/bytes/1048576",
+            "success": false,
+            "error": "self-signed certificate in certificate chain"
+          }
+        ],
+        "timestamp": "2025-07-16T17:57:34.335Z"
+      },
+      "memoryUsage": {
+        "snapshots": [
+          {
+            "timestamp": 1752688654837,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2339,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688655337,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2401,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688655837,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2401,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688656338,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2401,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688656839,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2401,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688657340,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2402,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688657841,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2387,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688658342,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2387,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688658843,
+            "heapUsed": 5,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2387,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688659343,
+            "heapUsed": 6,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2363,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688659844,
+            "heapUsed": 6,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2360,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688660345,
+            "heapUsed": 6,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2363,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688660846,
+            "heapUsed": 6,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2362,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688661347,
+            "heapUsed": 6,
+            "heapTotal": 8,
+            "rss": 52,
+            "systemUsed": 2362,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688661847,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2360,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688662347,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2359,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688662847,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2359,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688663347,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2359,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688663847,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2308,
+            "systemPercent": 15
+          },
+          {
+            "timestamp": 1752688664348,
+            "heapUsed": 5,
+            "heapTotal": 7,
+            "rss": 51,
+            "systemUsed": 2309,
+            "systemPercent": 15
+          }
+        ],
+        "analysis": {
+          "avgHeapUsed": 5,
+          "maxHeapUsed": 6,
+          "minHeapUsed": 5,
+          "avgSystemPercent": 15,
+          "memoryGrowthRate": 0,
+          "totalSnapshots": 20
+        },
+        "timestamp": "2025-07-16T17:57:44.348Z"
+      },
+      "startupTime": {
+        "total": 406,
+        "breakdown": [
+          {
+            "name": "Node.js 프로세스 시작",
+            "duration": 1,
+            "success": true
+          },
+          {
+            "name": "파일 시스템 초기화",
+            "duration": 1,
+            "success": true
+          },
+          {
+            "name": "네트워크 연결 테스트",
+            "duration": 404,
+            "success": true
+          }
+        ],
+        "timestamp": "2025-07-16T17:57:44.756Z"
+      },
+      "installationTime": {
+        "total": 403,
+        "steps": [
+          {
+            "name": "다운로드 시뮬레이션",
+            "expectedDuration": 2000,
+            "actualDuration": 258,
+            "efficiency": "7.75",
+            "success": true
+          },
+          {
+            "name": "파일 압축 해제",
+            "expectedDuration": 1000,
+            "actualDuration": 0,
+            "efficiency": "Infinity",
+            "success": true
+          },
+          {
+            "name": "파일 복사",
+            "expectedDuration": 500,
+            "actualDuration": 0,
+            "efficiency": "Infinity",
+            "success": true
+          },
+          {
+            "name": "레지스트리 업데이트",
+            "expectedDuration": 300,
+            "actualDuration": 112,
+            "efficiency": "2.68",
+            "success": true
+          },
+          {
+            "name": "설치 후 정리",
+            "expectedDuration": 200,
+            "actualDuration": 33,
+            "efficiency": "6.06",
+            "success": true
+          }
+        ],
+        "timestamp": "2025-07-16T17:57:45.160Z"
+      },
+      "performanceBenchmark": {
+        "results": [
+          {
+            "name": "CPU 집약적 작업",
+            "duration": 9,
+            "result": -681.7596643536841,
+            "metrics": {
+              "memoryDelta": -1,
+              "cpuDelta": 0.08112622624239141
+            },
+            "success": true
+          },
+          {
+            "name": "I/O 집약적 작업",
+            "duration": 4,
+            "result": 1190,
+            "metrics": {
+              "memoryDelta": 1,
+              "cpuDelta": 0.045620084563200214
+            },
+            "success": true
+          },
+          {
+            "name": "메모리 집약적 작업",
+            "duration": 92,
+            "result": 50000,
+            "metrics": {
+              "memoryDelta": 103,
+              "cpuDelta": 1.488259412995798
+            },
+            "success": true
+          }
+        ],
+        "timestamp": "2025-07-16T17:57:45.265Z"
+      }
+    }
+  },
+  "metrics": {
+    "downloadSpeed": {
+      "average": "16.25",
+      "results": [
+        {
+          "name": "GitHub API",
+          "url": "https://api.github.com/repos/JaekyungCho2140/sebastian/releases",
+          "success": false,
+          "error": "HTTP 403: Forbidden"
+        },
+        {
+          "name": "Package.json",
+          "url": "https://raw.githubusercontent.com/JaekyungCho2140/sebastian/main/package.json",
+          "size": 4616,
+          "duration": 284,
+          "speedMbps": "0.13",
+          "speedKBps": "16.25",
+          "success": true
+        },
+        {
+          "name": "Large File Simulation",
+          "url": "https://httpbin.org/bytes/1048576",
+          "success": false,
+          "error": "self-signed certificate in certificate chain"
+        }
+      ],
+      "timestamp": "2025-07-16T17:57:34.335Z"
+    },
+    "memoryUsage": {
+      "snapshots": [
+        {
+          "timestamp": 1752688654837,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2339,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688655337,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2401,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688655837,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2401,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688656338,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2401,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688656839,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2401,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688657340,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2402,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688657841,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2387,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688658342,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2387,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688658843,
+          "heapUsed": 5,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2387,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688659343,
+          "heapUsed": 6,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2363,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688659844,
+          "heapUsed": 6,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2360,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688660345,
+          "heapUsed": 6,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2363,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688660846,
+          "heapUsed": 6,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2362,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688661347,
+          "heapUsed": 6,
+          "heapTotal": 8,
+          "rss": 52,
+          "systemUsed": 2362,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688661847,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2360,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688662347,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2359,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688662847,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2359,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688663347,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2359,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688663847,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2308,
+          "systemPercent": 15
+        },
+        {
+          "timestamp": 1752688664348,
+          "heapUsed": 5,
+          "heapTotal": 7,
+          "rss": 51,
+          "systemUsed": 2309,
+          "systemPercent": 15
+        }
+      ],
+      "analysis": {
+        "avgHeapUsed": 5,
+        "maxHeapUsed": 6,
+        "minHeapUsed": 5,
+        "avgSystemPercent": 15,
+        "memoryGrowthRate": 0,
+        "totalSnapshots": 20
+      },
+      "timestamp": "2025-07-16T17:57:44.348Z"
+    },
+    "startupTime": {
+      "total": 406,
+      "breakdown": [
+        {
+          "name": "Node.js 프로세스 시작",
+          "duration": 1,
+          "success": true
+        },
+        {
+          "name": "파일 시스템 초기화",
+          "duration": 1,
+          "success": true
+        },
+        {
+          "name": "네트워크 연결 테스트",
+          "duration": 404,
+          "success": true
+        }
+      ],
+      "timestamp": "2025-07-16T17:57:44.756Z"
+    },
+    "installationTime": {
+      "total": 403,
+      "steps": [
+        {
+          "name": "다운로드 시뮬레이션",
+          "expectedDuration": 2000,
+          "actualDuration": 258,
+          "efficiency": "7.75",
+          "success": true
+        },
+        {
+          "name": "파일 압축 해제",
+          "expectedDuration": 1000,
+          "actualDuration": 0,
+          "efficiency": "Infinity",
+          "success": true
+        },
+        {
+          "name": "파일 복사",
+          "expectedDuration": 500,
+          "actualDuration": 0,
+          "efficiency": "Infinity",
+          "success": true
+        },
+        {
+          "name": "레지스트리 업데이트",
+          "expectedDuration": 300,
+          "actualDuration": 112,
+          "efficiency": "2.68",
+          "success": true
+        },
+        {
+          "name": "설치 후 정리",
+          "expectedDuration": 200,
+          "actualDuration": 33,
+          "efficiency": "6.06",
+          "success": true
+        }
+      ],
+      "timestamp": "2025-07-16T17:57:45.160Z"
+    },
+    "performanceBenchmark": {
+      "results": [
+        {
+          "name": "CPU 집약적 작업",
+          "duration": 9,
+          "result": -681.7596643536841,
+          "metrics": {
+            "memoryDelta": -1,
+            "cpuDelta": 0.08112622624239141
+          },
+          "success": true
+        },
+        {
+          "name": "I/O 집약적 작업",
+          "duration": 4,
+          "result": 1190,
+          "metrics": {
+            "memoryDelta": 1,
+            "cpuDelta": 0.045620084563200214
+          },
+          "success": true
+        },
+        {
+          "name": "메모리 집약적 작업",
+          "duration": 92,
+          "result": 50000,
+          "metrics": {
+            "memoryDelta": 103,
+            "cpuDelta": 1.488259412995798
+          },
+          "success": true
+        }
+      ],
+      "timestamp": "2025-07-16T17:57:45.265Z"
+    }
+  },
+  "manualTestGuide": {
+    "title": "성능 메트릭 수동 테스트 가이드",
+    "description": "실제 환경에서 성능을 측정하고 분석하는 테스트 항목",
+    "tests": [
+      {
+        "id": "PERF_1",
+        "name": "실제 업데이트 다운로드 속도 측정",
+        "priority": "HIGH",
+        "duration": "10분",
+        "description": "실제 GitHub에서 업데이트 파일을 다운로드하여 속도 측정",
+        "steps": [
+          "1. 네트워크 모니터링 도구 실행 (Resource Monitor, Task Manager)",
+          "2. Sebastian에서 업데이트 확인 및 다운로드 시작",
+          "3. 다운로드 속도 실시간 모니터링",
+          "4. 완료 시간 및 평균 속도 기록",
+          "5. 다양한 네트워크 환경에서 반복 테스트"
+        ],
+        "expectedResult": "안정적인 다운로드 속도 및 진행률 표시"
+      },
+      {
+        "id": "PERF_2",
+        "name": "메모리 사용량 장기 모니터링",
+        "priority": "HIGH",
+        "duration": "30분",
+        "description": "애플리케이션 실행 중 메모리 사용량 변화 모니터링",
+        "steps": [
+          "1. 메모리 모니터링 도구 시작",
+          "2. Sebastian 실행 및 초기 메모리 사용량 기록",
+          "3. 다양한 작업 수행 (파일 열기, 설정 변경 등)",
+          "4. 업데이트 확인 및 다운로드 수행",
+          "5. 30분간 메모리 사용량 변화 관찰"
+        ],
+        "expectedResult": "메모리 누수 없이 안정적인 사용량 유지"
+      },
+      {
+        "id": "PERF_3",
+        "name": "애플리케이션 시작 시간 측정",
+        "priority": "MEDIUM",
+        "duration": "15분",
+        "description": "다양한 조건에서 애플리케이션 시작 시간 측정",
+        "steps": [
+          "1. 콜드 스타트 시간 측정 (시스템 재시작 후)",
+          "2. 웜 스타트 시간 측정 (두 번째 실행)",
+          "3. 다양한 시스템 부하 조건에서 측정",
+          "4. 10회 측정 후 평균 시간 계산",
+          "5. 결과 분석 및 기록"
+        ],
+        "expectedResult": "5초 이내 시작 시간 및 일관된 성능"
+      },
+      {
+        "id": "PERF_4",
+        "name": "설치 프로세스 시간 측정",
+        "priority": "MEDIUM",
+        "duration": "20분",
+        "description": "실제 NSIS 설치 프로세스의 각 단계별 시간 측정",
+        "steps": [
+          "1. 타이머 도구 준비",
+          "2. 업데이트 시작부터 완료까지 전체 시간 측정",
+          "3. 다운로드, 설치, 재시작 단계별 시간 기록",
+          "4. 다양한 파일 크기로 반복 테스트",
+          "5. 결과 분석 및 최적화 포인트 식별"
+        ],
+        "expectedResult": "예측 가능한 설치 시간 및 단계별 진행률"
+      },
+      {
+        "id": "PERF_5",
+        "name": "CPU 사용률 모니터링",
+        "priority": "LOW",
+        "duration": "25분",
+        "description": "다양한 작업 중 CPU 사용률 모니터링",
+        "steps": [
+          "1. CPU 모니터링 도구 시작",
+          "2. 유휴 상태에서 CPU 사용률 기록",
+          "3. 일반 작업 중 CPU 사용률 측정",
+          "4. 업데이트 중 CPU 사용률 측정",
+          "5. 피크 사용률 및 평균 사용률 분석"
+        ],
+        "expectedResult": "적절한 CPU 사용률 및 시스템 부하 최소화"
+      }
+    ]
+  },
+  "systemInfo": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpus": 24,
+    "memory": "16GB"
+  },
+  "recommendations": [
+    "실제 환경에서 성능 메트릭 수동 테스트 수행",
+    "다양한 네트워크 조건에서 다운로드 속도 측정",
+    "장기간 메모리 사용량 모니터링",
+    "시스템 부하 조건에서 성능 벤치마크 실행"
+  ]
+}

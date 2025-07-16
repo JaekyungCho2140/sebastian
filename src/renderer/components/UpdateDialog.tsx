@@ -167,6 +167,7 @@ const UpdateDialog: React.FC<UpdateDialogProps> = ({
             <button 
               className="dialog-button secondary"
               onClick={handleUpdateLater}
+              title="나중에 다시 알림받기 (재시작 시 다시 표시)"
             >
               Later
             </button>
@@ -176,6 +177,7 @@ const UpdateDialog: React.FC<UpdateDialogProps> = ({
             <button 
               className="dialog-button ignore"
               onClick={handleIgnoreUpdate}
+              title="이 버전 업데이트를 더 이상 알리지 않습니다"
             >
               Ignore This Version
             </button>

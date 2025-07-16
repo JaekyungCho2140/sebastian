@@ -42,13 +42,13 @@ git push --follow-tags
    ```
 
 3. **GitHub Actions 자동 실행**
-   - Windows 환경에서 MSI 빌드
+   - Windows 환경에서 NSIS 설치 파일 빌드
    - 릴리즈 페이지에 자동 업로드
    - 아티팩트로 30일간 보관
 
 ### 빌드 결과물
 
-- **MSI 설치 파일**: `Sebastian-[버전]-Setup.msi`
+- **NSIS 설치 파일**: `Sebastian-[버전]-Setup.exe`
 - **GitHub 릴리즈 페이지**: 자동 업로드
 - **아티팩트**: 30일간 보관
 
@@ -57,7 +57,7 @@ git push --follow-tags
 #### release.yml
 - **트리거**: `v*` 태그 push 시
 - **실행 환경**: Windows Latest
-- **결과물**: MSI 설치 파일
+- **결과물**: NSIS 설치 파일
 
 #### ci.yml
 - **트리거**: main/develop 브랜치 push 및 PR
@@ -76,7 +76,7 @@ git push --follow-tags
 ### 주의사항
 
 - 태그는 반드시 `v`로 시작해야 함 (예: `v0.1.1`)
-- WSL2 환경에서는 MSI 빌드 불가능 (GitHub Actions 필수)
+- WSL2 환경에서는 NSIS 빌드 불가능 (GitHub Actions 필수)
 - 릴리즈 생성 후 약 5-10분 소요 (빌드 + 업로드)
 - 실패 시 "Actions" 탭에서 로그 확인 가능
 

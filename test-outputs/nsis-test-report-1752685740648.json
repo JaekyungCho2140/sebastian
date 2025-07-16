@@ -1,0 +1,59 @@
+{
+  "passed": [
+    {
+      "testName": "Build File Existence Check",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:08:55.266Z",
+      "fileName": "Sebastian-0.1.28-Setup.exe",
+      "fileSize": 222499,
+      "filePath": "/home/jkcho/repository/sebastian/release/Sebastian-0.1.28-Setup.exe"
+    },
+    {
+      "testName": "Package Version Validation",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:08:55.767Z",
+      "version": "0.1.28"
+    },
+    {
+      "testName": "NSIS Error Code Mapping",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:08:57.274Z",
+      "totalCodes": 6,
+      "coverage": 100
+    },
+    {
+      "testName": "TypeScript Type Definitions",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:08:59.141Z",
+      "output": "TypeScript compilation successful"
+    },
+    {
+      "testName": "Memory Leak Pattern Detection",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:08:59.646Z",
+      "message": "No memory leak patterns detected"
+    }
+  ],
+  "failed": [
+    {
+      "testName": "Update Service Configuration",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:08:56.270Z",
+      "error": "Missing required configuration in updateService.ts"
+    },
+    {
+      "testName": "IPC Channel Definitions",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:08:56.772Z",
+      "error": "Missing IPC channels: CHECK_UPDATE, INITIATE_NSIS_INSTALLATION, PREPARE_FOR_NSIS_INSTALLATION, CANCEL_NSIS_INSTALLATION, RETRY_NSIS_INSTALLATION"
+    },
+    {
+      "testName": "Network Error Handling Simulation",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:09:00.147Z",
+      "error": "Insufficient error handling coverage: 57.14285714285714%"
+    }
+  ],
+  "skipped": [],
+  "timestamp": "2025-07-16T17:08:55.264Z"
+}

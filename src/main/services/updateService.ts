@@ -1,6 +1,18 @@
 import { EventEmitter } from 'events'
 import { net } from 'electron'
-import { AppState, UpdateInfo, IpcError, UpdateProgress } from '../../shared/types'
+import { 
+  AppState, 
+  UpdateInfo, 
+  IpcError, 
+  UpdateProgress, 
+  TimeoutUserAction, 
+  InstallationTimeoutStatus,
+  RecoveryActionRequest,
+  RecoveryActionResult,
+  RecoveryOption,
+  SystemSnapshot,
+  ErrorLogExportRequest
+} from '../../shared/types'
 import { StateManager } from '../state-manager'
 import { UpdateDownloader, DownloadOptions } from './updateDownloader'
 import { UpdateInstaller, InstallOptions } from './updateInstaller'
@@ -124,6 +136,18 @@ export class UpdateService extends EventEmitter {
     this.installer.on('installationCancelled', () => {
       console.log('Installation cancelled')
       this.emit('installationCancelled')
+    })
+    
+    this.installer.on('installationLog', (logEntry) => {
+      this.emit('installationLog', logEntry)
+    })
+    
+    this.installer.on('timeout', (timeoutNotification) => {
+      this.emit('timeout', timeoutNotification)
+    })
+    
+    this.installer.on('userActionRequired', (actionRequest) => {
+      this.emit('userActionRequired', actionRequest)
     })
   }
 
@@ -361,17 +385,17 @@ export class UpdateService extends EventEmitter {
   }
 
   private getDownloadAsset(release: GitHubRelease): GitHubAsset | undefined {
-    // Look for MSI file first, then exe, then any Windows asset
+    // Look for EXE installer file first, then any Windows asset
     const windowsAssets = release.assets.filter(asset => 
-      asset.name.toLowerCase().includes('win') || 
-      asset.name.toLowerCase().includes('msi') ||
-      asset.name.toLowerCase().includes('exe')
+      asset.name.toLowerCase().includes('win') ||
+      asset.name.toLowerCase().includes('exe') ||
+      asset.name.toLowerCase().includes('setup')
     )
     
     if (windowsAssets.length > 0) {
-      // Prefer MSI over exe
-      const msiAsset = windowsAssets.find(asset => asset.name.toLowerCase().includes('msi'))
-      return msiAsset || windowsAssets[0]
+      // Prefer EXE installer files
+      const exeAsset = windowsAssets.find(asset => asset.name.toLowerCase().includes('exe'))
+      return exeAsset || windowsAssets[0]
     }
     
     // Fallback to first asset
@@ -484,7 +508,7 @@ export class UpdateService extends EventEmitter {
     
     // Extract filename from URL
     const url = new URL(updateInfo.downloadUrl)
-    const filename = url.pathname.split('/').pop() || `sebastian-${updateInfo.version}.msi`
+    const filename = url.pathname.split('/').pop() || `sebastian-${updateInfo.version}-Setup.exe`
     const filePath = join(this.downloadPath, filename)
 
     const downloadOptions: DownloadOptions = {
@@ -536,15 +560,15 @@ export class UpdateService extends EventEmitter {
     return this.currentDownloadInfo
   }
 
-  public async installUpdate(msiPath: string, options?: Partial<InstallOptions>): Promise<void> {
-    if (!msiPath) {
-      throw new Error('No MSI file path provided')
+  public async installUpdate(installerPath: string, options?: Partial<InstallOptions>): Promise<void> {
+    if (!installerPath) {
+      throw new Error('No installer file path provided')
     }
 
-    this.currentInstallPath = msiPath
+    this.currentInstallPath = installerPath
 
     const installOptions: InstallOptions = {
-      msiPath,
+      installerPath,
       silentInstall: true,
       elevatePermissions: true,
       timeout: 10 * 60 * 1000, // 10 minutes
@@ -558,7 +582,7 @@ export class UpdateService extends EventEmitter {
       
       if (result.success) {
         this.emit('installComplete', { 
-          msiPath, 
+          installerPath, 
           installPath: result.installPath,
           duration: result.duration,
           exitCode: result.exitCode 
@@ -568,7 +592,7 @@ export class UpdateService extends EventEmitter {
       }
     } catch (error) {
       this.emit('installError', { 
-        msiPath, 
+        installerPath, 
         error: error instanceof Error ? error.message : 'Installation failed' 
       })
       throw error
@@ -580,6 +604,61 @@ export class UpdateService extends EventEmitter {
   public cancelInstallation(): void {
     this.installer.cancelInstallation()
     this.currentInstallPath = undefined
+  }
+  
+  public forceCancelInstallation(): void {
+    // Force cancel with immediate termination
+    this.installer.cancelInstallation()
+    this.installer.cleanup()
+    this.currentInstallPath = undefined
+  }
+  
+  public handleTimeoutUserAction(action: TimeoutUserAction): void {
+    this.installer.handleUserAction(action)
+  }
+  
+  public getTimeoutStatus(): InstallationTimeoutStatus {
+    return this.installer.getTimeoutStatus()
+  }
+  
+  public async executeRecoveryAction(request: RecoveryActionRequest): Promise<RecoveryActionResult> {
+    return this.installer.executeRecoveryAction(request)
+  }
+  
+  public getRecoveryOptions(correlationId: string): RecoveryOption[] {
+    return this.installer.getRecoveryOptionsForCorrelation(correlationId)
+  }
+  
+  public async getSystemSnapshot(): Promise<SystemSnapshot> {
+    return this.installer.captureSystemSnapshot()
+  }
+  
+  public async exportErrorLogs(request: ErrorLogExportRequest): Promise<string> {
+    return this.installer.exportErrorLogs(request)
+  }
+
+  public getSupportInfo() {
+    return this.installer.getSupportInfo()
+  }
+
+  public performSelfDiagnostics() {
+    return this.installer.performSelfDiagnostics()
+  }
+
+  public getHelpTopics() {
+    return this.installer.getHelpTopics()
+  }
+
+  public searchHelp(query: string) {
+    return this.installer.searchHelp(query)
+  }
+
+  public exportDetailedErrorAnalysis(): string {
+    return this.installer.exportDetailedErrorAnalysis()
+  }
+
+  public compressLogs(): void {
+    this.installer.compressLogs()
   }
 
   public isInstalling(): boolean {

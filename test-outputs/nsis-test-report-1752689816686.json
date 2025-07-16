@@ -1,0 +1,77 @@
+{
+  "passed": [
+    {
+      "testName": "Build File Existence Check",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:50.343Z",
+      "fileName": "Sebastian-0.1.28-Setup.exe",
+      "fileSize": 222499,
+      "filePath": "/home/jkcho/repository/sebastian/release/Sebastian-0.1.28-Setup.exe"
+    },
+    {
+      "testName": "Package Version Validation",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:50.844Z",
+      "version": "0.1.28"
+    },
+    {
+      "testName": "Update Service Configuration",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:51.346Z",
+      "checks": {
+        "githubRepo": true,
+        "checkInterval": true,
+        "maxRetries": true,
+        "retryDelay": true,
+        "requestTimeout": true
+      }
+    },
+    {
+      "testName": "IPC Channel Definitions",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:51.847Z",
+      "totalChannels": 13,
+      "verified": true
+    },
+    {
+      "testName": "NSIS Error Code Mapping",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:52.348Z",
+      "totalCodes": 6,
+      "coverage": 100
+    },
+    {
+      "testName": "TypeScript Type Definitions",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:55.179Z",
+      "output": "TypeScript compilation successful"
+    },
+    {
+      "testName": "Memory Leak Pattern Detection",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:55.684Z",
+      "message": "No memory leak patterns detected"
+    },
+    {
+      "testName": "Network Error Handling Simulation",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:16:56.185Z",
+      "coverage": 100,
+      "foundPatterns": [
+        "catch",
+        "retry",
+        "circuit breaker",
+        "timeout",
+        "error"
+      ],
+      "additionalChecks": {
+        "hasErrorHandler": true,
+        "hasRetryLogic": true,
+        "hasTimeoutHandler": true
+      }
+    }
+  ],
+  "failed": [],
+  "skipped": [],
+  "timestamp": "2025-07-16T18:16:50.341Z"
+}

@@ -1,0 +1,55 @@
+{
+  "passed": [
+    {
+      "testName": "Version Comparison Logic Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:14:09.159Z",
+      "totalTests": 5,
+      "passedTests": 5
+    },
+    {
+      "testName": "Download Process Simulation Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:14:10.162Z",
+      "features": {
+        "hasProgressTracking": true,
+        "hasErrorHandling": true,
+        "hasValidation": true,
+        "hasRetryMechanism": true,
+        "hasCleanup": true
+      },
+      "coverage": 100
+    }
+  ],
+  "failed": [
+    {
+      "testName": "GitHub API Access Test",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:14:08.657Z",
+      "error": "HTTP 404: {\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+      "statusCode": 404
+    },
+    {
+      "testName": "Update Detection Configuration Test",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:14:09.661Z",
+      "error": "Insufficient configuration coverage: 1/4 checks passed"
+    },
+    {
+      "testName": "Network Conditions Simulation Test",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:14:10.698Z",
+      "error": "Poor network conditions: 66.66666666666666% success rate"
+    }
+  ],
+  "manual": [
+    {
+      "testName": "Manual Test Guide Generation",
+      "status": "manual",
+      "timestamp": "2025-07-16T17:14:11.200Z",
+      "guideFile": "/home/jkcho/repository/sebastian/test-outputs/manual-test-guide.json",
+      "totalTests": 4
+    }
+  ],
+  "timestamp": "2025-07-16T17:14:08.352Z"
+}

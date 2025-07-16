@@ -1,0 +1,78 @@
+{
+  "passed": [
+    {
+      "testName": "Build File Existence Check",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:50.894Z",
+      "fileName": "Sebastian-0.1.28-Setup.exe",
+      "fileSize": 222499,
+      "filePath": "/home/jkcho/repository/sebastian/release/Sebastian-0.1.28-Setup.exe"
+    },
+    {
+      "testName": "Package Version Validation",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:51.395Z",
+      "version": "0.1.28"
+    },
+    {
+      "testName": "Update Service Configuration",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:51.897Z",
+      "checks": {
+        "githubRepo": true,
+        "checkInterval": true,
+        "maxRetries": true,
+        "retryDelay": true,
+        "requestTimeout": true
+      }
+    },
+    {
+      "testName": "IPC Channel Definitions",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:52.399Z",
+      "totalChannels": 13,
+      "verified": true
+    },
+    {
+      "testName": "NSIS Error Code Mapping",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:52.900Z",
+      "totalCodes": 6,
+      "coverage": 100
+    },
+    {
+      "testName": "Memory Leak Pattern Detection",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:54.047Z",
+      "message": "No memory leak patterns detected"
+    },
+    {
+      "testName": "Network Error Handling Simulation",
+      "status": "passed",
+      "timestamp": "2025-07-16T18:12:54.548Z",
+      "coverage": 100,
+      "foundPatterns": [
+        "catch",
+        "retry",
+        "circuit breaker",
+        "timeout",
+        "error"
+      ],
+      "additionalChecks": {
+        "hasErrorHandler": true,
+        "hasRetryLogic": true,
+        "hasTimeoutHandler": true
+      }
+    }
+  ],
+  "failed": [
+    {
+      "testName": "TypeScript Type Definitions",
+      "status": "failed",
+      "timestamp": "2025-07-16T18:12:53.538Z",
+      "error": "\n> sebastian@0.1.28 build\n> npm run build:clean && npm run build:renderer && npm run build:preload && npm run build:main\n\n\n> sebastian@0.1.28 build:clean\n> rimraf dist\n\n"
+    }
+  ],
+  "skipped": [],
+  "timestamp": "2025-07-16T18:12:50.892Z"
+}

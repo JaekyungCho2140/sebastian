@@ -1,0 +1,78 @@
+{
+  "passed": [
+    {
+      "testName": "Build File Existence Check",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:18.804Z",
+      "fileName": "Sebastian-0.1.28-Setup.exe",
+      "fileSize": 222499,
+      "filePath": "/home/jkcho/repository/sebastian/release/Sebastian-0.1.28-Setup.exe"
+    },
+    {
+      "testName": "Package Version Validation",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:19.305Z",
+      "version": "0.1.28"
+    },
+    {
+      "testName": "Update Service Configuration",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:19.806Z",
+      "checks": {
+        "githubRepo": true,
+        "checkInterval": true,
+        "maxRetries": true,
+        "retryDelay": true,
+        "requestTimeout": true
+      }
+    },
+    {
+      "testName": "IPC Channel Definitions",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:20.307Z",
+      "totalChannels": 13,
+      "verified": true
+    },
+    {
+      "testName": "NSIS Error Code Mapping",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:20.809Z",
+      "totalCodes": 6,
+      "coverage": 100
+    },
+    {
+      "testName": "Memory Leak Pattern Detection",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:23.191Z",
+      "message": "No memory leak patterns detected"
+    },
+    {
+      "testName": "Network Error Handling Simulation",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:11:23.692Z",
+      "coverage": 100,
+      "foundPatterns": [
+        "catch",
+        "retry",
+        "circuit breaker",
+        "timeout",
+        "error"
+      ],
+      "additionalChecks": {
+        "hasErrorHandler": true,
+        "hasRetryLogic": true,
+        "hasTimeoutHandler": true
+      }
+    }
+  ],
+  "failed": [
+    {
+      "testName": "TypeScript Type Definitions",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:11:22.687Z",
+      "error": "\n\u001b[41m                                                                               \u001b[0m\n\u001b[41m\u001b[37m                This is not the tsc command you are looking for                \u001b[0m\n\u001b[41m                                                                               \u001b[0m\n\nTo get access to the TypeScript compiler, \u001b[34mtsc\u001b[0m, from the command line either:\n\n- Use \u001b[1mnpm install typescript\u001b[0m to first add TypeScript to your project \u001b[1mbefore\u001b[0m using npx\n- Use \u001b[1myarn\u001b[0m to avoid accidentally running code from un-installed packages\n"
+    }
+  ],
+  "skipped": [],
+  "timestamp": "2025-07-16T17:11:18.802Z"
+}

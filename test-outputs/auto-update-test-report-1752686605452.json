@@ -1,0 +1,63 @@
+{
+  "passed": [
+    {
+      "testName": "GitHub API Access Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:23:21.900Z",
+      "statusCode": 200,
+      "latestVersion": "v0.1.28",
+      "publishedAt": "2025-07-16T03:24:36Z",
+      "assetCount": 1
+    },
+    {
+      "testName": "Version Comparison Logic Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:23:22.402Z",
+      "totalTests": 5,
+      "passedTests": 5
+    },
+    {
+      "testName": "Update Detection Configuration Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:23:22.903Z",
+      "checks": {
+        "hasUpdateService": true,
+        "hasGitHubRepo": true,
+        "hasCheckInterval": true,
+        "hasAutoStart": true
+      },
+      "coverage": 100
+    },
+    {
+      "testName": "Download Process Simulation Test",
+      "status": "passed",
+      "timestamp": "2025-07-16T17:23:23.406Z",
+      "features": {
+        "hasProgressTracking": true,
+        "hasErrorHandling": true,
+        "hasValidation": true,
+        "hasRetryMechanism": true,
+        "hasCleanup": true
+      },
+      "coverage": 100
+    }
+  ],
+  "failed": [
+    {
+      "testName": "Network Conditions Simulation Test",
+      "status": "failed",
+      "timestamp": "2025-07-16T17:23:24.951Z",
+      "error": "Poor network conditions: 66.66666666666666% success rate"
+    }
+  ],
+  "manual": [
+    {
+      "testName": "Manual Test Guide Generation",
+      "status": "manual",
+      "timestamp": "2025-07-16T17:23:25.452Z",
+      "guideFile": "/home/jkcho/repository/sebastian/test-outputs/manual-test-guide.json",
+      "totalTests": 4
+    }
+  ],
+  "timestamp": "2025-07-16T17:23:21.626Z"
+}

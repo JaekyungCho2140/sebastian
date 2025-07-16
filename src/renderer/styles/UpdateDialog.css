@@ -71,11 +71,13 @@
   border-radius: var(--border-radius);
   box-shadow: 0 20px 25px -5px var(--dialog-shadow), 0 10px 10px -5px var(--dialog-shadow);
   max-width: var(--dialog-max-width);
-  max-height: var(--dialog-max-height);
+  max-height: 85vh;
   width: 90vw;
   margin: 20px;
   overflow: hidden;
   animation: slideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideIn {
@@ -142,8 +144,9 @@
 /* Dialog Content */
 .update-dialog-content {
   padding: 20px 24px;
-  max-height: 50vh;
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .update-info {
@@ -284,6 +287,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .primary-actions,
@@ -424,4 +428,617 @@
 
 .changelog-text::-webkit-scrollbar-thumb:hover {
   background: rgba(107, 114, 128, 0.5);
+}
+
+/* Installation Progress Styles */
+.install-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.install-phase,
+.install-timestamp,
+.install-eta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid var(--update-primary);
+}
+
+.phase-label,
+.timestamp-label,
+.eta-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.phase-value,
+.timestamp-value,
+.eta-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.install-message {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Enhanced phase indicators */
+.install-phase {
+  background: rgba(16, 185, 129, 0.15);
+  border-left-color: var(--update-primary);
+}
+
+.install-timestamp {
+  background: rgba(107, 114, 128, 0.1);
+  border-left-color: var(--update-secondary);
+}
+
+.install-eta {
+  background: rgba(245, 158, 11, 0.1);
+  border-left-color: #f59e0b;
+}
+
+.install-eta .eta-value {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+/* Enhanced animations for installation progress */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.install-details .install-phase {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.progress-fill {
+  transition: width 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill.animating {
+  transition: none;
+}
+
+/* NSIS-optimized progress animation */
+.progress-fill.nsis-installing {
+  transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.progress-fill.nsis-installing.animating {
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-fill.nsis-phase-change {
+  transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.progress-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.step-item {
+  animation: slideIn 0.5s ease-out;
+}
+
+.step-item.active {
+  animation: pulse 2s ease-in-out infinite, slideIn 0.5s ease-out;
+}
+
+.step-item.completed {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.time-remaining-badge {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.info-item {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.info-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.info-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.info-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Progress bar enhancements */
+.progress-bar {
+  position: relative;
+  background: linear-gradient(45deg, rgba(107, 114, 128, 0.1) 25%, transparent 25%, transparent 50%, rgba(107, 114, 128, 0.1) 50%, rgba(107, 114, 128, 0.1) 75%, transparent 75%, transparent);
+  background-size: 20px 20px;
+  animation: progressBackground 2s linear infinite;
+}
+
+@keyframes progressBackground {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 0;
+  }
+}
+
+.progress-percentage {
+  animation: fadeIn 0.3s ease-out;
+  transition: all 0.3s ease;
+}
+
+.progress-percentage:hover {
+  transform: scale(1.1);
+}
+
+/* Enhanced Installation Progress Styles */
+.install-phase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.current-phase {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.phase-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.phase-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.phase-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.phase-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.time-remaining-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f59e0b;
+}
+
+.time-icon {
+  font-size: 1rem;
+}
+
+.time-value {
+  font-weight: 600;
+}
+
+/* Installation Steps Progress */
+.installation-steps {
+  margin: 20px 0;
+}
+
+.steps-header {
+  margin-bottom: 12px;
+}
+
+.steps-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.step-item.completed {
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 3px solid var(--update-primary);
+}
+
+.step-item.active {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3b82f6;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.step-item.pending {
+  background: rgba(107, 114, 128, 0.05);
+  border-left: 3px solid var(--update-secondary);
+  opacity: 0.6;
+}
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(107, 114, 128, 0.1);
+  border: 2px solid rgba(107, 114, 128, 0.3);
+  transition: all 0.3s ease;
+}
+
+.step-item.completed .step-indicator {
+  background: var(--update-primary);
+  border-color: var(--update-primary);
+}
+
+.step-item.active .step-indicator {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.step-icon {
+  font-size: 1rem;
+  color: white;
+}
+
+.step-number {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: var(--update-secondary);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.step-item.completed .step-number {
+  background: var(--update-primary);
+}
+
+.step-item.active .step-number {
+  background: #3b82f6;
+}
+
+.step-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.step-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.step-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(107, 114, 128, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.step-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--update-primary), var(--update-primary-hover));
+  transition: width 0.5s ease;
+  border-radius: 2px;
+}
+
+.step-item.active .step-progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+/* Installation Info Grid */
+.install-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(107, 114, 128, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(107, 114, 128, 0.1);
+}
+
+.info-icon {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Installation Message Container */
+.install-message-container {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.install-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.message-icon {
+  font-size: 1.2rem;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.install-message p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .install-phase-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .time-remaining-badge {
+    align-self: flex-end;
+  }
+  
+  .install-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .step-item {
+    padding: 10px 8px;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus management for accessibility */
+.update-progress-dialog:focus {
+  outline: 2px solid var(--update-primary);
+  outline-offset: 2px;
+}
+
+.step-item:focus-within {
+  outline: 2px solid var(--update-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+.info-item:focus-within {
+  outline: 2px solid var(--update-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .progress-fill::before {
+    animation: none;
+  }
+  
+  .progress-bar {
+    animation: none;
+  }
+  
+  .install-details .install-phase {
+    animation: none;
+  }
+  
+  .step-item.active {
+    animation: none;
+  }
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .install-phase,
+  .install-timestamp,
+  .install-eta {
+    background: rgba(16, 185, 129, 0.2);
+  }
+  
+  .install-timestamp {
+    background: rgba(107, 114, 128, 0.2);
+  }
+  
+  .install-eta {
+    background: rgba(245, 158, 11, 0.2);
+  }
+  
+  .install-phase-header {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  
+  .time-remaining-badge {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+  
+  .step-item.completed {
+    background: rgba(16, 185, 129, 0.15);
+  }
+  
+  .step-item.active {
+    background: rgba(59, 130, 246, 0.15);
+  }
+  
+  .step-item.pending {
+    background: rgba(107, 114, 128, 0.1);
+  }
+  
+  .info-item {
+    background: rgba(107, 114, 128, 0.1);
+    border-color: rgba(107, 114, 128, 0.2);
+  }
+  
+  .install-message-container {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+  }
 }

@@ -1,0 +1,356 @@
+{
+  "timestamp": "2025-07-16T17:57:54.083Z",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "manual": 3
+  },
+  "results": {
+    "passed": [
+      {
+        "name": "다운로드 속도 벤치마크",
+        "duration": 932
+      },
+      {
+        "name": "설치 시간 측정",
+        "duration": 9234
+      },
+      {
+        "name": "메모리 사용량 프로파일링",
+        "duration": 10101
+      },
+      {
+        "name": "CPU 성능 벤치마크",
+        "duration": 120
+      },
+      {
+        "name": "응답 시간 측정",
+        "duration": 17730
+      },
+      {
+        "name": "파일 크기 및 압축 효율성 측정",
+        "duration": 0
+      },
+      {
+        "name": "네트워크 지연 시간 측정",
+        "duration": 5513
+      }
+    ],
+    "failed": [],
+    "manual": [],
+    "metrics": []
+  },
+  "performanceReport": {
+    "timestamp": "2025-07-16T17:57:54.081Z",
+    "systemInfo": {
+      "platform": "linux",
+      "architecture": "x64",
+      "nodeVersion": "v22.17.0",
+      "cpuCores": 24,
+      "totalMemory": 16,
+      "freeMemory": 13
+    },
+    "metrics": {
+      "downloadSpeed": [
+        {
+          "name": "GitHub API 응답",
+          "size": 10000,
+          "duration": 642.9806789999999,
+          "speed": 15.188053574468295
+        },
+        {
+          "name": "Package.json 파일",
+          "size": 5000,
+          "duration": 186.33706000000006,
+          "speed": 26.20419416298614
+        },
+        {
+          "name": "대용량 파일 시뮬레이션",
+          "size": 10485760,
+          "duration": 101.72685200000001,
+          "speed": 98.30246196943162
+        }
+      ],
+      "installTime": [
+        {
+          "phase": "파일 다운로드",
+          "expectedDuration": 2000,
+          "actualDuration": 2063.3085549999996,
+          "efficiency": 96.93169715956518
+        },
+        {
+          "phase": "설치 파일 검증",
+          "expectedDuration": 500,
+          "actualDuration": 479.76464899999974,
+          "efficiency": 104.21776615725604
+        },
+        {
+          "phase": "기존 앱 종료",
+          "expectedDuration": 1000,
+          "actualDuration": 982.172521,
+          "efficiency": 101.81510667615186
+        },
+        {
+          "phase": "NSIS 설치 실행",
+          "expectedDuration": 3000,
+          "actualDuration": 2974.2039750000004,
+          "efficiency": 100.86732534879353
+        },
+        {
+          "phase": "레지스트리 업데이트",
+          "expectedDuration": 800,
+          "actualDuration": 859.0356350000002,
+          "efficiency": 93.12768497665405
+        },
+        {
+          "phase": "바로가기 생성",
+          "expectedDuration": 300,
+          "actualDuration": 305.612251999999,
+          "efficiency": 98.16360372881941
+        },
+        {
+          "phase": "앱 재시작",
+          "expectedDuration": 1500,
+          "actualDuration": 1567.7009269999999,
+          "efficiency": 95.68151515164602
+        }
+      ],
+      "memoryUsage": [
+        {
+          "duration": 10000,
+          "snapshots": 19,
+          "maxMemory": 8,
+          "avgMemory": 7,
+          "memoryGrowth": 3,
+          "initialMemory": 5
+        }
+      ],
+      "cpuUsage": [
+        {
+          "test": "정수 연산",
+          "duration": 2.1453309999997145,
+          "cpuTime": 3.63,
+          "efficiency": 169.2046588615222,
+          "result": 999999000000
+        },
+        {
+          "test": "부동소수점 연산",
+          "duration": 14.301704000001337,
+          "cpuTime": 15.144,
+          "efficiency": 105.8894800227902,
+          "result": 0.20325529135763964
+        },
+        {
+          "test": "문자열 처리",
+          "duration": 0.38210500000059255,
+          "cpuTime": 0.383,
+          "efficiency": 100.23422881129692,
+          "result": 158890
+        },
+        {
+          "test": "배열 정렬",
+          "duration": 102.8329620000004,
+          "cpuTime": 112.177,
+          "efficiency": 109.08661757695899,
+          "result": 100000
+        }
+      ],
+      "responseTime": [
+        {
+          "test": "앱 시작 시간",
+          "measurements": [
+            658.1515619999991,
+            1094.1879880000015,
+            887.0142369999994,
+            1460.5629079999999,
+            700.9251860000004
+          ],
+          "avgResponseTime": 960.1683762,
+          "minResponseTime": 658.1515619999991,
+          "maxResponseTime": 1460.5629079999999,
+          "consistency": 16.430142265708092
+        },
+        {
+          "test": "업데이트 확인 시간",
+          "measurements": [
+            2977.386918,
+            1693.0873009999996,
+            2981.176303,
+            1141.2491329999975,
+            2541.7172529999953
+          ],
+          "avgResponseTime": 2266.9233815999987,
+          "minResponseTime": 1141.2491329999975,
+          "maxResponseTime": 2981.176303,
+          "consistency": 18.83593486510432
+        },
+        {
+          "test": "설정 저장 시간",
+          "measurements": [
+            127.41111300000193,
+            130.21185200000036,
+            104.22058200000174,
+            136.26333799999702,
+            103.29196899999806
+          ],
+          "avgResponseTime": 120.27977079999982,
+          "minResponseTime": 103.29196899999806,
+          "maxResponseTime": 136.26333799999702,
+          "consistency": 72.58776868238013
+        },
+        {
+          "test": "파일 읽기 시간",
+          "measurements": [
+            139.37218199999916,
+            108.36504100000457,
+            128.22642399999313,
+            149.24122300000454,
+            276.36353000000236
+          ],
+          "avgResponseTime": 160.31368000000074,
+          "minResponseTime": 108.36504100000457,
+          "maxResponseTime": 276.36353000000236,
+          "consistency": -4.793607756990559
+        },
+        {
+          "test": "UI 렌더링 시간",
+          "measurements": [
+            20.211087000003317,
+            52.3401440000016,
+            67.16995600000519,
+            27.18288599999505,
+            23.13853000000381
+          ],
+          "avgResponseTime": 38.008520600001795,
+          "minResponseTime": 20.211087000003317,
+          "maxResponseTime": 67.16995600000519,
+          "consistency": -23.54826827961216
+        }
+      ],
+      "fileSize": [
+        {
+          "name": "Sebastian.exe",
+          "path": "dist/win-unpacked/Sebastian.exe",
+          "sizeBytes": 0,
+          "sizeMB": 0,
+          "exists": false
+        },
+        {
+          "name": "Sebastian Setup.exe",
+          "path": "dist/Sebastian Setup.exe",
+          "sizeBytes": 0,
+          "sizeMB": 0,
+          "exists": false
+        },
+        {
+          "name": "app.asar",
+          "path": "dist/win-unpacked/resources/app.asar",
+          "sizeBytes": 0,
+          "sizeMB": 0,
+          "exists": false
+        }
+      ],
+      "networkLatency": [
+        {
+          "endpoint": "GitHub API",
+          "url": "https://api.github.com",
+          "measurements": [
+            206.48203700000158,
+            739.857422000001,
+            740.8708370000022
+          ],
+          "avgLatency": 562.4034320000015,
+          "minLatency": 206.48203700000158,
+          "maxLatency": 740.8708370000022,
+          "reliability": 100
+        },
+        {
+          "endpoint": "GitHub Raw",
+          "url": "https://raw.githubusercontent.com",
+          "measurements": [
+            817.9922329999972,
+            168.31309400000464,
+            430.6411250000019
+          ],
+          "avgLatency": 472.3154840000013,
+          "minLatency": 168.31309400000464,
+          "maxLatency": 817.9922329999972,
+          "reliability": 100
+        },
+        {
+          "endpoint": "GitHub Releases",
+          "url": "https://github.com",
+          "measurements": [
+            630.8629719999954,
+            1035.2041230000032,
+            742.0228540000026
+          ],
+          "avgLatency": 802.696649666667,
+          "minLatency": 630.8629719999954,
+          "maxLatency": 1035.2041230000032,
+          "reliability": 100
+        }
+      ]
+    },
+    "summary": {
+      "avgDownloadSpeed": 46.56,
+      "totalInstallTime": 9231.798513999998,
+      "peakMemoryUsage": 8,
+      "avgResponseTime": 709,
+      "networkReliability": 100
+    },
+    "recommendations": []
+  },
+  "manualTestGuide": {
+    "title": "성능 메트릭 수동 검증 가이드",
+    "description": "실제 환경에서 성능을 측정하고 검증하는 가이드",
+    "tests": [
+      {
+        "id": "PERF_1",
+        "name": "실제 다운로드 속도 측정",
+        "priority": "HIGH",
+        "duration": "10분",
+        "description": "실제 네트워크 환경에서 업데이트 다운로드 속도 측정",
+        "steps": [
+          "1. 안정적인 네트워크 환경 확인",
+          "2. Sebastian 업데이트 다운로드 시작",
+          "3. 다운로드 진행률 및 속도 모니터링",
+          "4. 완료 시간 기록",
+          "5. 다양한 네트워크 조건에서 반복 측정"
+        ],
+        "expectedResult": "일관된 다운로드 성능 및 적절한 속도 표시"
+      },
+      {
+        "id": "PERF_2",
+        "name": "설치 시간 실측",
+        "priority": "HIGH",
+        "duration": "15분",
+        "description": "실제 NSIS 설치 프로세스 시간 측정",
+        "steps": [
+          "1. 설치 시작 시간 기록",
+          "2. 각 설치 단계별 시간 측정",
+          "3. 완료 시간 기록",
+          "4. 여러 시스템에서 반복 측정",
+          "5. 평균 설치 시간 계산"
+        ],
+        "expectedResult": "10초 이내 설치 완료 및 일관된 성능"
+      },
+      {
+        "id": "PERF_3",
+        "name": "메모리 사용량 장기 모니터링",
+        "priority": "MEDIUM",
+        "duration": "1시간",
+        "description": "장시간 실행 시 메모리 사용량 변화 모니터링",
+        "steps": [
+          "1. 작업 관리자 또는 모니터링 도구 준비",
+          "2. Sebastian 시작 시 메모리 사용량 기록",
+          "3. 1시간 동안 주기적으로 메모리 사용량 측정",
+          "4. 메모리 누수 패턴 확인",
+          "5. 최대 메모리 사용량 기록"
+        ],
+        "expectedResult": "150MB 이하 메모리 사용 및 누수 없음"
+      }
+    ]
+  }
+}

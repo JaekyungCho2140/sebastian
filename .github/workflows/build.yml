@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build Windows MSI
+    name: Build Windows Installer
     runs-on: windows-latest
     
     steps:
@@ -30,8 +30,8 @@ jobs:
       - name: Build application
         run: npm run build
         
-      - name: Create MSI installer
-        run: npm run dist:win-msi
+      - name: Create NSIS installer
+        run: npm run dist:win-nsis
         
       - name: Get version
         id: get_version
@@ -41,31 +41,31 @@ jobs:
           echo "Build version: $version"
         shell: powershell
         
-      - name: Find MSI file
-        id: find_msi
+      - name: Find installer file
+        id: find_installer
         run: |
-          $msiFile = Get-ChildItem -Path "release" -Filter "*.msi" -Recurse | Select-Object -First 1
-          if ($msiFile) {
-            $fullPath = $msiFile.FullName
-            $fileName = $msiFile.Name
-            $fileSize = [math]::Round($msiFile.Length / 1MB, 2)
+          $installerFile = Get-ChildItem -Path "release" -Filter "*.exe" -Recurse | Select-Object -First 1
+          if ($installerFile) {
+            $fullPath = $installerFile.FullName
+            $fileName = $installerFile.Name
+            $fileSize = [math]::Round($installerFile.Length / 1MB, 2)
             
-            echo "MSI_PATH=$fullPath" >> $env:GITHUB_OUTPUT
-            echo "MSI_NAME=$fileName" >> $env:GITHUB_OUTPUT
-            echo "MSI_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
+            echo "INSTALLER_PATH=$fullPath" >> $env:GITHUB_OUTPUT
+            echo "INSTALLER_NAME=$fileName" >> $env:GITHUB_OUTPUT
+            echo "INSTALLER_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
             
-            echo "✅ MSI file found: $fileName ($fileSize MB)"
+            echo "✅ Installer file found: $fileName ($fileSize MB)"
           } else {
-            echo "❌ No MSI file found"
+            echo "❌ No installer file found"
             exit 1
           }
         shell: powershell
         
-      - name: Upload MSI artifact
+      - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sebastian-v${{ steps.get_version.outputs.VERSION }}-msi
-          path: ${{ steps.find_msi.outputs.MSI_PATH }}
+          name: sebastian-v${{ steps.get_version.outputs.VERSION }}-installer
+          path: ${{ steps.find_installer.outputs.INSTALLER_PATH }}
           retention-days: 30
           
       - name: Create GitHub Release
@@ -75,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           $version = "${{ steps.get_version.outputs.VERSION }}"
-          $msiSize = "${{ steps.find_msi.outputs.MSI_SIZE }}"
+          $installerSize = "${{ steps.find_installer.outputs.INSTALLER_SIZE }}"
           $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm UTC"
           
           $releaseNotes = @"
@@ -83,12 +83,12 @@ jobs:
           
           ### 📦 Release Information
           - **Build Date**: $buildDate
-          - **Installer Size**: $msiSize MB
+          - **Installer Size**: $installerSize MB
           - **Platform**: Windows x64
           - **Build Source**: ${{ github.sha }}
           
           ### 📥 Installation
-          1. Download the Sebastian-$version-Setup.msi file below
+          1. Download the Sebastian-$version-Setup.exe file below
           2. Run the installer and follow the setup wizard
           3. Launch Sebastian from Start Menu or Desktop shortcut
           
@@ -128,7 +128,7 @@ jobs:
           
           # Create new release
           try {
-            gh release create $tagName --title "Sebastian v$version" --notes $releaseNotes "${{ steps.find_msi.outputs.MSI_PATH }}"
+            gh release create $tagName --title "Sebastian v$version" --notes $releaseNotes "${{ steps.find_installer.outputs.INSTALLER_PATH }}"
             echo "✅ GitHub Release created: $tagName"
           } catch {
             echo "❌ Failed to create GitHub Release: $_"
@@ -142,11 +142,11 @@ jobs:
           echo ""
           echo "📋 Build Summary:"
           echo "   Version: ${{ steps.get_version.outputs.VERSION }}"
-          echo "   MSI File: ${{ steps.find_msi.outputs.MSI_NAME }}"
-          echo "   File Size: ${{ steps.find_msi.outputs.MSI_SIZE }} MB"
+          echo "   Installer File: ${{ steps.find_installer.outputs.INSTALLER_NAME }}"
+          echo "   File Size: ${{ steps.find_installer.outputs.INSTALLER_SIZE }} MB"
           echo ""
           if [ "${{ inputs.create_release }}" = "true" ]; then
             echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.VERSION }}"
           fi
-          echo "📎 Artifact: sebastian-v${{ steps.get_version.outputs.VERSION }}-msi"
+          echo "📎 Artifact: sebastian-v${{ steps.get_version.outputs.VERSION }}-installer"
         shell: bash
