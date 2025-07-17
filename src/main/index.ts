@@ -138,6 +138,7 @@ function createWindow(): void {
     minimizable: true,
     show: false,
     autoHideMenuBar: true,
+    icon: join(__dirname, '../../src/assets/icons/icon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

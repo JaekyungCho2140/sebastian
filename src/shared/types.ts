@@ -169,6 +169,12 @@ export interface IpcResponses {
   [IPC_CHANNELS.SEARCH_HELP]: HelpSearchResult[]
   [IPC_CHANNELS.EXPORT_DETAILED_ERROR_ANALYSIS]: string // file path
   [IPC_CHANNELS.COMPRESS_LOGS]: void
+  
+  // Development/debugging handlers
+  'reset-circuit-breaker': { success: boolean; message: string }
+  'get-circuit-breaker-status': { isOpen: boolean; resetTime: number; retryCount: number }
+  'force-update-check': UpdateInfo | null
+  'mock-update-available': UpdateInfo
 }
 
 // Events that can be sent from main to renderer
@@ -712,6 +718,12 @@ declare global {
       onUpdateProgress: (callback: (progress: UpdateProgress) => void) => void
       onUpdateError: (callback: (error: string) => void) => void
       onShowUpdateDialog: (callback: (data: UpdateDialogData) => void) => void
+      
+      // Development/debugging functions
+      resetCircuitBreaker: () => Promise<{ success: boolean; message: string }>
+      getCircuitBreakerStatus: () => Promise<{ isOpen: boolean; resetTime: number; retryCount: number }>
+      forceUpdateCheck: () => Promise<UpdateInfo | null>
+      mockUpdateAvailable: () => Promise<UpdateInfo>
     }
   }
 }
