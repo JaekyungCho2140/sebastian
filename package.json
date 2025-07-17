@@ -9,7 +9,7 @@
     "wscat": "^6.1.0"
   },
   "name": "sebastian",
-  "version": "0.1.31",
+  "version": "0.2.0",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
