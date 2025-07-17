@@ -154,23 +154,44 @@ export class UpdateService extends EventEmitter {
   public async start(): Promise<void> {
     console.log('UpdateService starting...')
     
-    // Check for updates on startup if enough time has passed
-    const state = await this.stateManager.getState()
-    const timeSinceLastCheck = Date.now() - state.lastUpdateCheck
-    
-    console.log('=== UPDATE SERVICE DEBUG ===')
-    console.log('Current version:', state.version)
-    console.log('Last update check:', new Date(state.lastUpdateCheck))
-    console.log('Time since last check (ms):', timeSinceLastCheck)
-    console.log('Check interval (ms):', this.options.checkInterval)
-    console.log('Should check for updates:', timeSinceLastCheck > this.options.checkInterval)
-    
-    // Force update check for debugging (remove in production)
-    console.log('Forcing update check for debugging...')
-    await this.checkForUpdates()
-    
-    // Set up periodic checking
-    this.scheduleNextCheck()
+    try {
+      // Check for updates on startup if enough time has passed
+      const state = await this.stateManager.getState()
+      const timeSinceLastCheck = Date.now() - state.lastUpdateCheck
+      
+      console.log('=== UPDATE SERVICE DEBUG ===')
+      console.log('Current version:', state.version)
+      console.log('Last update check:', new Date(state.lastUpdateCheck))
+      console.log('Time since last check (ms):', timeSinceLastCheck)
+      console.log('Check interval (ms):', this.options.checkInterval)
+      console.log('Should check for updates:', timeSinceLastCheck > this.options.checkInterval)
+      console.log('Circuit breaker status:', {
+        isOpen: this.circuitBreakerOpen,
+        resetTime: this.circuitBreakerResetTime ? new Date(this.circuitBreakerResetTime) : 'N/A',
+        retryCount: this.retryCount
+      })
+      console.log('GitHub repo:', this.options.githubRepo)
+      console.log('Request timeout:', this.options.requestTimeout)
+      
+      // Force update check for debugging (remove in production)
+      console.log('Forcing update check for debugging...')
+      
+      // Reset circuit breaker if it's open for development
+      if (this.circuitBreakerOpen) {
+        console.log('Circuit breaker is open, resetting for development...')
+        this.resetCircuitBreaker()
+      }
+      
+      const result = await this.checkForUpdates()
+      console.log('Initial update check result:', result)
+      
+      // Set up periodic checking
+      this.scheduleNextCheck()
+      console.log('UpdateService started successfully')
+    } catch (error) {
+      console.error('UpdateService start failed:', error)
+      throw error
+    }
   }
 
   public async stop(): Promise<void> {
@@ -687,6 +708,42 @@ export class UpdateService extends EventEmitter {
         updateInfo, 
         error: error instanceof Error ? error.message : 'Update failed' 
       })
+      throw error
+    }
+  }
+
+  // Reset circuit breaker manually (for development/debugging)
+  public resetCircuitBreaker(): void {
+    this.circuitBreakerOpen = false
+    this.circuitBreakerResetTime = 0
+    this.retryCount = 0
+    console.log('Circuit breaker manually reset')
+  }
+
+  // Get circuit breaker status
+  public getCircuitBreakerStatus(): { isOpen: boolean, resetTime: number, retryCount: number } {
+    return {
+      isOpen: this.circuitBreakerOpen,
+      resetTime: this.circuitBreakerResetTime,
+      retryCount: this.retryCount
+    }
+  }
+
+  // Force update check (bypasses circuit breaker for testing)
+  public async forceUpdateCheck(): Promise<UpdateCheckResult> {
+    console.log('Force update check requested - bypassing circuit breaker')
+    const wasOpen = this.circuitBreakerOpen
+    this.resetCircuitBreaker()
+    
+    try {
+      const result = await this.checkForUpdates()
+      return result
+    } catch (error) {
+      // Restore circuit breaker state if it was open before
+      if (wasOpen) {
+        this.circuitBreakerOpen = true
+        this.circuitBreakerResetTime = Date.now() + (30 * 60 * 1000)
+      }
       throw error
     }
   }

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-// IPC Channel constants - copied from shared/types to avoid module dependency in preload
+// IPC Channel constants - temporarily hardcoded to fix module loading issue
 const IPC_CHANNELS = {
   GET_VERSION: 'get-version',
   SHOW_SUCCESS_DIALOG: 'show-success-dialog',
@@ -169,6 +169,12 @@ const electronAPI = {
   
   // Generic invoke method
   invoke: (channel: string, ...args: any[]) => safeInvoke(channel, ...args),
+  
+  // Development/debugging methods
+  resetCircuitBreaker: () => safeInvoke('reset-circuit-breaker'),
+  getCircuitBreakerStatus: () => safeInvoke('get-circuit-breaker-status'),
+  forceUpdateCheck: () => safeInvoke('force-update-check'),
+  mockUpdateAvailable: () => safeInvoke('mock-update-available'),
   
   // Generic event listener methods
   on: (channel: string, callback: (data: any) => void) => {

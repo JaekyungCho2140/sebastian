@@ -290,26 +290,63 @@ function handleInstallationFailure(): void {
 
 // Initialize IPC handlers
 export function setupIpcHandlers(): void {
+  console.log('=== IPC HANDLERS: SETUP STARTING ===')
+  
   const stateManager = getStateManager()
+  console.log('StateManager retrieved:', !!stateManager)
+  
+  // Test StateManager functionality
+  try {
+    const testState = stateManager.getState()
+    console.log('StateManager test - current state:', testState)
+  } catch (stateError) {
+    console.error('StateManager test failed:', stateError)
+  }
   
   // Initialize error reporter
+  console.log('Initializing error reporter...')
   errorReporter = new LocalErrorReporter({
     reportingLevel: 'medium',
     maxFiles: 100,
     maxAge: 30
   })
+  console.log('Error reporter initialized successfully')
   
   // Initialize update service
-  updateService = new UpdateService(stateManager, {
-    githubRepo: 'JaekyungCho2140/sebastian', // Replace with your actual GitHub repo
-    checkInterval: 24 * 60 * 60 * 1000, // 24 hours
-    maxRetries: 3,
-    retryDelay: 5000,
-    requestTimeout: 30000
-  })
+  console.log('=== IPC HANDLERS: INITIALIZING UPDATE SERVICE ===')
   
-  // Start update service
-  updateService.start().catch(console.error)
+  try {
+    updateService = new UpdateService(stateManager, {
+      githubRepo: 'JaekyungCho2140/sebastian', // Replace with your actual GitHub repo
+      checkInterval: 24 * 60 * 60 * 1000, // 24 hours
+      maxRetries: 3,
+      retryDelay: 5000,
+      requestTimeout: 30000
+    })
+    
+    console.log('UpdateService instance created successfully')
+    
+    // Start update service with comprehensive error handling
+    updateService.start()
+      .then(() => {
+        console.log('=== UPDATE SERVICE STARTED SUCCESSFULLY ===')
+      })
+      .catch((error) => {
+        console.error('=== UPDATE SERVICE START FAILED ===')
+        console.error('Error details:', error)
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack available')
+        
+        // Continue with IPC setup even if update service fails
+        console.log('Continuing with IPC setup despite UpdateService failure...')
+      })
+  } catch (initError) {
+    console.error('=== UPDATE SERVICE INITIALIZATION FAILED ===')
+    console.error('Initialization error:', initError)
+    console.error('Error stack:', initError instanceof Error ? initError.stack : 'No stack available')
+    
+    // Set updateService to null so other handlers can check
+    updateService = null
+  }
 
   // Get version handler
   createHandler(IPC_CHANNELS.GET_VERSION, async () => {
@@ -901,6 +938,106 @@ export function setupIpcHandlers(): void {
     }
   })
 
+  // Development/debugging handlers - using direct ipcMain.handle
+  console.log('Registering development IPC handlers...')
+  
+  // Reset circuit breaker handler
+  ipcMain.handle('reset-circuit-breaker', async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Resetting circuit breaker...')
+      updateService.resetCircuitBreaker()
+      return { success: true, message: 'Circuit breaker reset successfully' }
+    } catch (error) {
+      console.error('Failed to reset circuit breaker:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to reset circuit breaker',
+        'RESET_CIRCUIT_BREAKER_FAILED'
+      )
+    }
+  })
+
+  // Get circuit breaker status handler
+  ipcMain.handle('get-circuit-breaker-status', async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Getting circuit breaker status...')
+      return updateService.getCircuitBreakerStatus()
+    } catch (error) {
+      console.error('Failed to get circuit breaker status:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get circuit breaker status',
+        'GET_CIRCUIT_BREAKER_STATUS_FAILED'
+      )
+    }
+  })
+
+  // Force update check handler
+  ipcMain.handle('force-update-check', async () => {
+    if (!updateService) {
+      throw new IpcError('Update service not initialized', 'UPDATE_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      console.log('Force update check requested...')
+      const result = await updateService.forceUpdateCheck()
+      
+      if (result.error) {
+        throw new IpcError(result.error, 'FORCE_UPDATE_CHECK_FAILED')
+      }
+      
+      return result.updateInfo || null
+    } catch (error) {
+      console.error('Force update check failed:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Force update check failed',
+        'FORCE_UPDATE_CHECK_ERROR'
+      )
+    }
+  })
+
+  // Mock update available handler
+  ipcMain.handle('mock-update-available', async () => {
+    try {
+      console.log('Triggering mock update available...')
+      
+      // Create fake update info for testing
+      const mockUpdateInfo: UpdateInfo = {
+        version: 'v0.1.30-test',
+        releaseDate: new Date().toISOString(),
+        downloadUrl: 'https://github.com/JaekyungCho2140/sebastian/releases/download/v0.1.29/Sebastian-0.1.29-Setup.exe',
+        changelog: '## Test Update v0.1.30\n\n### 🧪 Development Testing\n- This is a mock update for testing the auto-update system\n- UI changes: "Sebastian +++" → "Sebastian Test"\n- This update is for development purposes only\n\n### 🔧 Technical Changes\n- Enhanced update testing capabilities\n- Improved circuit breaker handling\n- Better development workflow',
+        downloadSize: 157180000 // ~157MB
+      }
+      
+      // Trigger the update available event
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_AVAILABLE, mockUpdateInfo)
+      })
+      
+      // Update app state
+      stateManager.setState({
+        isUpdateAvailable: true,
+        lastUpdateCheck: Date.now()
+      })
+      
+      console.log('Mock update available event triggered')
+      return mockUpdateInfo
+    } catch (error) {
+      console.error('Failed to trigger mock update:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to trigger mock update',
+        'MOCK_UPDATE_FAILED'
+      )
+    }
+  })
+
   // Setup update service event listeners
   if (updateService) {
     updateService.on('updateAvailable', (updateInfo: UpdateInfo) => {
@@ -1009,6 +1146,7 @@ export function setupIpcHandlers(): void {
     })
   }
 
+  console.log('Development IPC handlers registered successfully')
   console.log('IPC handlers initialized')
 }
 

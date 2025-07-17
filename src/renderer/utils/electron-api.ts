@@ -151,6 +151,48 @@ export class ElectronAPI {
     
     window.electronAPI.removeAllListeners(channel)
   }
+  
+  // Development/debugging methods
+  async resetCircuitBreaker(): Promise<any> {
+    if (!isElectronAvailable()) {
+      console.log('Circuit breaker reset not available in browser mode')
+      return { success: false, message: 'Not available in browser mode' }
+    }
+    
+    return this.withRetry(() => window.electronAPI.resetCircuitBreaker())
+  }
+  
+  async getCircuitBreakerStatus(): Promise<any> {
+    if (!isElectronAvailable()) {
+      console.log('Circuit breaker status not available in browser mode')
+      return { isOpen: false, message: 'Not available in browser mode' }
+    }
+    
+    return this.withRetry(() => window.electronAPI.getCircuitBreakerStatus())
+  }
+  
+  async forceUpdateCheck(): Promise<UpdateInfo | null> {
+    if (!isElectronAvailable()) {
+      console.log('Force update check not available in browser mode')
+      return null
+    }
+    
+    return this.withRetry(() => window.electronAPI.forceUpdateCheck())
+  }
+  
+  async mockUpdateAvailable(): Promise<UpdateInfo | null> {
+    if (!isElectronAvailable()) {
+      console.log('Mock update not available in browser mode')
+      return null
+    }
+    
+    return this.withRetry(() => window.electronAPI.mockUpdateAvailable())
+  }
+  
+  // Development mode detection
+  isDevelopmentMode(): boolean {
+    return process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev'
+  }
 }
 
 // Export singleton instance
