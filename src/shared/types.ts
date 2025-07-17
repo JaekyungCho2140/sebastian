@@ -5,6 +5,7 @@ export interface AppState {
   isUpdateAvailable: boolean
   lastUpdateCheck: number
   ignoredVersion?: string
+  ignoreUntil?: number // 24시간 후 재체크를 위한 타임스탬프
   userPreferences: {
     theme: 'light' | 'dark'
     language: 'ko' | 'en'

@@ -173,16 +173,41 @@ export class UpdateService extends EventEmitter {
       console.log('GitHub repo:', this.options.githubRepo)
       console.log('Request timeout:', this.options.requestTimeout)
       
-      // Force update check for debugging (remove in production)
-      console.log('Forcing update check for debugging...')
+      // Check ignore until timestamp
+      const isIgnored = state.ignoreUntil && Date.now() < state.ignoreUntil
+      console.log('Ignore until:', state.ignoreUntil ? new Date(state.ignoreUntil) : 'Not set')
+      console.log('Is currently ignored:', isIgnored)
       
-      // Reset circuit breaker if it's open for development
-      if (this.circuitBreakerOpen) {
-        console.log('Circuit breaker is open, resetting for development...')
-        this.resetCircuitBreaker()
+      // Skip update check if we're in ignore period
+      if (isIgnored) {
+        console.log('Skipping update check - in ignore period')
+        return
       }
       
-      const result = await this.checkForUpdates()
+      // Check if enough time has passed since last check
+      const shouldCheck = timeSinceLastCheck > this.options.checkInterval
+      console.log('Should check for updates:', shouldCheck)
+      
+      // Force update check for debugging in development mode
+      const isDev = process.env.NODE_ENV === 'development'
+      if (isDev) {
+        console.log('Forcing update check for debugging (development mode)...')
+        
+        // Reset circuit breaker if it's open for development
+        if (this.circuitBreakerOpen) {
+          console.log('Circuit breaker is open, resetting for development...')
+          this.resetCircuitBreaker()
+        }
+      }
+      
+      // Check for updates if conditions are met
+      let result: UpdateCheckResult = { hasUpdate: false }
+      if (shouldCheck || isDev) {
+        result = await this.checkForUpdates()
+        console.log('Update check result:', result)
+      } else {
+        console.log('Skipping update check - not enough time passed')
+      }
       console.log('Initial update check result:', result)
       
       // Set up periodic checking

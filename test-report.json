@@ -1,46 +1,46 @@
 {
-  "timestamp": "2025-07-16T11:45:01.750Z",
+  "timestamp": "2025-07-17T08:26:28.004Z",
   "version": "0.2.0",
   "platform": "linux",
   "nodeVersion": "v22.17.0",
-  "totalDuration": 2479,
+  "totalDuration": 2789,
   "results": [
     {
       "name": "Basic Infrastructure Tests",
       "status": "PASS",
-      "duration": 2024,
+      "duration": 2329,
       "message": "Test suite passed",
       "details": "🧪 LocalErrorReporter 통합 테스트 시작\n\n✅ ErrorReport 타입 구조 검증\n✅ LocalErrorReporter 클래스 파일 존재\n✅ 유틸리티 모듈들 존재 확인\n✅ 모듈 임포트 및 기본 인스턴스 생성\n✅ 에러 리포팅 설정 검증\n✅ 기본 데이터 마스킹 패턴 검증\n✅ 로그 로테이션 로직 구현 확인\n✅ TypeScript 컴파일 호환성\n\n📊 테스트 결과:\n   통과: 8/8\n   실패: 0/8\n\n🎉 모든 테스트 통과!\n"
     },
     {
       "name": "Schema Compatibility Tests",
       "status": "PASS",
-      "duration": 17,
+      "duration": 18,
       "message": "Test suite passed",
       "details": "🧪 JSON Schema Compatibility 테스트 시작\n\n✅ Error Report Schema 파일 존재 확인\n✅ Config Schema 파일 존재 확인\n✅ Serialization 유틸리티 모듈 존재 확인\n✅ Schema Validation 유틸리티 모듈 존재 확인\n✅ 유효한 에러 리포트 데이터 구조 검증\n✅ 유효한 설정 데이터 구조 검증\n✅ JSON 직렬화/역직렬화 호환성\n✅ 스키마 버전 호환성\n✅ 에지 케이스 처리\n✅ 직렬화 성능 테스트\n\n📊 테스트 결과:\n   통과: 10/10\n   실패: 0/10\n\n🎉 모든 스키마 호환성 테스트 통과!\n"
     },
     {
       "name": "Report Error Functionality",
       "status": "PASS",
-      "duration": 1,
+      "duration": 2,
       "message": "Test suite passed"
     },
     {
       "name": "Error Scenarios Validation",
       "status": "PASS",
-      "duration": 409,
+      "duration": 404,
       "message": "Test suite passed"
     },
     {
       "name": "Dialog Automation Tests",
       "status": "PASS",
-      "duration": 15,
+      "duration": 16,
       "message": "Test suite passed"
     },
     {
       "name": "File System & Log Rotation",
       "status": "PASS",
-      "duration": 12,
+      "duration": 19,
       "message": "Test suite passed"
     }
   ],

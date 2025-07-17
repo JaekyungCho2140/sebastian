@@ -125,6 +125,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Sebastian",
+      "installerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
       "installerLanguages": [
         "en_US"
       ],

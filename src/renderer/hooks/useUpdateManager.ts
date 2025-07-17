@@ -109,7 +109,7 @@ export const useUpdateManager = (): UpdateManagerState & UpdateManagerActions =>
     setState(prev => ({ ...prev, isShowingUpdateDialog: false }))
   }, [])
 
-  // Ignore update - mark version as ignored
+  // Ignore update - mark version as ignored for 24 hours
   const ignoreUpdate = useCallback(() => {
     if (state.updateInfo?.version) {
       setState(prev => ({ 
@@ -119,8 +119,14 @@ export const useUpdateManager = (): UpdateManagerState & UpdateManagerActions =>
         isUpdateAvailable: false
       }))
       
+      // Set ignore until 24 hours from now
+      const ignoreUntil = Date.now() + (24 * 60 * 60 * 1000) // 24 hours
       window.electronAPI.ignoreUpdate(state.updateInfo.version)
         .catch((error: Error) => console.error('Failed to ignore update:', error))
+      
+      // Also set the ignore until timestamp
+      window.electronAPI.setAppState({ ignoreUntil })
+        .catch((error: Error) => console.error('Failed to set ignore until:', error))
     }
   }, [state.updateInfo?.version])
 
