@@ -5,10 +5,11 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.34.3",
-    "task-master-ai": "^0.20.0"
+    "task-master-ai": "^0.20.0",
+    "wscat": "^6.1.0"
   },
   "name": "sebastian",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
