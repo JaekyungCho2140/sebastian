@@ -8,7 +8,7 @@
     "task-master-ai": "^0.20.0"
   },
   "name": "sebastian",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "main": "dist/main/index.js",
   "scripts": {
