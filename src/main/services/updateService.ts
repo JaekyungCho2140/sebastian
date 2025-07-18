@@ -275,12 +275,17 @@ export class UpdateService extends EventEmitter {
     
     if (hasUpdate) {
       const downloadAsset = this.getDownloadAsset(latestRelease)
+      
+      // Get M4 feature versions
+      const m4Features = this.stateManager.getM4FeatureVersions()
+      
       const updateInfo: UpdateInfo = {
         version: latestRelease.tag_name,
         releaseDate: latestRelease.published_at,
         downloadUrl: this.getDownloadUrl(latestRelease),
         changelog: latestRelease.body,
-        downloadSize: downloadAsset?.size
+        downloadSize: downloadAsset?.size,
+        m4Features: m4Features || undefined // Include M4 feature versions only if available
       }
       
       // Store the update info for later download

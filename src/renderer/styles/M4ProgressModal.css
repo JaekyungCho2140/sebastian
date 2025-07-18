@@ -1,0 +1,424 @@
+/* M4 Progress Modal Styles */
+
+/* CSS Variables for M4 Progress Modal */
+:root {
+  --m4-progress-primary: #3b82f6;
+  --m4-progress-success: #28a745;
+  --m4-progress-danger: #dc3545;
+  --m4-progress-warning: #ffc107;
+  --m4-progress-secondary: #6c757d;
+  
+  --m4-progress-bg: #e0e0e0;
+  --m4-progress-fill: var(--m4-progress-primary);
+  --m4-progress-text: #333333;
+  
+  --m4-modal-bg: #f5f5f5;
+  --m4-modal-border: #e0e0e0;
+  --m4-modal-shadow: rgba(0, 0, 0, 0.15);
+  --m4-modal-overlay-bg: rgba(0, 0, 0, 0.6);
+  
+  --m4-text-primary: #333333;
+  --m4-text-secondary: #6c757d;
+  --m4-text-muted: #999999;
+  
+  --m4-font-family: "Malgun Gothic", "맑은 고딕", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --m4-font-size: 12px;
+  --m4-font-weight-bold: 700;
+  
+  --m4-border-radius: 8px;
+  --m4-modal-width: 500px;
+  --m4-modal-height: 300px;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --m4-modal-bg: #2d2d2d;
+    --m4-modal-border: #404040;
+    --m4-modal-shadow: rgba(0, 0, 0, 0.3);
+    --m4-modal-overlay-bg: rgba(0, 0, 0, 0.8);
+    
+    --m4-text-primary: #ffffff;
+    --m4-text-secondary: #d1d5db;
+    --m4-text-muted: #9ca3af;
+    
+    --m4-progress-bg: #404040;
+    --m4-progress-text: #ffffff;
+  }
+}
+
+/* Modal Overlay */
+.m4-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--m4-modal-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1060;
+  animation: m4FadeIn 0.3s ease-out;
+}
+
+@keyframes m4FadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Modal Container */
+.m4-progress-modal {
+  background-color: var(--m4-modal-bg);
+  border: 1px solid var(--m4-modal-border);
+  border-radius: var(--m4-border-radius);
+  box-shadow: 0 4px 20px var(--m4-modal-shadow);
+  width: var(--m4-modal-width);
+  height: var(--m4-modal-height);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--m4-font-family);
+  font-size: var(--m4-font-size);
+  animation: m4SlideIn 0.3s ease-out;
+  position: relative;
+}
+
+@keyframes m4SlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Frame Styles */
+.m4-progress-modal .step-frame,
+.m4-progress-modal .file-frame,
+.m4-progress-modal .progress-frame,
+.m4-progress-modal .info-frame,
+.m4-progress-modal .files-frame {
+  margin-bottom: 12px;
+}
+
+/* Step Frame - 현재 단계 X/Y 표시 */
+.m4-progress-modal .step-frame {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.m4-progress-modal .step-label {
+  font-size: var(--m4-font-size);
+  font-weight: var(--m4-font-weight-bold);
+  color: var(--m4-text-primary);
+}
+
+/* File Frame - 현재 파일명 표시 (왼쪽 여백 포함) */
+.m4-progress-modal .file-frame {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.m4-progress-modal .file-label {
+  font-size: var(--m4-font-size);
+  font-weight: var(--m4-font-weight-bold);
+  color: var(--m4-text-primary);
+  margin-left: 10px;
+}
+
+/* Progress Frame - 사용자 정의 테마 색상 진행률 바 */
+.m4-progress-modal .progress-frame {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.m4-progress-modal .progress-container {
+  width: 100%;
+  height: 20px;
+  position: relative;
+}
+
+.m4-progress-modal .progress-bar-bg {
+  width: 100%;
+  height: 100%;
+  background-color: var(--m4-progress-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.m4-progress-modal .progress-bar-fill {
+  height: 100%;
+  background-color: var(--m4-progress-fill);
+  border-radius: 10px;
+  transition: width 0.3s ease-out;
+  position: relative;
+}
+
+/* Progress Bar Animation */
+.m4-progress-modal .progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Info Frame - 퍼센트 + 남은 시간 표시 */
+.m4-progress-modal .info-frame {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.m4-progress-modal .info-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.m4-progress-modal .progress-percentage,
+.m4-progress-modal .estimated-time {
+  font-size: var(--m4-font-size);
+  font-weight: var(--m4-font-weight-bold);
+  color: var(--m4-text-primary);
+}
+
+/* Files Frame - 처리된 파일 카운터 표시 */
+.m4-progress-modal .files-frame {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.m4-progress-modal .files-counter {
+  font-size: var(--m4-font-size);
+  font-weight: var(--m4-font-weight-bold);
+  color: var(--m4-text-primary);
+}
+
+/* Canvas Frame - 애니메이션 점 표시 */
+.m4-progress-modal .canvas-frame {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  min-height: 40px;
+}
+
+.m4-progress-modal .progress-canvas {
+  border: 1px solid var(--m4-modal-border);
+  border-radius: 4px;
+  background-color: var(--m4-modal-bg);
+}
+
+/* Button Frame - 취소/닫기 버튼 */
+.m4-progress-modal .button-frame {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+}
+
+.m4-progress-modal .progress-button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: var(--m4-font-size);
+  font-weight: var(--m4-font-weight-bold);
+  cursor: pointer;
+  min-width: 80px;
+  font-family: var(--m4-font-family);
+  transition: all 0.2s ease;
+}
+
+.m4-progress-modal .progress-button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.m4-progress-modal .progress-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Button Color States */
+.m4-progress-modal .progress-button.preparing,
+.m4-progress-modal .progress-button.processing {
+  background-color: var(--m4-progress-danger);
+  color: white;
+}
+
+.m4-progress-modal .progress-button.complete {
+  background-color: var(--m4-progress-success);
+  color: white;
+}
+
+.m4-progress-modal .progress-button.error {
+  background-color: var(--m4-progress-danger);
+  color: white;
+}
+
+.m4-progress-modal .progress-button.cancelled {
+  background-color: var(--m4-progress-secondary);
+  color: white;
+}
+
+/* Stage-specific modal styling */
+.m4-progress-modal.stage-preparing {
+  /* 준비 중 상태 */
+}
+
+.m4-progress-modal.stage-processing {
+  /* 처리 중 상태 */
+}
+
+.m4-progress-modal.stage-complete {
+  border-color: var(--m4-progress-success);
+}
+
+.m4-progress-modal.stage-error {
+  border-color: var(--m4-progress-danger);
+}
+
+.m4-progress-modal.stage-cancelled {
+  border-color: var(--m4-progress-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .m4-progress-modal {
+    width: 90vw;
+    max-width: 400px;
+    height: auto;
+    min-height: 280px;
+    padding: 16px;
+  }
+  
+  .m4-progress-modal .step-frame,
+  .m4-progress-modal .file-frame,
+  .m4-progress-modal .progress-frame,
+  .m4-progress-modal .info-frame,
+  .m4-progress-modal .files-frame {
+    margin-bottom: 10px;
+  }
+  
+  .m4-progress-modal .canvas-frame {
+    min-height: 40px;
+  }
+  
+  .m4-progress-modal .button-frame button {
+    min-width: 70px;
+    padding: 6px 12px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .m4-progress-overlay,
+  .m4-progress-modal,
+  .m4-progress-modal .progress-frame > div > div,
+  .m4-progress-modal .button-frame button {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus management */
+.m4-progress-modal .button-frame button:focus {
+  outline: 2px solid var(--m4-progress-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .m4-progress-modal {
+    border-width: 2px;
+    border-color: var(--m4-text-primary);
+  }
+  
+  .m4-progress-modal .canvas-frame canvas {
+    border-width: 2px;
+  }
+  
+  .m4-progress-modal .button-frame button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Loading states */
+.m4-progress-modal.loading .progress-frame > div > div {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Canvas animation dot */
+.m4-progress-modal .canvas-frame canvas.animated {
+  position: relative;
+}
+
+.m4-progress-modal .canvas-frame canvas.animated::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--m4-progress-primary);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  animation: moveDot 3s linear infinite;
+}
+
+@keyframes moveDot {
+  0% {
+    left: 10px;
+  }
+  100% {
+    left: calc(100% - 16px);
+  }
+}
+
+/* Error state specific styling */
+.m4-progress-modal.stage-error .progress-frame > div > div {
+  background-color: var(--m4-progress-danger);
+}
+
+/* Success state specific styling */
+.m4-progress-modal.stage-complete .progress-frame > div > div {
+  background-color: var(--m4-progress-success);
+}
+
+/* Warning state specific styling */
+.m4-progress-modal.stage-warning .progress-frame > div > div {
+  background-color: var(--m4-progress-warning);
+}

@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "commander": "^12.0.0",
     "electron-log": "^5.4.1",
     "electron-store": "^10.1.0",
+    "exceljs": "^4.4.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "sharp": "^0.34.3",
@@ -11,6 +13,17 @@
   "name": "sebastian",
   "version": "0.2.0",
   "description": "Sebastian Electron-Vite-React Demo Application",
+  "m4Features": {
+    "version": "1.0.0",
+    "components": {
+      "dialogueProcessor": "1.0.0",
+      "stringProcessor": "1.0.0",
+      "optimization": "1.0.0",
+      "performance": "1.0.0",
+      "workerThreads": "1.0.0"
+    },
+    "lastUpdated": "2025-01-18"
+  },
   "main": "dist/main/index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
@@ -37,11 +50,31 @@
     "test:filesystem": "node tests/filesystem-rotation-test.js",
     "test:preload-format": "node tests/preload-format-validation.js",
     "test:e2e": "node tests/end-to-end-test.js",
-    "test:all": "npm run test:integration && npm run test:schema && npm run test:report-error && npm run test:scenarios && npm run test:dialog && npm run test:filesystem && npm run test:preload-format",
+    "test:exceljs": "node tests/exceljs-integration.test.js",
+    "test:m4-types": "node tests/m4-types-validation.test.js",
+    "test:m4-settings": "node tests/m4-settings-schema-validation.js",
+    "test:vitest": "vitest",
+    "test:vitest:ui": "vitest --ui",
+    "test:vitest:coverage": "vitest run --coverage",
+    "test:benchmark": "vitest tests/benchmark-suite.test.ts",
+    "test:final-verification": "vitest tests/m4-final-verification.test.js --run",
+    "test:long-running": "vitest tests/m4-long-running-test.js --run",
+    "test:memory-leaks": "node --expose-gc tests/m4-final-verification.test.js",
+    "test:generate-report": "node tests/generate-final-report.js",
+    "test:m4-update": "node tests/m4-update-migration.test.js",
+    "test:all": "npm run test:integration && npm run test:schema && npm run test:report-error && npm run test:scenarios && npm run test:dialog && npm run test:filesystem && npm run test:preload-format && npm run test:exceljs && npm run test:m4-types && npm run test:m4-settings && npm run test:m4-update",
+    "benchmark": "ts-node src/scripts/run-benchmark.ts",
+    "benchmark:quick": "ts-node src/scripts/run-benchmark.ts --quick",
+    "benchmark:full": "ts-node src/scripts/run-benchmark.ts --sizes 1MB,10MB,50MB,100MB,500MB --iterations 5 --parallel",
+    "benchmark:compare": "ts-node src/scripts/run-benchmark.ts compare",
+    "benchmark:baseline": "ts-node src/scripts/run-benchmark.ts baseline",
+    "verify:bundle": "node scripts/verify-bundle-contents.js",
+    "postbuild": "npm run verify:bundle",
     "version:patch": "npm version patch",
     "version:minor": "npm version minor",
     "version:major": "npm version major",
-    "release": "npm run version:patch && git push --follow-tags"
+    "release:notes": "node scripts/generate-release-notes.js",
+    "release": "npm run version:patch && npm run release:notes && git push --follow-tags"
   },
   "repository": {
     "type": "git",
@@ -56,18 +89,27 @@
   },
   "homepage": "https://github.com/JaekyungCho2140/sebastian#readme",
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/electron-store": "^1.3.1",
+    "@types/exceljs": "^0.5.3",
+    "@types/jest": "^29.5.12",
     "@types/node": "^24.0.12",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
     "concurrently": "^9.2.0",
     "cross-env": "^7.0.3",
     "electron": "^37.2.0",
     "electron-builder": "^26.0.12",
+    "jest": "^29.7.0",
     "rimraf": "^6.0.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "vite": "^7.0.3"
+    "vite": "^7.0.3",
+    "vitest": "^3.2.4"
   },
   "build": {
     "appId": "com.sebastian.app",
@@ -83,7 +125,10 @@
     },
     "files": [
       "dist/**/*",
-      "package.json"
+      "package.json",
+      "!dist/**/*.map",
+      "!dist/**/test/**",
+      "!dist/**/tests/**"
     ],
     "asarUnpack": [
       "node_modules/electron-store/**/*",
@@ -93,7 +138,13 @@
       "node_modules/write-file-atomic/**/*",
       "node_modules/find-up/**/*",
       "node_modules/locate-path/**/*",
-      "node_modules/path-exists/**/*"
+      "node_modules/path-exists/**/*",
+      "dist/workers/**/*",
+      "node_modules/exceljs/**/*",
+      "node_modules/archiver/**/*",
+      "node_modules/unzipper/**/*",
+      "node_modules/saxes/**/*",
+      "node_modules/dayjs/**/*"
     ],
     "extraResources": [
       {

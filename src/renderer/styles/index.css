@@ -1,5 +1,7 @@
 /* Import component styles */
 @import './components/main-content.css';
+@import './M4ProgressModal.css';
+@import './PerformanceMonitor.css';
 
 /* CSS Reset */
 * {
@@ -175,4 +177,35 @@ html, body {
 
 .font-semibold {
   font-weight: 600;
+}
+
+/* Performance Monitor Toggle Button */
+.performance-monitor-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 48px;
+  height: 48px;
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #4CAF50;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+.performance-monitor-toggle:hover {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: #4CAF50;
+  transform: scale(1.1);
+}
+
+.performance-monitor-toggle:active {
+  transform: scale(0.95);
 }

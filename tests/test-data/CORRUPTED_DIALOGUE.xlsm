@@ -1,0 +1,5 @@
+
+      This is not a valid Excel file.
+      This file is created to test error handling.
+      It should cause an error when trying to parse as Excel.
+    

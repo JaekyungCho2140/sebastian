@@ -184,12 +184,30 @@ function createWindow(): void {
 }
 
 // This method will be called when Electron has finished initialization
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   log.info('Electron app ready, initializing components...')
   
   // Initialize state manager first
-  initializeStateManager()
+  const stateManager = initializeStateManager()
   log.info('State manager initialized')
+  
+  // Perform M4 settings migration if needed
+  try {
+    const currentM4Settings = stateManager.getM4Settings()
+    const appVersion = app.getVersion()
+    
+    // Check if migration is needed (version mismatch)
+    if (currentM4Settings.version !== appVersion) {
+      log.info(`M4 settings migration needed: ${currentM4Settings.version} -> ${appVersion}`)
+      const migratedSettings = stateManager.migrateM4Settings(currentM4Settings, appVersion)
+      log.info('M4 settings migration completed successfully')
+    } else {
+      log.info('M4 settings are up to date, no migration needed')
+    }
+  } catch (error) {
+    log.error('Failed to migrate M4 settings:', error)
+    // Continue with app initialization even if migration fails
+  }
   
   // Set up IPC handlers
   setupIpcHandlers()

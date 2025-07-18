@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-export interface ErrorDialogData {
-  title: string
-  message: string
-  error?: Error
-  details?: string
-  stack?: string
-  timestamp?: number
-  severity?: 'low' | 'medium' | 'high' | 'critical'
-}
+import { ErrorDialogData } from '../../types/errorDialog'
 
 interface ErrorDialogProps {
   isOpen: boolean

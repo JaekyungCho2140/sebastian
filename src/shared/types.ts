@@ -10,6 +10,7 @@ export interface AppState {
     theme: 'light' | 'dark'
     language: 'ko' | 'en'
   }
+  m4Settings?: M4Settings
 }
 
 export interface UpdateInfo {
@@ -19,6 +20,7 @@ export interface UpdateInfo {
   changelog: string
   downloadSize?: number
   installerType?: 'msi' | 'nsis' | 'exe' // Support multiple installer types (primary: NSIS)
+  m4Features?: Record<string, any> // M4 feature version information
 }
 
 export interface UpdateProgress {
@@ -89,7 +91,38 @@ export const IPC_CHANNELS = {
   GET_HELP_TOPICS: 'get-help-topics',
   SEARCH_HELP: 'search-help',
   EXPORT_DETAILED_ERROR_ANALYSIS: 'export-detailed-error-analysis',
-  COMPRESS_LOGS: 'compress-logs'
+  COMPRESS_LOGS: 'compress-logs',
+  // M4 processing channels
+  SELECT_M4_FOLDER: 'select-m4-folder',
+  VALIDATE_M4_FOLDER: 'validate-m4-folder',
+  START_M4_PROCESSING: 'start-m4-processing',
+  CANCEL_M4_PROCESSING: 'cancel-m4-processing',
+  M4_PROGRESS_UPDATE: 'm4-progress-update',
+  // M4 settings channels
+  GET_M4_SETTINGS: 'get-m4-settings',
+  SET_M4_SETTINGS: 'set-m4-settings',
+  RESET_M4_SETTINGS: 'reset-m4-settings',
+  MIGRATE_M4_SETTINGS: 'migrate-m4-settings',
+  VALIDATE_M4_SETTINGS: 'validate-m4-settings',
+  ADD_RECENT_M4_FOLDER: 'add-recent-m4-folder',
+  REMOVE_RECENT_M4_FOLDER: 'remove-recent-m4-folder',
+  CLEANUP_RECENT_M4_FOLDERS: 'cleanup-recent-m4-folders',
+  // M4 error reporting channels
+  REPORT_M4_ERROR: 'report-m4-error',
+  M4_ERROR_CONTEXT_UPDATE: 'm4-error-context-update',
+  GET_M4_ERROR_STATS: 'get-m4-error-stats',
+  EXPORT_M4_ERROR_LOGS: 'export-m4-error-logs',
+  CLEAR_M4_ERROR_LOGS: 'clear-m4-error-logs',
+  // M4 error events (Main -> Renderer)
+  M4_ERROR_REPORTED: 'm4-error-reported',
+  M4_ERROR_CONTEXT_UPDATED: 'm4-error-context-updated',
+  // Performance profiling channels
+  GET_PERFORMANCE_STATS: 'get-performance-stats',
+  GET_PERFORMANCE_REPORT: 'get-performance-report',
+  START_PROFILING: 'start-profiling',
+  STOP_PROFILING: 'stop-profiling',
+  CLEAR_PERFORMANCE_DATA: 'clear-performance-data',
+  SET_PROFILING_ENABLED: 'set-profiling-enabled'
 } as const
 
 export type IpcChannel = typeof IPC_CHANNELS[keyof typeof IPC_CHANNELS]
@@ -104,6 +137,98 @@ export interface RendererErrorReport {
   line?: number
   column?: number
   stack?: string
+}
+
+// M4 Error Reporting Types
+export interface M4ErrorReportRequest {
+  errorType: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  message: string
+  stackTrace?: string
+  context: M4ErrorContext
+  timestamp: number
+  correlationId: string
+  workerId?: string
+  taskId?: string
+  recoverable?: boolean
+  retryable?: boolean
+  userMessage?: string
+  technicalMessage?: string
+  resolutionSteps?: string[]
+}
+
+export interface M4ErrorContext {
+  processType: 'dialogue' | 'string'
+  stage: string | number  // ProcessStep string enum 또는 number (하위 호환성)
+  fileName?: string
+  filePath?: string
+  processedFiles?: number
+  totalFiles?: number
+  memoryUsage?: number
+  workerId?: string
+  // Excel-specific context
+  sheetName?: string
+  rowNumber?: number
+  columnNumber?: number
+  fieldValue?: string
+  dataType?: string
+  validationRule?: string
+  // File I/O context
+  operation?: 'read' | 'write' | 'create' | 'delete' | 'move'
+  fileSize?: number
+  permissions?: string
+  encoding?: string
+  // Worker thread context
+  threadId?: string
+  isMainThread?: boolean
+  parentPort?: boolean
+  taskQueue?: number
+  // Additional context
+  customData?: Record<string, any>
+}
+
+export interface M4ErrorContextUpdate {
+  correlationId: string
+  context: Partial<M4ErrorContext>
+  timestamp: number
+}
+
+export interface M4ErrorStats {
+  totalErrors: number
+  errorsByType: Record<string, number>
+  errorsBySeverity: Record<string, number>
+  errorsByProcessStep: Record<string, number>
+  errorsByProcessType: Record<'dialogue' | 'string', number>
+  lastErrorTime?: number
+  lastError?: any  // M4ProcessingError from m4ErrorIntegration
+  errorRate?: number
+  avgMemoryUsage?: number
+  topErrorFiles?: { fileName: string; count: number }[]
+}
+
+export interface M4ErrorLogExportRequest {
+  startDate?: number
+  endDate?: number
+  errorTypes?: string[]
+  severities?: string[]
+  processTypes?: ('dialogue' | 'string')[]
+  includeContext?: boolean
+  includeSensitiveData?: boolean
+  outputFormat?: 'json' | 'csv' | 'txt'
+  maxRecords?: number
+}
+
+export interface M4ErrorReportedEvent {
+  reportId: string
+  correlationId: string
+  errorType: string
+  severity: string
+  message: string
+  timestamp: number
+  processType: 'dialogue' | 'string'
+  fileName?: string
+  recoverable?: boolean
+  retryable?: boolean
 }
 
 export interface IpcRequests {
@@ -137,6 +262,33 @@ export interface IpcRequests {
   [IPC_CHANNELS.SEARCH_HELP]: string // search query
   [IPC_CHANNELS.EXPORT_DETAILED_ERROR_ANALYSIS]: void
   [IPC_CHANNELS.COMPRESS_LOGS]: void
+  // M4 processing requests
+  [IPC_CHANNELS.SELECT_M4_FOLDER]: void
+  [IPC_CHANNELS.VALIDATE_M4_FOLDER]: M4FolderValidationRequest
+  [IPC_CHANNELS.START_M4_PROCESSING]: M4ProcessingRequest
+  [IPC_CHANNELS.CANCEL_M4_PROCESSING]: void
+  // M4 settings requests
+  [IPC_CHANNELS.GET_M4_SETTINGS]: void
+  [IPC_CHANNELS.SET_M4_SETTINGS]: Partial<M4Settings>
+  [IPC_CHANNELS.RESET_M4_SETTINGS]: void
+  [IPC_CHANNELS.MIGRATE_M4_SETTINGS]: { oldSettings: any; targetVersion?: string }
+  [IPC_CHANNELS.VALIDATE_M4_SETTINGS]: M4Settings
+  [IPC_CHANNELS.ADD_RECENT_M4_FOLDER]: { processType: 'dialogue' | 'string'; folderPath: string; alias?: string }
+  [IPC_CHANNELS.REMOVE_RECENT_M4_FOLDER]: { processType: 'dialogue' | 'string'; folderPath: string }
+  [IPC_CHANNELS.CLEANUP_RECENT_M4_FOLDERS]: { maxAge?: number }
+  // M4 error reporting requests
+  [IPC_CHANNELS.REPORT_M4_ERROR]: M4ErrorReportRequest
+  [IPC_CHANNELS.M4_ERROR_CONTEXT_UPDATE]: M4ErrorContextUpdate
+  [IPC_CHANNELS.GET_M4_ERROR_STATS]: void
+  [IPC_CHANNELS.EXPORT_M4_ERROR_LOGS]: M4ErrorLogExportRequest
+  [IPC_CHANNELS.CLEAR_M4_ERROR_LOGS]: void
+  // Performance profiling requests
+  [IPC_CHANNELS.GET_PERFORMANCE_STATS]: void
+  [IPC_CHANNELS.GET_PERFORMANCE_REPORT]: void
+  [IPC_CHANNELS.START_PROFILING]: ProfilingConfig | void
+  [IPC_CHANNELS.STOP_PROFILING]: void
+  [IPC_CHANNELS.CLEAR_PERFORMANCE_DATA]: void
+  [IPC_CHANNELS.SET_PROFILING_ENABLED]: boolean
 }
 
 export interface IpcResponses {
@@ -170,6 +322,33 @@ export interface IpcResponses {
   [IPC_CHANNELS.SEARCH_HELP]: HelpSearchResult[]
   [IPC_CHANNELS.EXPORT_DETAILED_ERROR_ANALYSIS]: string // file path
   [IPC_CHANNELS.COMPRESS_LOGS]: void
+  // M4 processing responses
+  [IPC_CHANNELS.SELECT_M4_FOLDER]: M4FolderSelectionResult
+  [IPC_CHANNELS.VALIDATE_M4_FOLDER]: M4FileValidationResult
+  [IPC_CHANNELS.START_M4_PROCESSING]: void
+  [IPC_CHANNELS.CANCEL_M4_PROCESSING]: void
+  // M4 settings responses
+  [IPC_CHANNELS.GET_M4_SETTINGS]: M4Settings
+  [IPC_CHANNELS.SET_M4_SETTINGS]: void
+  [IPC_CHANNELS.RESET_M4_SETTINGS]: M4Settings
+  [IPC_CHANNELS.MIGRATE_M4_SETTINGS]: M4Settings
+  [IPC_CHANNELS.VALIDATE_M4_SETTINGS]: { isValid: boolean; errors: string[] }
+  [IPC_CHANNELS.ADD_RECENT_M4_FOLDER]: M4Settings
+  [IPC_CHANNELS.REMOVE_RECENT_M4_FOLDER]: M4Settings
+  [IPC_CHANNELS.CLEANUP_RECENT_M4_FOLDERS]: M4Settings
+  // M4 error reporting responses
+  [IPC_CHANNELS.REPORT_M4_ERROR]: string | null // Returns error report ID
+  [IPC_CHANNELS.M4_ERROR_CONTEXT_UPDATE]: void
+  [IPC_CHANNELS.GET_M4_ERROR_STATS]: M4ErrorStats
+  [IPC_CHANNELS.EXPORT_M4_ERROR_LOGS]: string // file path
+  [IPC_CHANNELS.CLEAR_M4_ERROR_LOGS]: void
+  // Performance profiling responses
+  [IPC_CHANNELS.GET_PERFORMANCE_STATS]: Record<string, PerformanceStat>
+  [IPC_CHANNELS.GET_PERFORMANCE_REPORT]: PerformanceReport
+  [IPC_CHANNELS.START_PROFILING]: void
+  [IPC_CHANNELS.STOP_PROFILING]: PerformanceReport
+  [IPC_CHANNELS.CLEAR_PERFORMANCE_DATA]: void
+  [IPC_CHANNELS.SET_PROFILING_ENABLED]: void
   
   // Development/debugging handlers
   'reset-circuit-breaker': { success: boolean; message: string }
@@ -188,6 +367,9 @@ export interface IpcEvents {
   [IPC_CHANNELS.UPDATE_ERROR]: string
   [IPC_CHANNELS.INSTALLATION_TIMEOUT]: TimeoutNotification
   [IPC_CHANNELS.NSIS_INSTALLATION_ERROR]: EnhancedErrorDialogData
+  // M4 error events
+  [IPC_CHANNELS.M4_ERROR_REPORTED]: M4ErrorReportedEvent
+  [IPC_CHANNELS.M4_ERROR_CONTEXT_UPDATED]: M4ErrorContextUpdate
 }
 
 // Error types for IPC communication
@@ -211,7 +393,7 @@ export interface IpcErrorResponse {
 
 // Error Reporting Types
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical'
-export type ErrorType = 'javascript' | 'promise-rejection' | 'react-component' | 'main-process' | 'ipc' | 'filesystem' | 'network'
+export type ErrorType = 'javascript' | 'promise-rejection' | 'react-component' | 'main-process' | 'ipc' | 'filesystem' | 'network' | 'm4-excel-parse' | 'm4-worker-thread' | 'm4-file-io' | 'm4-data-validation' | 'm4-process-type'
 export type ProcessType = 'main' | 'renderer' | 'preload'
 
 export interface SystemInfo {
@@ -242,6 +424,98 @@ export interface ErrorContext {
   userAgent?: string
   viewport?: { width: number; height: number }
   customData?: Record<string, any>
+  m4Context?: M4Context
+}
+
+/**
+ * M4 처리 관련 에러 컨텍스트
+ */
+export interface M4Context {
+  /** 처리 단계 */
+  processStep: M4ProcessStep
+  /** 처리 타입 */
+  processType: 'dialogue' | 'string'
+  /** 현재 처리 중인 파일 경로 */
+  currentFile?: string
+  /** 처리된 파일 수 */
+  processedCount?: number
+  /** 전체 파일 수 */
+  totalFiles?: number
+  /** 워커 스레드 ID */
+  workerId?: string
+  /** 메모리 사용량 (MB) */
+  memoryUsage?: number
+  /** 처리 시작 시간 */
+  startTime?: number
+  /** 입력 폴더 경로 */
+  inputPath?: string
+  /** 출력 폴더 경로 */
+  outputPath?: string
+  /** 에러 발생 시 추가 정보 */
+  errorDetails?: {
+    /** 엑셀 파일 관련 세부사항 */
+    excelDetails?: {
+      sheetName?: string
+      rowIndex?: number
+      columnIndex?: number
+      cellValue?: string
+      expectedFormat?: string
+    }
+    /** 워커 스레드 관련 세부사항 */
+    workerDetails?: {
+      threadId?: string
+      taskQueue?: number
+      isMainThread?: boolean
+      parentPort?: boolean
+    }
+    /** 파일 I/O 관련 세부사항 */
+    fileIODetails?: {
+      operation?: 'read' | 'write' | 'create' | 'delete' | 'move'
+      fileSize?: number
+      permissions?: string
+      encoding?: string
+    }
+    /** 데이터 검증 관련 세부사항 */
+    validationDetails?: {
+      validationRule?: string
+      expectedValue?: string
+      actualValue?: string
+      fieldName?: string
+      recordIndex?: number
+    }
+  }
+}
+
+/**
+ * M4 처리 단계 정의
+ */
+export enum M4ProcessStep {
+  /** 초기화 */
+  INITIALIZATION = 'initialization',
+  /** 폴더 검증 */
+  FOLDER_VALIDATION = 'folder_validation',
+  /** 파일 목록 수집 */
+  FILE_COLLECTION = 'file_collection',
+  /** 파일 읽기 */
+  FILE_READING = 'file_reading',
+  /** 데이터 파싱 */
+  DATA_PARSING = 'data_parsing',
+  /** 데이터 검증 */
+  DATA_VALIDATION = 'data_validation',
+  /** 데이터 처리 */
+  DATA_PROCESSING = 'data_processing',
+  /** 데이터 변환 */
+  DATA_TRANSFORMATION = 'data_transformation',
+  /** 파일 쓰기 */
+  FILE_WRITING = 'file_writing',
+  /** 백업 생성 */
+  BACKUP_CREATION = 'backup_creation',
+  /** 출력 검증 */
+  OUTPUT_VALIDATION = 'output_validation',
+  /** 정리 작업 */
+  CLEANUP = 'cleanup',
+  /** 완료 */
+  COMPLETION = 'completion'
 }
 
 export interface ErrorReport {
@@ -676,6 +950,26 @@ export interface HelpSearchResult extends HelpTopic {
   relevanceScore: number
 }
 
+// M4 Processing Types
+export interface M4FolderSelectionResult {
+  success: boolean
+  folderPath?: string
+  error?: string
+}
+
+export interface M4FileValidationResult {
+  isValid: boolean
+  missingFiles: string[]
+  foundFiles: string[]
+  processType: 'dialogue' | 'string'
+  errorMessage?: string
+}
+
+export interface M4FolderValidationRequest {
+  folderPath: string
+  processType: 'dialogue' | 'string'
+}
+
 // Window object extensions
 declare global {
   interface Window {
@@ -725,6 +1019,953 @@ declare global {
       getCircuitBreakerStatus: () => Promise<{ isOpen: boolean; resetTime: number; retryCount: number }>
       forceUpdateCheck: () => Promise<UpdateInfo | null>
       mockUpdateAvailable: () => Promise<UpdateInfo>
+      
+      // M4 processing functions
+      selectM4Folder: () => Promise<M4FolderSelectionResult>
+      validateM4Folder: (request: M4FolderValidationRequest) => Promise<M4FileValidationResult>
+      startM4Processing: (request: M4ProcessingRequest) => Promise<void>
+      cancelM4Processing: () => Promise<void>
+      onM4ProgressUpdate: (callback: (progress: M4ProgressUpdate) => void) => void
+      
+      // M4 settings functions
+      getM4Settings: () => Promise<M4Settings>
+      setM4Settings: (settings: Partial<M4Settings>) => Promise<void>
+      resetM4Settings: () => Promise<M4Settings>
+      migrateM4Settings: (oldSettings: any, targetVersion?: string) => Promise<M4Settings>
+      validateM4Settings: (settings: M4Settings) => Promise<{ isValid: boolean; errors: string[] }>
+      addRecentM4Folder: (processType: 'dialogue' | 'string', folderPath: string, alias?: string) => Promise<M4Settings>
+      removeRecentM4Folder: (processType: 'dialogue' | 'string', folderPath: string) => Promise<M4Settings>
+      cleanupRecentM4Folders: (maxAge?: number) => Promise<M4Settings>
+      
+      // Performance profiling functions
+      getPerformanceStats: () => Promise<Record<string, PerformanceStat>>
+      getPerformanceReport: () => Promise<PerformanceReport>
+      startProfiling: (sessionName: string) => Promise<void>
+      stopProfiling: () => Promise<PerformanceReport>
+      clearPerformanceData: () => Promise<void>
+      setProfilingEnabled: (enabled: boolean) => Promise<void>
     }
   }
+}
+
+// M4 Progress 관련 타입들
+export interface M4ProcessingRequest {
+  type: 'dialogue' | 'string'
+  folderPath: string
+  outputPath?: string
+}
+
+export interface M4ProgressUpdate {
+  type: 'step' | 'file' | 'progress' | 'processed' | 'complete' | 'error'
+  data: string | number | { message: string; stage?: 'preparing' | 'processing' | 'complete' | 'error' }
+}
+
+export interface M4ProgressMessage {
+  percentage?: number
+  currentStep?: number
+  totalSteps?: number
+  currentFile?: string
+  processedCount?: number
+  totalCount?: number
+  estimatedTime?: number
+  startTime?: number
+  stage?: 'preparing' | 'processing' | 'complete' | 'error' | 'cancelled'
+  isActive?: boolean
+  message?: string
+}
+
+// ============================================================================
+// M4 Settings Types
+// ============================================================================
+
+/**
+ * M4 설정 메인 인터페이스
+ */
+export interface M4Settings {
+  /** 설정 버전 (마이그레이션 용) */
+  version: string
+  
+  /** 폴더 경로 설정 */
+  folderPaths: M4FolderPaths
+  
+  /** 출력 설정 */
+  outputSettings: M4OutputSettings
+  
+  /** 처리 옵션 */
+  processingOptions: M4ProcessingOptions
+  
+  /** 최근 사용한 폴더 목록 */
+  recentFolders: M4RecentFolders
+  
+  /** 기본 설정 */
+  defaults: M4DefaultSettings
+  
+  /** 마지막 업데이트 시간 */
+  lastUpdated: number
+}
+
+/**
+ * M4 폴더 경로 설정
+ */
+export interface M4FolderPaths {
+  /** Dialogue 처리 폴더 */
+  dialogue: {
+    /** 현재 설정된 입력 폴더 */
+    inputFolder: string
+    /** 출력 폴더 */
+    outputFolder: string
+  }
+  
+  /** String 처리 폴더 */
+  string: {
+    /** 현재 설정된 입력 폴더 */
+    inputFolder: string
+    /** 출력 폴더 */
+    outputFolder: string
+  }
+  
+  /** 공통 출력 디렉토리 */
+  commonOutputDirectory: string
+}
+
+/**
+ * M4 출력 설정
+ */
+export interface M4OutputSettings {
+  /** 출력 디렉토리 기본값 */
+  defaultOutputDirectory: string
+  
+  /** 출력 파일명 규칙 */
+  outputFileNaming: M4OutputFileNaming
+  
+  /** 백업 파일 생성 여부 */
+  createBackup: boolean
+  
+  /** 백업 파일 보관 기간 (일) */
+  backupRetentionDays: number
+  
+  /** 출력 파일 압축 여부 */
+  compressOutput: boolean
+  
+  /** 출력 파일 형식 */
+  outputFormat: 'xlsx' | 'xlsm' | 'csv'
+}
+
+/**
+ * M4 출력 파일명 규칙
+ */
+export interface M4OutputFileNaming {
+  /** 파일명 패턴 */
+  pattern: string
+  
+  /** 타임스탬프 포함 여부 */
+  includeTimestamp: boolean
+  
+  /** 타임스탬프 형식 */
+  timestampFormat: string
+  
+  /** 프로세스 타입 포함 여부 */
+  includeProcessType: boolean
+  
+  /** 사용자 정의 접두사 */
+  customPrefix: string
+}
+
+/**
+ * M4 처리 옵션
+ */
+export interface M4ProcessingOptions {
+  /** 자동 출력 열기 */
+  autoOpenOutput: boolean
+  
+  /** 처리 완료 후 원본 파일 보존 */
+  preserveOriginalFiles: boolean
+  
+  /** 오류 시 처리 중단 */
+  stopOnError: boolean
+  
+  /** 상세 로그 활성화 */
+  enableVerboseLogging: boolean
+  
+  /** 병렬 처리 활성화 */
+  enableParallelProcessing: boolean
+  
+  /** 최대 워커 스레드 수 */
+  maxWorkerThreads: number
+  
+  /** 메모리 제한 (MB) */
+  memoryLimit: number
+  
+  /** 처리 타임아웃 (초) */
+  processingTimeout: number
+  
+  /** 알림 설정 */
+  notificationSettings: M4NotificationSettings
+  
+  /** 검증 설정 */
+  validationSettings: M4ValidationSettings
+}
+
+/**
+ * M4 알림 설정
+ */
+export interface M4NotificationSettings {
+  /** 처리 시작 알림 */
+  notifyOnStart: boolean
+  
+  /** 처리 완료 알림 */
+  notifyOnComplete: boolean
+  
+  /** 오류 발생 알림 */
+  notifyOnError: boolean
+  
+  /** 사운드 알림 */
+  soundNotification: boolean
+  
+  /** 시스템 알림 */
+  systemNotification: boolean
+}
+
+/**
+ * M4 검증 설정
+ */
+export interface M4ValidationSettings {
+  /** 파일 검증 활성화 */
+  enableFileValidation: boolean
+  
+  /** 데이터 검증 활성화 */
+  enableDataValidation: boolean
+  
+  /** 엄격한 검증 모드 */
+  strictValidation: boolean
+  
+  /** 검증 실패 시 경고만 표시 */
+  warningOnValidationFailure: boolean
+  
+  /** 사용자 정의 검증 규칙 */
+  customValidationRules: string[]
+}
+
+/**
+ * M4 최근 사용한 폴더 관리
+ */
+export interface M4RecentFolders {
+  /** Dialogue 최근 폴더 목록 */
+  dialogue: M4RecentFolderItem[]
+  
+  /** String 최근 폴더 목록 */
+  string: M4RecentFolderItem[]
+  
+  /** 최대 보관 개수 */
+  maxItems: number
+  
+  /** 자동 정리 활성화 */
+  autoCleanup: boolean
+}
+
+/**
+ * M4 최근 폴더 항목
+ */
+export interface M4RecentFolderItem {
+  /** 폴더 경로 */
+  path: string
+  
+  /** 마지막 사용 시간 */
+  lastUsed: number
+  
+  /** 사용 빈도 */
+  usageCount: number
+  
+  /** 폴더 별명 */
+  alias?: string
+  
+  /** 즐겨찾기 여부 */
+  isFavorite: boolean
+  
+  /** 검증 상태 */
+  validationStatus: 'valid' | 'invalid' | 'unknown'
+}
+
+/**
+ * M4 기본 설정
+ */
+export interface M4DefaultSettings {
+  /** 기본 처리 타입 */
+  defaultProcessType: 'dialogue' | 'string'
+  
+  /** 기본 입력 폴더 */
+  defaultInputFolder: string
+  
+  /** 기본 출력 폴더 */
+  defaultOutputFolder: string
+  
+  /** 기본 처리 옵션 */
+  defaultProcessingOptions: Partial<M4ProcessingOptions>
+  
+  /** 사용자 정의 기본값 */
+  customDefaults: Record<string, any>
+}
+
+// ============================================================================
+// M4 Settings Constants
+// ============================================================================
+
+/**
+ * M4 설정 기본값 상수
+ */
+export const M4_SETTINGS_DEFAULTS: M4Settings = {
+  version: '1.0.0',
+  folderPaths: {
+    dialogue: {
+      inputFolder: '',
+      outputFolder: ''
+    },
+    string: {
+      inputFolder: '',
+      outputFolder: ''
+    },
+    commonOutputDirectory: ''
+  },
+  outputSettings: {
+    defaultOutputDirectory: '',
+    outputFileNaming: {
+      pattern: '{processType}_{timestamp}',
+      includeTimestamp: true,
+      timestampFormat: 'YYYY-MM-DD_HH-mm-ss',
+      includeProcessType: true,
+      customPrefix: ''
+    },
+    createBackup: true,
+    backupRetentionDays: 30,
+    compressOutput: false,
+    outputFormat: 'xlsx'
+  },
+  processingOptions: {
+    autoOpenOutput: true,
+    preserveOriginalFiles: true,
+    stopOnError: false,
+    enableVerboseLogging: false,
+    enableParallelProcessing: true,
+    maxWorkerThreads: 4,
+    memoryLimit: 1024,
+    processingTimeout: 300,
+    notificationSettings: {
+      notifyOnStart: true,
+      notifyOnComplete: true,
+      notifyOnError: true,
+      soundNotification: true,
+      systemNotification: true
+    },
+    validationSettings: {
+      enableFileValidation: true,
+      enableDataValidation: true,
+      strictValidation: false,
+      warningOnValidationFailure: false,
+      customValidationRules: []
+    }
+  },
+  recentFolders: {
+    dialogue: [],
+    string: [],
+    maxItems: 10,
+    autoCleanup: true
+  },
+  defaults: {
+    defaultProcessType: 'dialogue',
+    defaultInputFolder: '',
+    defaultOutputFolder: '',
+    defaultProcessingOptions: {},
+    customDefaults: {}
+  },
+  lastUpdated: Date.now()
+}
+
+// ============================================================================
+// M4 Error Utility Functions
+// ============================================================================
+
+/**
+ * M4 에러 타입 가드 함수
+ */
+export function isM4ErrorType(errorType: ErrorType): boolean {
+  return errorType.startsWith('m4-')
+}
+
+/**
+ * M4 에러 컨텍스트 생성 함수
+ */
+export function createM4ErrorContext(
+  processStep: M4ProcessStep,
+  processType: 'dialogue' | 'string',
+  options: Partial<M4Context> = {}
+): M4Context {
+  return {
+    processStep,
+    processType,
+    startTime: Date.now(),
+    ...options
+  }
+}
+
+/**
+ * M4 에러 타입에 따른 기본 심각도 반환
+ */
+export function getM4ErrorSeverity(errorType: ErrorType): ErrorSeverity {
+  switch (errorType) {
+    case 'm4-excel-parse':
+      return 'high'  // 엑셀 파싱 오류는 중요
+    case 'm4-worker-thread':
+      return 'critical'  // 워커 스레드 오류는 치명적
+    case 'm4-file-io':
+      return 'high'  // 파일 I/O 오류는 중요
+    case 'm4-data-validation':
+      return 'medium'  // 데이터 검증 오류는 중간
+    case 'm4-process-type':
+      return 'medium'  // 프로세스 타입 오류는 중간
+    default:
+      return 'medium'
+  }
+}
+
+/**
+ * M4 에러 타입에 따른 기본 메시지 반환
+ */
+export function getM4ErrorMessage(errorType: ErrorType, context?: M4Context): string {
+  const currentFile = context?.currentFile ? ` (${context.currentFile})` : ''
+  const processStep = context?.processStep ? ` during ${context.processStep}` : ''
+  
+  switch (errorType) {
+    case 'm4-excel-parse':
+      return `Excel file parsing error${currentFile}${processStep}`
+    case 'm4-worker-thread':
+      return `Worker thread error${processStep}`
+    case 'm4-file-io':
+      return `File I/O operation error${currentFile}${processStep}`
+    case 'm4-data-validation':
+      return `Data validation error${currentFile}${processStep}`
+    case 'm4-process-type':
+      return `Process type error${processStep}`
+    default:
+      return `M4 processing error${processStep}`
+  }
+}
+
+/**
+ * M4 에러 리포트 생성 헬퍼 함수
+ */
+export function createM4ErrorReport(
+  errorType: ErrorType,
+  error: Error,
+  context: M4Context,
+  sessionId: string,
+  systemInfo: SystemInfo
+): ErrorReport {
+  if (!isM4ErrorType(errorType)) {
+    throw new Error(`Invalid M4 error type: ${errorType}`)
+  }
+
+  return {
+    id: `m4-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    timestamp: Date.now(),
+    severity: getM4ErrorSeverity(errorType),
+    errorType,
+    processType: 'main',
+    message: error.message || getM4ErrorMessage(errorType, context),
+    stack: error.stack,
+    systemInfo,
+    context: {
+      sessionId,
+      m4Context: context
+    },
+    breadcrumbs: [],
+    tags: ['m4', context.processType, context.processStep],
+    fingerprint: `${errorType}-${context.processStep}-${context.processType}`
+  }
+}
+
+/**
+ * M4 처리 단계별 권장 에러 타입 반환
+ */
+export function getRecommendedErrorType(processStep: M4ProcessStep): ErrorType {
+  switch (processStep) {
+    case M4ProcessStep.INITIALIZATION:
+    case M4ProcessStep.FOLDER_VALIDATION:
+    case M4ProcessStep.FILE_COLLECTION:
+      return 'm4-file-io'
+    case M4ProcessStep.FILE_READING:
+    case M4ProcessStep.DATA_PARSING:
+      return 'm4-excel-parse'
+    case M4ProcessStep.DATA_VALIDATION:
+    case M4ProcessStep.OUTPUT_VALIDATION:
+      return 'm4-data-validation'
+    case M4ProcessStep.DATA_PROCESSING:
+    case M4ProcessStep.DATA_TRANSFORMATION:
+      return 'm4-worker-thread'
+    case M4ProcessStep.FILE_WRITING:
+    case M4ProcessStep.BACKUP_CREATION:
+    case M4ProcessStep.CLEANUP:
+      return 'm4-file-io'
+    case M4ProcessStep.COMPLETION:
+      return 'm4-process-type'
+    default:
+      return 'm4-process-type'
+  }
+}
+
+/**
+ * M4 에러 컨텍스트 업데이트 함수
+ */
+export function updateM4ErrorContext(
+  context: M4Context,
+  updates: Partial<M4Context>
+): M4Context {
+  return {
+    ...context,
+    ...updates
+  }
+}
+
+/**
+ * M4 처리 진행률 계산 함수
+ */
+export function calculateM4Progress(context: M4Context): number {
+  if (!context.processedCount || !context.totalFiles) {
+    return 0
+  }
+  
+  const fileProgress = (context.processedCount / context.totalFiles) * 100
+  return Math.min(Math.max(fileProgress, 0), 100)
+}
+
+/**
+ * M4 처리 단계 순서 확인 함수
+ */
+export function getM4ProcessStepOrder(step: M4ProcessStep): number {
+  const stepOrder = {
+    [M4ProcessStep.INITIALIZATION]: 0,
+    [M4ProcessStep.FOLDER_VALIDATION]: 1,
+    [M4ProcessStep.FILE_COLLECTION]: 2,
+    [M4ProcessStep.FILE_READING]: 3,
+    [M4ProcessStep.DATA_PARSING]: 4,
+    [M4ProcessStep.DATA_VALIDATION]: 5,
+    [M4ProcessStep.DATA_PROCESSING]: 6,
+    [M4ProcessStep.DATA_TRANSFORMATION]: 7,
+    [M4ProcessStep.FILE_WRITING]: 8,
+    [M4ProcessStep.BACKUP_CREATION]: 9,
+    [M4ProcessStep.OUTPUT_VALIDATION]: 10,
+    [M4ProcessStep.CLEANUP]: 11,
+    [M4ProcessStep.COMPLETION]: 12
+  }
+  
+  return stepOrder[step] ?? -1
+}
+
+/**
+ * M4 에러 타입 상수
+ */
+export const M4_ERROR_TYPES = {
+  EXCEL_PARSE: 'm4-excel-parse' as const,
+  WORKER_THREAD: 'm4-worker-thread' as const,
+  FILE_IO: 'm4-file-io' as const,
+  DATA_VALIDATION: 'm4-data-validation' as const,
+  PROCESS_TYPE: 'm4-process-type' as const
+} as const
+
+/**
+ * M4 에러 타입 검증 함수
+ */
+export function validateM4ErrorType(errorType: string): errorType is ErrorType {
+  return Object.values(M4_ERROR_TYPES).includes(errorType as any)
+}
+
+/**
+ * M4 설정 파일명 규칙 템플릿
+ */
+export const M4_FILENAME_PATTERNS = {
+  SIMPLE: '{processType}',
+  WITH_TIMESTAMP: '{processType}_{timestamp}',
+  WITH_DATE: '{processType}_{date}',
+  WITH_PREFIX: '{prefix}_{processType}',
+  FULL: '{prefix}_{processType}_{timestamp}',
+  CUSTOM: '{custom}'
+} as const
+
+/**
+ * M4 설정 타임스탬프 형식 옵션
+ */
+export const M4_TIMESTAMP_FORMATS = {
+  DATETIME: 'YYYY-MM-DD_HH-mm-ss',
+  DATE_ONLY: 'YYYY-MM-DD',
+  TIME_ONLY: 'HH-mm-ss',
+  COMPACT: 'YYYYMMDDHHmmss',
+  ISO: 'YYYY-MM-DDTHH:mm:ss'
+} as const
+
+// ============================================================================
+// M4 Settings Type Guards
+// ============================================================================
+
+/**
+ * M4Settings 타입 가드
+ */
+export function isM4Settings(value: any): value is M4Settings {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.version === 'string' &&
+    typeof value.folderPaths === 'object' &&
+    typeof value.outputSettings === 'object' &&
+    typeof value.processingOptions === 'object' &&
+    typeof value.recentFolders === 'object' &&
+    typeof value.defaults === 'object' &&
+    typeof value.lastUpdated === 'number'
+  )
+}
+
+/**
+ * M4FolderPaths 타입 가드
+ */
+export function isM4FolderPaths(value: any): value is M4FolderPaths {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.dialogue === 'object' &&
+    typeof value.string === 'object' &&
+    typeof value.commonOutputDirectory === 'string'
+  )
+}
+
+/**
+ * M4RecentFolderItem 타입 가드
+ */
+export function isM4RecentFolderItem(value: any): value is M4RecentFolderItem {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.path === 'string' &&
+    typeof value.lastUsed === 'number' &&
+    typeof value.usageCount === 'number' &&
+    typeof value.isFavorite === 'boolean' &&
+    ['valid', 'invalid', 'unknown'].includes(value.validationStatus)
+  )
+}
+
+/**
+ * M4ProcessingOptions 타입 가드
+ */
+export function isM4ProcessingOptions(value: any): value is M4ProcessingOptions {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof value.autoOpenOutput === 'boolean' &&
+    typeof value.preserveOriginalFiles === 'boolean' &&
+    typeof value.stopOnError === 'boolean' &&
+    typeof value.enableVerboseLogging === 'boolean' &&
+    typeof value.enableParallelProcessing === 'boolean' &&
+    typeof value.maxWorkerThreads === 'number' &&
+    typeof value.memoryLimit === 'number' &&
+    typeof value.processingTimeout === 'number' &&
+    typeof value.notificationSettings === 'object' &&
+    typeof value.validationSettings === 'object'
+  )
+}
+
+// ============================================================================
+// M4 Settings Utility Functions
+// ============================================================================
+
+/**
+ * M4 설정 병합 함수
+ */
+export function mergeM4Settings(
+  currentSettings: Partial<M4Settings>,
+  newSettings: Partial<M4Settings>
+): M4Settings {
+  const merged = {
+    ...M4_SETTINGS_DEFAULTS,
+    ...currentSettings,
+    ...newSettings,
+    lastUpdated: Date.now()
+  }
+  
+  // 중첩 객체 깊은 병합
+  if (currentSettings.folderPaths && newSettings.folderPaths) {
+    merged.folderPaths = {
+      ...M4_SETTINGS_DEFAULTS.folderPaths,
+      ...currentSettings.folderPaths,
+      ...newSettings.folderPaths
+    }
+  }
+  
+  if (currentSettings.outputSettings && newSettings.outputSettings) {
+    merged.outputSettings = {
+      ...M4_SETTINGS_DEFAULTS.outputSettings,
+      ...currentSettings.outputSettings,
+      ...newSettings.outputSettings
+    }
+  }
+  
+  if (currentSettings.processingOptions && newSettings.processingOptions) {
+    merged.processingOptions = {
+      ...M4_SETTINGS_DEFAULTS.processingOptions,
+      ...currentSettings.processingOptions,
+      ...newSettings.processingOptions
+    }
+  }
+  
+  if (currentSettings.recentFolders && newSettings.recentFolders) {
+    merged.recentFolders = {
+      ...M4_SETTINGS_DEFAULTS.recentFolders,
+      ...currentSettings.recentFolders,
+      ...newSettings.recentFolders
+    }
+  }
+  
+  if (currentSettings.defaults && newSettings.defaults) {
+    merged.defaults = {
+      ...M4_SETTINGS_DEFAULTS.defaults,
+      ...currentSettings.defaults,
+      ...newSettings.defaults
+    }
+  }
+  
+  return merged
+}
+
+/**
+ * M4 설정 초기화 함수
+ */
+export function initializeM4Settings(customDefaults?: Partial<M4Settings>): M4Settings {
+  if (customDefaults) {
+    return mergeM4Settings(M4_SETTINGS_DEFAULTS, customDefaults)
+  }
+  return { ...M4_SETTINGS_DEFAULTS }
+}
+
+/**
+ * M4 설정 검증 함수
+ */
+export function validateM4Settings(settings: any): { isValid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!isM4Settings(settings)) {
+    errors.push('Invalid M4Settings structure')
+    return { isValid: false, errors }
+  }
+  
+  // 버전 호환성 검증
+  if (!settings.version || settings.version !== M4_SETTINGS_DEFAULTS.version) {
+    errors.push(`Unsupported settings version: ${settings.version}`)
+  }
+  
+  // 폴더 경로 검증
+  if (!isM4FolderPaths(settings.folderPaths)) {
+    errors.push('Invalid folderPaths structure')
+  }
+  
+  // 처리 옵션 검증
+  if (!isM4ProcessingOptions(settings.processingOptions)) {
+    errors.push('Invalid processingOptions structure')
+  }
+  
+  // 최근 폴더 검증
+  if (settings.recentFolders.dialogue && 
+      !settings.recentFolders.dialogue.every(isM4RecentFolderItem)) {
+    errors.push('Invalid dialogue recent folders structure')
+  }
+  
+  if (settings.recentFolders.string && 
+      !settings.recentFolders.string.every(isM4RecentFolderItem)) {
+    errors.push('Invalid string recent folders structure')
+  }
+  
+  return { isValid: errors.length === 0, errors }
+}
+
+/**
+ * M4 설정 마이그레이션 함수
+ */
+export function migrateM4Settings(
+  oldSettings: any,
+  targetVersion: string = M4_SETTINGS_DEFAULTS.version
+): M4Settings {
+  // 기존 설정이 없거나 잘못된 경우 기본값 반환
+  if (!oldSettings || typeof oldSettings !== 'object') {
+    return initializeM4Settings()
+  }
+  
+  // 버전별 마이그레이션 로직
+  let migratedSettings = { ...oldSettings }
+  
+  // 버전 1.0.0으로 마이그레이션
+  if (!migratedSettings.version || migratedSettings.version < '1.0.0') {
+    migratedSettings = {
+      ...M4_SETTINGS_DEFAULTS,
+      ...migratedSettings,
+      version: '1.0.0'
+    }
+  }
+  
+  // 추가 마이그레이션 로직은 여기에 추가
+  
+  return mergeM4Settings(M4_SETTINGS_DEFAULTS, migratedSettings)
+}
+
+/**
+ * 최근 사용한 폴더 추가 함수
+ */
+export function addRecentFolder(
+  settings: M4Settings,
+  processType: 'dialogue' | 'string',
+  folderPath: string,
+  alias?: string
+): M4Settings {
+  const recentFolders = { ...settings.recentFolders }
+  
+  if (processType === 'dialogue') {
+    let folders = [...recentFolders.dialogue]
+    
+    // 기존 항목 제거 (중복 방지)
+    folders = folders.filter(item => item.path !== folderPath)
+    
+    // 새 항목 추가
+    const newItem: M4RecentFolderItem = {
+      path: folderPath,
+      lastUsed: Date.now(),
+      usageCount: 1,
+      alias,
+      isFavorite: false,
+      validationStatus: 'unknown'
+    }
+    
+    folders.unshift(newItem)
+    
+    // 최대 개수 제한
+    if (folders.length > recentFolders.maxItems) {
+      folders = folders.slice(0, recentFolders.maxItems)
+    }
+    
+    recentFolders.dialogue = folders
+  } else if (processType === 'string') {
+    let folders = [...recentFolders.string]
+    
+    // 기존 항목 제거 (중복 방지)
+    folders = folders.filter(item => item.path !== folderPath)
+    
+    // 새 항목 추가
+    const newItem: M4RecentFolderItem = {
+      path: folderPath,
+      lastUsed: Date.now(),
+      usageCount: 1,
+      alias,
+      isFavorite: false,
+      validationStatus: 'unknown'
+    }
+    
+    folders.unshift(newItem)
+    
+    // 최대 개수 제한
+    if (folders.length > recentFolders.maxItems) {
+      folders = folders.slice(0, recentFolders.maxItems)
+    }
+    
+    recentFolders.string = folders
+  }
+  
+  return {
+    ...settings,
+    recentFolders,
+    lastUpdated: Date.now()
+  }
+}
+
+/**
+ * 최근 사용한 폴더 정리 함수
+ */
+export function cleanupRecentFolders(
+  settings: M4Settings,
+  maxAge: number = 30 * 24 * 60 * 60 * 1000 // 30일
+): M4Settings {
+  const now = Date.now()
+  const recentFolders = { ...settings.recentFolders }
+  
+  // 오래된 항목 제거 (즐겨찾기는 유지)
+  recentFolders.dialogue = recentFolders.dialogue.filter(
+    item => item.isFavorite || (now - item.lastUsed) < maxAge
+  )
+  
+  recentFolders.string = recentFolders.string.filter(
+    item => item.isFavorite || (now - item.lastUsed) < maxAge
+  )
+  
+  return {
+    ...settings,
+    recentFolders,
+    lastUpdated: Date.now()
+  }
+}
+
+// ============================================================================
+// Performance Profiling Types
+// ============================================================================
+
+/**
+ * Performance measurement statistic
+ */
+export interface PerformanceStat {
+  name: string
+  count: number
+  totalTime: number
+  averageTime: number
+  minTime: number
+  maxTime: number
+  standardDeviation: number
+  slowestOccurrences: Array<{
+    time: number
+    metadata?: Record<string, any>
+  }>
+}
+
+/**
+ * Performance profiling report
+ */
+export interface PerformanceReport {
+  startTime: string
+  endTime: string
+  totalDuration: number
+  statistics: Record<string, PerformanceStat>
+  slowOperations: Array<{
+    name: string
+    duration: number
+    path: string[]
+    metadata?: Record<string, any>
+  }>
+  timeline: Array<{
+    timestamp: number
+    event: string
+    duration?: number
+  }>
+  recommendations: string[]
+}
+
+/**
+ * Profiling configuration
+ */
+export interface ProfilingConfig {
+  enabled: boolean
+  slowThreshold: number
+  trackMemory: boolean
+  includeStackTraces: boolean
+  minDuration: number
+}
+
+/**
+ * Profiling status
+ */
+export interface ProfilingStatus {
+  isEnabled: boolean
+  isRunning: boolean
+  startTime?: number
+  measurementCount: number
+  config: ProfilingConfig
 }

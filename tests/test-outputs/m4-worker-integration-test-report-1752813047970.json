@@ -1,0 +1,57 @@
+{
+  "totalTests": 8,
+  "passedTests": 3,
+  "failedTests": 5,
+  "results": [
+    {
+      "name": "Test data file exists: CINEMATIC_DIALOGUE.xlsm",
+      "passed": true,
+      "message": "",
+      "timestamp": 1752813047785
+    },
+    {
+      "name": "Test data file exists: SMALLTALK_DIALOGUE.xlsm",
+      "passed": true,
+      "message": "",
+      "timestamp": 1752813047785
+    },
+    {
+      "name": "Test data file exists: NPC.xlsm",
+      "passed": true,
+      "message": "",
+      "timestamp": 1752813047785
+    },
+    {
+      "name": "M4 Dialogue Worker integration",
+      "passed": false,
+      "message": "M4 Dialogue Worker integration test failed: Testing M4 Dialogue Worker integration...\nWorker thread error: Error: Cannot find module '/home/jkcho/repository/dist/workers/m4ProcessWorker.js'\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:212:26)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n",
+      "timestamp": 1752813047823
+    },
+    {
+      "name": "M4 String Worker integration",
+      "passed": false,
+      "message": "M4 String Worker integration test failed: Testing M4 String Worker integration...\nWorker thread error: Error: Cannot find module '/home/jkcho/repository/dist/workers/m4ProcessWorker.js'\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:212:26)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n",
+      "timestamp": 1752813047864
+    },
+    {
+      "name": "Worker message protocol",
+      "passed": false,
+      "message": "Worker message protocol test failed: Testing Worker message protocol...\nWorker thread error: Error: Cannot find module '/home/jkcho/repository/dist/workers/m4ProcessWorker.js'\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:212:26)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n",
+      "timestamp": 1752813047901
+    },
+    {
+      "name": "Concurrent workers handling",
+      "passed": false,
+      "message": "Concurrent workers test failed: Testing concurrent workers...\nWorker 1 error: Error: Cannot find module '/home/jkcho/repository/dist/workers/m4ProcessWorker.js'\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:212:26)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n",
+      "timestamp": 1752813047937
+    },
+    {
+      "name": "Memory usage monitoring",
+      "passed": false,
+      "message": "Memory usage test failed: Testing memory usage...\nInitial memory usage: 4.21 MB\nWorker error: Error: Cannot find module '/home/jkcho/repository/dist/workers/m4ProcessWorker.js'\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at MessagePort.<anonymous> (node:internal/main/worker_thread:212:26)\n    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:827:20)\n    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n",
+      "timestamp": 1752813047970
+    }
+  ],
+  "startTime": 1752813047784,
+  "endTime": 1752813047970
+}

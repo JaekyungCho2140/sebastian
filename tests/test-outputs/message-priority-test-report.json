@@ -1,0 +1,91 @@
+{
+  "tests": [
+    {
+      "name": "MessagePriority enum 정의 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.731Z"
+    },
+    {
+      "name": "모든 우선순위 레벨 정의",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.731Z"
+    },
+    {
+      "name": "우선순위 점수 계산 함수 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.731Z"
+    },
+    {
+      "name": "기본 우선순위 함수 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.731Z"
+    },
+    {
+      "name": "WorkerMessage에 priority 필드 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.731Z"
+    },
+    {
+      "name": "우선순위 큐 항목 인터페이스 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "배치 처리 시스템 인터페이스 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "배치 메시지 처리 함수 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "배치 메시지 플러시 함수 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "우선순위별 타임아웃 함수 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "Worker에서 MessagePriority import 존재",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "진행률 업데이트에 배치 우선순위 설정",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "에러 메시지에 긴급 우선순위 설정",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:05.732Z"
+    },
+    {
+      "name": "TypeScript 컴파일 성공",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-07-18T03:40:06.844Z"
+    }
+  ],
+  "passed": 14,
+  "failed": 0,
+  "timestamp": "2025-07-18T03:40:05.729Z"
+}

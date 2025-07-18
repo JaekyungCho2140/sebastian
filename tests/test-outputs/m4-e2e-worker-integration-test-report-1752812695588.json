@@ -1,0 +1,51 @@
+{
+  "totalTests": 7,
+  "passedTests": 4,
+  "failedTests": 3,
+  "results": [
+    {
+      "name": "Test environment setup",
+      "passed": true,
+      "message": "",
+      "timestamp": 1752812693489
+    },
+    {
+      "name": "M4 Dialogue E2E processing",
+      "passed": false,
+      "message": "Processing failed",
+      "timestamp": 1752812693601
+    },
+    {
+      "name": "M4 String E2E error handling",
+      "passed": true,
+      "message": "Error handled in 1ms",
+      "timestamp": 1752812693705
+    },
+    {
+      "name": "Concurrent worker processing",
+      "passed": false,
+      "message": "Too few successful workers: 0",
+      "timestamp": 1752812693818
+    },
+    {
+      "name": "Large file processing",
+      "passed": false,
+      "message": "Processing failed",
+      "timestamp": 1752812693921
+    },
+    {
+      "name": "Performance benchmark",
+      "passed": true,
+      "message": "2 benchmarks completed",
+      "timestamp": 1752812695588
+    },
+    {
+      "name": "System stability validation",
+      "passed": true,
+      "message": "Final memory: 4.68MB",
+      "timestamp": 1752812695588
+    }
+  ],
+  "startTime": 1752812693487,
+  "endTime": 1752812695588
+}

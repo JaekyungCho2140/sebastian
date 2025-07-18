@@ -8,11 +8,19 @@
   },
   "include": [
     "src/main/**/*",
-    "src/shared/**/*"
+    "src/shared/**/*",
+    "src/utils/**/*",
+    "src/types/**/*",
+    "src/workers/**/*",
+    "src/services/**/*"
   ],
   "exclude": [
     "src/renderer/**/*",
     "src/preload/**/*",
+    "src/**/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "tests/**/*",
     "node_modules",
     "dist",
     "build"

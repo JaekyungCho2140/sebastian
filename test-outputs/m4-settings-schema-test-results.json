@@ -1,0 +1,115 @@
+{
+  "timestamp": "2025-07-18T04:58:02.207Z",
+  "totalTests": 21,
+  "passedTests": 21,
+  "failedTests": 0,
+  "successRate": "100.0%",
+  "totalDuration": 4,
+  "results": [
+    {
+      "name": "TypeScript types file exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4Settings interface definition exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4FolderPaths interface definition exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4OutputSettings interface definition exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4ProcessingOptions interface definition exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4RecentFolders interface definition exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4RecentFolderItem interface definition exists",
+      "status": "PASSED",
+      "duration": 1
+    },
+    {
+      "name": "M4_SETTINGS_DEFAULTS constant exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4_FILENAME_PATTERNS constant exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4_TIMESTAMP_FORMATS constant exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "Type guard functions exist",
+      "status": "PASSED",
+      "duration": 1
+    },
+    {
+      "name": "Utility functions exist",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4 settings IPC channels exist",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4 settings IPC request types exist",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4 settings IPC response types exist",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "electronAPI M4 settings functions exist",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "AppState interface includes M4Settings",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4NotificationSettings interface exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4ValidationSettings interface exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4OutputFileNaming interface exists",
+      "status": "PASSED",
+      "duration": 0
+    },
+    {
+      "name": "M4DefaultSettings interface exists",
+      "status": "PASSED",
+      "duration": 0
+    }
+  ]
+}

@@ -396,6 +396,99 @@ export class FileOperations {
   }
 
   /**
+   * Write JSON file atomically
+   */
+  public static async writeJsonFile(
+    filepath: string,
+    data: any,
+    options?: { pretty?: boolean }
+  ): Promise<FileOperationResult> {
+    try {
+      const content = options?.pretty 
+        ? JSON.stringify(data, null, 2) 
+        : JSON.stringify(data)
+      
+      return await this.writeFileAtomic(filepath, content, 'utf8')
+    } catch (error) {
+      const message = `Failed to write JSON file ${filepath}: ${error}`
+      log.error(message)
+      return { success: false, error: message }
+    }
+  }
+
+  /**
+   * Read JSON file atomically
+   */
+  public static async readJsonFile<T = any>(filepath: string): Promise<FileOperationResult> {
+    try {
+      const result = await this.readFileAtomic(filepath, 'utf8')
+      
+      if (!result.success) {
+        return result
+      }
+      
+      const data = JSON.parse(result.data)
+      return { success: true, data: data as T }
+      
+    } catch (error) {
+      const message = `Failed to read JSON file ${filepath}: ${error}`
+      log.error(message)
+      return { success: false, error: message }
+    }
+  }
+
+  /**
+   * List directory contents with stats
+   */
+  public static async listDirectory(
+    dirPath: string
+  ): Promise<FileOperationResult> {
+    try {
+      if (!await this.exists(dirPath)) {
+        return { success: false, error: 'Directory does not exist' }
+      }
+
+      const entries = await fs.readdir(dirPath, { withFileTypes: true })
+      const result: Array<{
+        name: string
+        path: string
+        stats: {
+          size: number
+          mtime: Date
+          isFile: boolean
+          isDirectory: boolean
+        }
+      }> = []
+
+      for (const entry of entries) {
+        const fullPath = join(dirPath, entry.name)
+        try {
+          const stats = await fs.stat(fullPath)
+          result.push({
+            name: entry.name,
+            path: fullPath,
+            stats: {
+              size: stats.size,
+              mtime: stats.mtime,
+              isFile: entry.isFile(),
+              isDirectory: entry.isDirectory()
+            }
+          })
+        } catch (statError) {
+          log.warn(`Failed to get stats for ${fullPath}: ${statError}`)
+        }
+      }
+
+      return { success: true, data: result }
+      
+    } catch (error) {
+      const message = `Failed to list directory ${dirPath}: ${error}`
+      log.error(message)
+      return { success: false, error: message }
+    }
+  }
+
+  /**
    * Move file safely (atomic rename if possible)
    */
   public static async moveFile(

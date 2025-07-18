@@ -1,0 +1,26 @@
+{
+  "version": "1.0.1",
+  "folderPaths": {
+    "m4DialogueFolder": "/test/dialogue",
+    "m4StringFolder": "/test/string",
+    "outputFolder": "/test/output"
+  },
+  "outputSettings": {
+    "createSubfolders": true,
+    "useTimestamp": true
+  },
+  "processingOptions": {
+    "validateData": true,
+    "enableStreaming": true,
+    "maxBatchSize": 1000
+  },
+  "recentFolders": {
+    "dialogue": [
+      "/test/dialogue"
+    ],
+    "string": [
+      "/test/string"
+    ]
+  },
+  "lastUpdated": 1752827114250
+}

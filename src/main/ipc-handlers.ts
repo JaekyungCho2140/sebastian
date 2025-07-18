@@ -17,12 +17,35 @@ import {
   SupportInformation,
   SelfDiagnosticReport,
   HelpTopic,
-  HelpSearchResult
+  HelpSearchResult,
+  M4FolderSelectionResult,
+  M4FileValidationResult,
+  M4FolderValidationRequest,
+  M4Settings,
+  M4ErrorReportRequest,
+  M4ErrorContextUpdate,
+  M4ErrorStats,
+  M4ErrorLogExportRequest,
+  M4ErrorReportedEvent,
+  ErrorBreadcrumb
 } from '../shared/types'
 import { getStateManager } from './state-manager'
 import { UpdateService } from './services/updateService'
 import { LocalErrorReporter } from './services/local-error-reporter'
+import { RemoteErrorReporter } from './services/remote-error-reporter'
+import { M4ErrorReporter } from './services/m4-error-reporter'
 import { InstallOptions, UpdateInstaller } from './services/updateInstaller'
+import { 
+  FolderDialogService, 
+  FolderSelectionResult, 
+  M4FileValidationResult as ServiceM4FileValidationResult
+} from '../services/folderDialogService'
+import { 
+  PerformanceProfiler, 
+  globalProfiler,
+  PerformanceReport,
+  ProfilerConfig as ProfilingConfig
+} from '../services/m4/performance/profiler'
 
 // Error handler wrapper
 function createErrorResponse(error: unknown, channel?: string): IpcErrorResponse {
@@ -37,21 +60,39 @@ function createErrorResponse(error: unknown, channel?: string): IpcErrorResponse
   }
 }
 
+// Performance profiler instance
+const ipcProfiler = globalProfiler.isEnabled() ? globalProfiler : null
+
 // Type-safe handler wrapper
-function createHandler<T extends keyof IpcRequests>(
+function createHandler<T extends keyof IpcRequests & keyof IpcResponses>(
   channel: T,
   handler: (
     request: IpcRequests[T]
   ) => Promise<IpcResponses[T]> | IpcResponses[T]
 ): void {
   ipcMain.handle(channel, async (event, request: IpcRequests[T]) => {
+    const measurementId = ipcProfiler?.begin(`IPC.${channel}`, {
+      channel,
+      requestSize: request ? JSON.stringify(request).length : 0
+    })
+    
     try {
       console.log(`IPC Handler: ${channel}`, request)
       const result = await handler(request)
       console.log(`IPC Response: ${channel}`, result)
+      
+      if (measurementId) {
+        ipcProfiler?.end(measurementId)
+      }
+      
       return result
     } catch (error) {
       console.error(`IPC Handler Error: ${channel}`, error)
+      
+      if (measurementId) {
+        ipcProfiler?.end(measurementId)
+      }
+      
       return createErrorResponse(error, channel)
     }
   })
@@ -62,6 +103,12 @@ let updateService: UpdateService | null = null
 
 // Error reporter instance
 let errorReporter: LocalErrorReporter | null = null
+
+// M4 error reporter instance
+let m4ErrorReporter: M4ErrorReporter | null = null
+
+// Folder dialog service instance
+let folderDialogService: FolderDialogService | null = null
 
 // NSIS installation process manager
 async function initiateNsisInstallation(installPath: string, customOptions?: Partial<InstallOptions>): Promise<void> {
@@ -311,6 +358,35 @@ export function setupIpcHandlers(): void {
     maxAge: 30
   })
   console.log('Error reporter initialized successfully')
+
+  // Initialize M4 error reporter
+  console.log('Initializing M4 error reporter...')
+  // RemoteErrorReporter 인스턴스 생성 (비활성화 상태)
+  const remoteReporter = new RemoteErrorReporter(
+    errorReporter, // LocalErrorReporter 인스턴스
+    false, // enableRemoteReporting
+    '' // Sentry DSN (empty since we're not using it)
+  )
+  
+  m4ErrorReporter = new M4ErrorReporter(
+    errorReporter,
+    remoteReporter,
+    {
+      enableLocalLogging: true,
+      enableRemoteReporting: false,
+      separateM4Logs: true,
+      maxM4Files: 200,
+      maxM4FileSize: 10 * 1024 * 1024, // 10MB
+      maxM4Age: 90, // 90일
+      logRotationEnabled: true
+    }
+  )
+  console.log('M4 error reporter initialized successfully')
+  
+  // Initialize folder dialog service
+  console.log('Initializing folder dialog service...')
+  folderDialogService = new FolderDialogService()
+  console.log('Folder dialog service initialized successfully')
   
   // Initialize update service
   console.log('=== IPC HANDLERS: INITIALIZING UPDATE SERVICE ===')
@@ -938,6 +1014,389 @@ export function setupIpcHandlers(): void {
     }
   })
 
+  // M4 processing handlers
+  console.log('Registering M4 processing IPC handlers...')
+  
+  // Select M4 folder handler
+  createHandler(IPC_CHANNELS.SELECT_M4_FOLDER, async () => {
+    if (!folderDialogService) {
+      throw new IpcError('Folder dialog service not initialized', 'FOLDER_DIALOG_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      const result = await folderDialogService.openFolderDialog()
+      return result
+    } catch (error) {
+      console.error('Failed to open folder dialog:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to open folder dialog',
+        'FOLDER_DIALOG_FAILED'
+      )
+    }
+  })
+  
+  // Validate M4 folder handler
+  createHandler(IPC_CHANNELS.VALIDATE_M4_FOLDER, async (request: M4FolderValidationRequest) => {
+    if (!folderDialogService) {
+      throw new IpcError('Folder dialog service not initialized', 'FOLDER_DIALOG_SERVICE_NOT_INITIALIZED')
+    }
+    
+    try {
+      let validationResult
+      
+      if (request.processType === 'dialogue') {
+        validationResult = folderDialogService.validateM4DialogueFiles(request.folderPath)
+      } else {
+        validationResult = folderDialogService.validateM4StringFiles(request.folderPath)
+      }
+      
+      const result: M4FileValidationResult = {
+        ...validationResult,
+        processType: request.processType,
+        errorMessage: !validationResult.isValid ? folderDialogService.generateValidationErrorMessage(
+          validationResult, 
+          request.processType
+        ) : undefined
+      }
+      
+      return result
+    } catch (error) {
+      console.error('Failed to validate M4 folder:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to validate M4 folder',
+        'M4_FOLDER_VALIDATION_FAILED'
+      )
+    }
+  })
+  
+  // ============================================================================
+  // M4 Settings IPC Handlers
+  // ============================================================================
+  
+  console.log('Registering M4 settings IPC handlers...')
+  
+  // Get M4 settings handler
+  createHandler(IPC_CHANNELS.GET_M4_SETTINGS, async () => {
+    try {
+      const settings = stateManager.getM4Settings()
+      console.log('M4 settings retrieved successfully')
+      return settings
+    } catch (error) {
+      console.error('Failed to get M4 settings:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get M4 settings',
+        'GET_M4_SETTINGS_FAILED'
+      )
+    }
+  })
+  
+  // Set M4 settings handler
+  createHandler(IPC_CHANNELS.SET_M4_SETTINGS, async (settings: Partial<M4Settings>) => {
+    try {
+      const updatedSettings = stateManager.saveM4Settings(settings)
+      
+      // Broadcast M4 settings change to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-settings-changed', updatedSettings)
+      })
+      
+      console.log('M4 settings updated successfully')
+    } catch (error) {
+      console.error('Failed to set M4 settings:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to set M4 settings',
+        'SET_M4_SETTINGS_FAILED'
+      )
+    }
+  })
+  
+  // Reset M4 settings handler
+  createHandler(IPC_CHANNELS.RESET_M4_SETTINGS, async () => {
+    try {
+      const resetSettings = stateManager.resetM4Settings()
+      
+      // Broadcast M4 settings reset to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-settings-reset', resetSettings)
+      })
+      
+      console.log('M4 settings reset successfully')
+      return resetSettings
+    } catch (error) {
+      console.error('Failed to reset M4 settings:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to reset M4 settings',
+        'RESET_M4_SETTINGS_FAILED'
+      )
+    }
+  })
+  
+  // Migrate M4 settings handler
+  createHandler(IPC_CHANNELS.MIGRATE_M4_SETTINGS, async (request: { oldSettings: any; targetVersion?: string }) => {
+    try {
+      const migratedSettings = stateManager.migrateM4Settings(request.oldSettings, request.targetVersion)
+      
+      // Broadcast M4 settings migration to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-settings-migrated', migratedSettings)
+      })
+      
+      console.log('M4 settings migrated successfully')
+      return migratedSettings
+    } catch (error) {
+      console.error('Failed to migrate M4 settings:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to migrate M4 settings',
+        'MIGRATE_M4_SETTINGS_FAILED'
+      )
+    }
+  })
+  
+  // Validate M4 settings handler
+  createHandler(IPC_CHANNELS.VALIDATE_M4_SETTINGS, async (settings: M4Settings) => {
+    try {
+      const validation = stateManager.validateM4Settings(settings)
+      console.log('M4 settings validation completed:', validation)
+      return validation
+    } catch (error) {
+      console.error('Failed to validate M4 settings:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to validate M4 settings',
+        'VALIDATE_M4_SETTINGS_FAILED'
+      )
+    }
+  })
+  
+  // Add recent M4 folder handler
+  createHandler(IPC_CHANNELS.ADD_RECENT_M4_FOLDER, async (request: { processType: 'dialogue' | 'string'; folderPath: string; alias?: string }) => {
+    try {
+      const updatedSettings = stateManager.updateLastUsedFolder(
+        request.processType,
+        request.folderPath,
+        request.alias
+      )
+      
+      // Broadcast recent folder update to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-recent-folder-added', {
+          processType: request.processType,
+          folderPath: request.folderPath,
+          settings: updatedSettings
+        })
+      })
+      
+      console.log('Recent M4 folder added successfully')
+      return updatedSettings
+    } catch (error) {
+      console.error('Failed to add recent M4 folder:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to add recent M4 folder',
+        'ADD_RECENT_M4_FOLDER_FAILED'
+      )
+    }
+  })
+  
+  // Remove recent M4 folder handler
+  createHandler(IPC_CHANNELS.REMOVE_RECENT_M4_FOLDER, async (request: { processType: 'dialogue' | 'string'; folderPath: string }) => {
+    try {
+      const updatedSettings = stateManager.removeRecentM4Folder(
+        request.processType,
+        request.folderPath
+      )
+      
+      // Broadcast recent folder removal to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-recent-folder-removed', {
+          processType: request.processType,
+          folderPath: request.folderPath,
+          settings: updatedSettings
+        })
+      })
+      
+      console.log('Recent M4 folder removed successfully')
+      return updatedSettings
+    } catch (error) {
+      console.error('Failed to remove recent M4 folder:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to remove recent M4 folder',
+        'REMOVE_RECENT_M4_FOLDER_FAILED'
+      )
+    }
+  })
+  
+  // Cleanup recent M4 folders handler
+  createHandler(IPC_CHANNELS.CLEANUP_RECENT_M4_FOLDERS, async (request: { maxAge?: number }) => {
+    try {
+      const updatedSettings = stateManager.cleanupRecentM4Folders(request.maxAge)
+      
+      // Broadcast cleanup completion to all windows
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send('m4-recent-folders-cleaned', updatedSettings)
+      })
+      
+      console.log('Recent M4 folders cleaned up successfully')
+      return updatedSettings
+    } catch (error) {
+      console.error('Failed to cleanup recent M4 folders:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to cleanup recent M4 folders',
+        'CLEANUP_RECENT_M4_FOLDERS_FAILED'
+      )
+    }
+  })
+  
+  // ============================================================================
+  // M4 Error Reporting IPC Handlers
+  // ============================================================================
+  
+  console.log('Registering M4 error reporting IPC handlers...')
+  
+  // Report M4 error handler
+  createHandler(IPC_CHANNELS.REPORT_M4_ERROR, async (errorRequest: M4ErrorReportRequest) => {
+    if (!m4ErrorReporter) {
+      throw new IpcError('M4 error reporter not initialized', 'M4_ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      const reportId = await m4ErrorReporter.reportM4Error(errorRequest)
+      
+      if (reportId) {
+        // M4 에러가 보고되었음을 모든 윈도우에 알림
+        const errorEvent: M4ErrorReportedEvent = {
+          reportId,
+          correlationId: errorRequest.correlationId,
+          errorType: errorRequest.errorType,
+          severity: errorRequest.severity,
+          message: errorRequest.message,
+          timestamp: errorRequest.timestamp,
+          processType: errorRequest.context.processType,
+          fileName: errorRequest.context.fileName,
+          recoverable: errorRequest.recoverable,
+          retryable: errorRequest.retryable
+        }
+        
+        BrowserWindow.getAllWindows().forEach(window => {
+          window.webContents.send(IPC_CHANNELS.M4_ERROR_REPORTED, errorEvent)
+        })
+        
+        console.log('M4 error reported successfully:', reportId)
+      }
+      
+      return reportId
+    } catch (error) {
+      console.error('Failed to report M4 error:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to report M4 error',
+        'M4_ERROR_REPORT_FAILED'
+      )
+    }
+  })
+  
+  // Update M4 error context handler
+  createHandler(IPC_CHANNELS.M4_ERROR_CONTEXT_UPDATE, async (contextUpdate: M4ErrorContextUpdate) => {
+    if (!m4ErrorReporter) {
+      throw new IpcError('M4 error reporter not initialized', 'M4_ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      await m4ErrorReporter.updateM4ErrorContext(
+        contextUpdate.correlationId,
+        contextUpdate.context
+      )
+      
+      // 컨텍스트 업데이트를 모든 윈도우에 알림
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.M4_ERROR_CONTEXT_UPDATED, contextUpdate)
+      })
+      
+      console.log('M4 error context updated:', contextUpdate.correlationId)
+    } catch (error) {
+      console.error('Failed to update M4 error context:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to update M4 error context',
+        'M4_ERROR_CONTEXT_UPDATE_FAILED'
+      )
+    }
+  })
+  
+  // Get M4 error stats handler
+  createHandler(IPC_CHANNELS.GET_M4_ERROR_STATS, async () => {
+    if (!m4ErrorReporter) {
+      throw new IpcError('M4 error reporter not initialized', 'M4_ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      const stats = m4ErrorReporter.getM4ErrorStats()
+      console.log('M4 error stats generated successfully')
+      return stats
+    } catch (error) {
+      console.error('Failed to generate M4 error stats:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to generate M4 error stats',
+        'M4_ERROR_STATS_FAILED'
+      )
+    }
+  })
+  
+  // Export M4 error logs handler
+  createHandler(IPC_CHANNELS.EXPORT_M4_ERROR_LOGS, async (request: M4ErrorLogExportRequest) => {
+    if (!m4ErrorReporter) {
+      throw new IpcError('M4 error reporter not initialized', 'M4_ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      const filePath = await m4ErrorReporter.exportM4ErrorLogs(request)
+      
+      // 로그 내보내기 완료를 모든 윈도우에 알림
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: `M4 error logs exported to: ${filePath}`,
+          phase: 'm4-log-export'
+        })
+      })
+      
+      console.log('M4 error logs exported successfully:', filePath)
+      return filePath
+    } catch (error) {
+      console.error('Failed to export M4 error logs:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to export M4 error logs',
+        'M4_ERROR_LOGS_EXPORT_FAILED'
+      )
+    }
+  })
+  
+  // Clear M4 error logs handler
+  createHandler(IPC_CHANNELS.CLEAR_M4_ERROR_LOGS, async () => {
+    if (!m4ErrorReporter) {
+      throw new IpcError('M4 error reporter not initialized', 'M4_ERROR_REPORTER_NOT_INITIALIZED')
+    }
+    
+    try {
+      await m4ErrorReporter.clearM4ErrorLogs()
+      
+      // 로그 정리 완료를 모든 윈도우에 알림
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+          stage: 'complete',
+          progress: 100,
+          message: 'M4 error logs cleared successfully',
+          phase: 'm4-log-clear'
+        })
+      })
+      
+      console.log('M4 error logs cleared successfully')
+    } catch (error) {
+      console.error('Failed to clear M4 error logs:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to clear M4 error logs',
+        'M4_ERROR_LOGS_CLEAR_FAILED'
+      )
+    }
+  })
+  
   // Development/debugging handlers - using direct ipcMain.handle
   console.log('Registering development IPC handlers...')
   
@@ -1147,6 +1606,147 @@ export function setupIpcHandlers(): void {
   }
 
   console.log('Development IPC handlers registered successfully')
+  console.log('M4 settings IPC handlers registered successfully')
+  
+  // ============================================================================
+  // Performance Profiling IPC Handlers
+  // ============================================================================
+  
+  console.log('Registering performance profiling IPC handlers...')
+  
+  // Get performance statistics handler
+  createHandler(IPC_CHANNELS.GET_PERFORMANCE_STATS, async () => {
+    try {
+      const stats = globalProfiler.getStatistics()
+      console.log('Performance statistics retrieved')
+      return stats
+    } catch (error) {
+      console.error('Failed to get performance statistics:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get performance statistics',
+        'GET_PERFORMANCE_STATS_FAILED'
+      )
+    }
+  })
+  
+  // Get performance report handler
+  createHandler(IPC_CHANNELS.GET_PERFORMANCE_REPORT, async () => {
+    try {
+      if (!globalProfiler.isEnabled()) {
+        // Return empty report if profiler is not enabled
+        return {
+          startTime: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          totalDuration: 0,
+          measurements: [],
+          statistics: {},
+          slowOperations: [],
+          timeline: [],
+          recommendations: ['Performance profiling is not enabled']
+        } as PerformanceReport
+      }
+      
+      // Generate report without stopping profiler
+      const report = await globalProfiler.stop()
+      
+      // Restart profiler if it was running
+      if (report) {
+        globalProfiler.start('Main Process')
+      }
+      
+      console.log('Performance report generated')
+      return report || {
+        startTime: new Date().toISOString(),
+        endTime: new Date().toISOString(),
+        totalDuration: 0,
+        measurements: [],
+        statistics: {},
+        slowOperations: [],
+        timeline: [],
+        recommendations: []
+      } as PerformanceReport
+    } catch (error) {
+      console.error('Failed to get performance report:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to get performance report',
+        'GET_PERFORMANCE_REPORT_FAILED'
+      )
+    }
+  })
+  
+  // Start profiling handler
+  createHandler(IPC_CHANNELS.START_PROFILING, async (request: ProfilingConfig | void) => {
+    try {
+      if (request) {
+        globalProfiler.setEnabled(request.enabled !== false)
+      } else {
+        globalProfiler.setEnabled(true)
+      }
+      globalProfiler.start('Profiling Session')
+      console.log('Performance profiling started')
+    } catch (error) {
+      console.error('Failed to start profiling:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to start profiling',
+        'START_PROFILING_FAILED'
+      )
+    }
+  })
+  
+  // Stop profiling handler
+  createHandler(IPC_CHANNELS.STOP_PROFILING, async () => {
+    try {
+      const report = await globalProfiler.stop()
+      console.log('Performance profiling stopped')
+      return report || {
+        startTime: new Date().toISOString(),
+        endTime: new Date().toISOString(),
+        totalDuration: 0,
+        measurements: [],
+        statistics: {},
+        slowOperations: [],
+        timeline: [],
+        recommendations: []
+      } as PerformanceReport
+    } catch (error) {
+      console.error('Failed to stop profiling:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to stop profiling',
+        'STOP_PROFILING_FAILED'
+      )
+    }
+  })
+  
+  // Clear performance data handler
+  createHandler(IPC_CHANNELS.CLEAR_PERFORMANCE_DATA, async () => {
+    try {
+      // Stop and restart profiler to clear data
+      await globalProfiler.stop()
+      console.log('Performance data cleared')
+    } catch (error) {
+      console.error('Failed to clear performance data:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to clear performance data',
+        'CLEAR_PERFORMANCE_DATA_FAILED'
+      )
+    }
+  })
+  
+  // Set profiling enabled handler
+  createHandler(IPC_CHANNELS.SET_PROFILING_ENABLED, async (enabled: boolean) => {
+    try {
+      globalProfiler.setEnabled(enabled)
+      console.log('Performance profiling enabled:', enabled)
+    } catch (error) {
+      console.error('Failed to set profiling enabled:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'Failed to set profiling enabled',
+        'SET_PROFILING_ENABLED_FAILED'
+      )
+    }
+  })
+  
+  console.log('Performance profiling IPC handlers registered successfully')
   console.log('IPC handlers initialized')
 }
 
@@ -1174,10 +1774,71 @@ export function updateAppState(updates: Partial<AppState>): void {
   })
 }
 
+// Get M4 error reporter instance (for use by other modules)
+export function getM4ErrorReporter(): M4ErrorReporter | null {
+  return m4ErrorReporter
+}
+
+// Report M4 error from other modules
+export async function reportM4Error(errorRequest: M4ErrorReportRequest): Promise<string | null> {
+  if (!m4ErrorReporter) {
+    console.error('M4 error reporter not initialized')
+    return null
+  }
+  
+  try {
+    const reportId = await m4ErrorReporter.reportM4Error(errorRequest)
+    
+    if (reportId) {
+      // M4 에러가 보고되었음을 모든 윈도우에 알림
+      const errorEvent: M4ErrorReportedEvent = {
+        reportId,
+        correlationId: errorRequest.correlationId,
+        errorType: errorRequest.errorType,
+        severity: errorRequest.severity,
+        message: errorRequest.message,
+        timestamp: errorRequest.timestamp,
+        processType: errorRequest.context.processType,
+        fileName: errorRequest.context.fileName,
+        recoverable: errorRequest.recoverable,
+        retryable: errorRequest.retryable
+      }
+      
+      BrowserWindow.getAllWindows().forEach(window => {
+        window.webContents.send(IPC_CHANNELS.M4_ERROR_REPORTED, errorEvent)
+      })
+    }
+    
+    return reportId
+  } catch (error) {
+    console.error('Failed to report M4 error:', error)
+    return null
+  }
+}
+
+// Add M4 breadcrumb from other modules
+export function addM4Breadcrumb(breadcrumb: Omit<ErrorBreadcrumb, 'timestamp'>): void {
+  if (m4ErrorReporter) {
+    m4ErrorReporter.addBreadcrumb(
+      breadcrumb.category,
+      breadcrumb.message,
+      breadcrumb.level,
+      breadcrumb.data
+    )
+  }
+}
+
 // Cleanup function to stop services
 export async function cleanup(): Promise<void> {
   if (updateService) {
     await updateService.stop()
     updateService = null
+  }
+  
+  // M4 error reporter cleanup
+  if (m4ErrorReporter) {
+    // M4 에러 리포터는 별도 정리 로직이 필요하지 않음
+    // 메모리 참조만 정리
+    m4ErrorReporter = null
   }
 }

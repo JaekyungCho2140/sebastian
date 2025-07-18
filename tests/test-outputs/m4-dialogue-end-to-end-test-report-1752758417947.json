@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-07-17T13:20:17.947Z",
+  "totalTests": 3,
+  "passedTests": 3,
+  "failedTests": 0,
+  "totalDuration": 69,
+  "successRate": "100.0",
+  "testResults": [
+    {
+      "name": "Full Workflow Execution",
+      "status": "PASSED",
+      "duration": 31
+    },
+    {
+      "name": "Output File Validation",
+      "status": "PASSED",
+      "duration": 4
+    },
+    {
+      "name": "Excel Formatting Validation",
+      "status": "PASSED",
+      "duration": 3
+    }
+  ]
+}
