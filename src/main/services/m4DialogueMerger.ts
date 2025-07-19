@@ -67,7 +67,7 @@ export class M4DialogueMergerService {
       })
 
       const cinematicPath = path.join(inputFolder, 'CINEMATIC_DIALOGUE.xlsm')
-      const cinematicData = await this.readExcelFile(cinematicPath, 1, 1, 9)
+      const cinematicData = await this.readExcelFile(cinematicPath, 1, 0, 9)
       
       reportProgress({
         current: 20,
@@ -93,7 +93,7 @@ export class M4DialogueMergerService {
       })
 
       const smalltalkPath = path.join(inputFolder, 'SMALLTALK_DIALOGUE.xlsm')
-      const smalltalkData = await this.readExcelFile(smalltalkPath, 1, 1, 4)
+      const smalltalkData = await this.readExcelFile(smalltalkPath, 1, 0, 4)
       
       reportProgress({
         current: 40,
@@ -249,6 +249,7 @@ export class M4DialogueMergerService {
 
   /**
    * Excel 파일 읽기
+   * Python의 pd.read_excel(sheet_name=sheet_name, header=header_row, skiprows=skip_rows)와 동일하게 동작
    */
   private static async readExcelFile(
     filePath: string,
@@ -259,33 +260,32 @@ export class M4DialogueMergerService {
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.readFile(filePath)
     
-    const worksheet = workbook.getWorksheet(sheetIndex + 1) // ExcelJS는 1-based index
+    const worksheet = workbook.getWorksheet(sheetIndex) // ExcelJS는 1-based index
     if (!worksheet) {
       throw new Error(`No worksheet found at index ${sheetIndex} in ${path.basename(filePath)}`)
     }
 
     const data: any[] = []
-    let headerRowData: string[] = []
-
+    let actualHeaderRow = skipRows + headerRow + 1 // skipRows 후 headerRow 위치
+    
     worksheet.eachRow((row, rowNumber) => {
-      // Skip rows 설정
+      // Skip rows 이후부터 처리
       if (rowNumber <= skipRows) return
       
-      // Header row 처리
-      if (rowNumber === skipRows + headerRow + 1) {
-        headerRowData = row.values as string[]
-        headerRowData = headerRowData.slice(1) // 첫 번째 undefined 제거
-        return
-      }
-
+      // Header row는 건너뛰기 (pandas와 동일)
+      if (rowNumber === actualHeaderRow) return
+      
       // Data rows
-      if (rowNumber > skipRows + headerRow + 1) {
+      if (rowNumber > actualHeaderRow) {
         const rowData: any = {}
         const values = row.values as any[]
         
-        headerRowData.forEach((header, index) => {
-          rowData[index] = values[index + 1] // values는 1-based
-        })
+        // 인덱스 기반으로 데이터 저장 (Python과 동일하게 0-based index)
+        if (values) {
+          for (let i = 1; i < values.length; i++) {
+            rowData[i] = values[i] // ExcelJS values는 1-based, rowData는 1-based로 저장
+          }
+        }
         
         data.push(rowData)
       }

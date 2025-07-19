@@ -155,7 +155,8 @@ export class M4StringMerger {
         // Excel 파일 읽기
         const workbook = new ExcelJS.Workbook()
         await workbook.xlsx.readFile(filePath)
-        const worksheet = workbook.getWorksheet(1)
+        // 모든 STRING 파일은 2번째 시트를 사용 (Python의 sheet_name=1)
+        const worksheet = workbook.getWorksheet(2)
 
         if (!worksheet) {
           throw new Error(`워크시트를 찾을 수 없습니다: ${filename}`)
