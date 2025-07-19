@@ -260,45 +260,51 @@ async function initiateNsisInstallation(installPath: string, customOptions?: Par
       
       console.log('NSIS installation options:', installOptions)
       
-      await updateService.installUpdate(installPath, installOptions)
-      
-      // Clear progress interval
-      clearInterval(progressInterval)
-      
-      // Installation successful - restart with new version
-      console.log('NSIS installation completed successfully')
-      
-      windows.forEach(window => {
-        window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
-          stage: 'complete',
-          progress: 100,
-          message: 'Installation completed successfully!',
-          phase: 'installation-complete',
-          timestamp: Date.now()
+      // Start installation - this returns immediately after spawning the process
+      updateService.installUpdate(installPath, installOptions)
+        .then(() => {
+          // Installation completed successfully
+          clearInterval(progressInterval)
+          console.log('NSIS installation completed successfully')
+          
+          windows.forEach(window => {
+            window.webContents.send(IPC_CHANNELS.UPDATE_PROGRESS, {
+              stage: 'complete',
+              progress: 100,
+              message: 'Installation completed successfully!',
+              phase: 'installation-complete',
+              timestamp: Date.now()
+            })
+            window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_COMPLETE, {
+              success: true,
+              message: 'Sebastian has been updated successfully',
+              timestamp: Date.now()
+            })
+          })
+          
+          setTimeout(() => {
+            app.relaunch()
+            app.exit(0)
+          }, 1000)
         })
-        window.webContents.send(IPC_CHANNELS.NSIS_INSTALLATION_COMPLETE, {
-          success: true,
-          message: 'Sebastian has been updated successfully',
-          timestamp: Date.now()
+        .catch((installError) => {
+          clearInterval(progressInterval)
+          console.error('NSIS installation failed:', installError)
+          handleInstallationFailure()
         })
-      })
       
+      // Wait a bit to ensure installer process has started
       setTimeout(() => {
-        app.relaunch()
-        app.exit(0)
-      }, 1000)
+        console.log('Installer process started, now safe to quit app')
+        app.quit()
+      }, 3000) // Wait 3 seconds to ensure installer is running
       
-    } catch (installError) {
+    } catch (error) {
       clearInterval(progressInterval)
-      console.error('NSIS installation failed:', installError)
+      console.error('Failed to start installation:', error)
       handleInstallationFailure()
     }
   }, 1000)
-  
-  // Gracefully quit current app
-  setTimeout(() => {
-    app.quit()
-  }, 1500)
 }
 
 // Get installation preferences from app state

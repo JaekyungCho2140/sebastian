@@ -11,7 +11,7 @@
     "wscat": "^6.1.0"
   },
   "name": "sebastian",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Sebastian Electron-Vite-React Demo Application",
   "m4Features": {
     "version": "1.0.0",
@@ -176,6 +176,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Sebastian",
+      "runAfterFinish": true,
       "installerIcon": "src/assets/icons/icon.ico",
       "installerHeaderIcon": "src/assets/icons/icon.ico",
       "installerLanguages": [

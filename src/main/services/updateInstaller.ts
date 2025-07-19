@@ -361,8 +361,12 @@ export class UpdateInstaller extends EventEmitter {
       this.activeInstallation = spawn(command, args, {
         stdio: ['ignore', 'pipe', 'pipe'],
         shell: false, // Use false for better security with NSIS
-        windowsHide: true
+        windowsHide: true,
+        detached: true // Run installer independently from parent process
       })
+
+      // Unref the process to allow parent to exit independently
+      this.activeInstallation.unref()
 
       let stdout = ''
       let stderr = ''
@@ -943,7 +947,9 @@ export class UpdateInstaller extends EventEmitter {
     this.log('debug', 'cleanup', 'Performing final cleanup')
     
     if (this.activeInstallation) {
-      this.activeInstallation.kill('SIGTERM')
+      // Don't kill detached installation process
+      // It will continue running independently
+      this.log('info', 'cleanup', 'Detached installation process will continue running')
       this.activeInstallation = undefined
     }
     

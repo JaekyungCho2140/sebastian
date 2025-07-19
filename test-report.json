@@ -1,1 +1,53 @@
-{"numTotalTestSuites":6,"numPassedTestSuites":1,"numFailedTestSuites":5,"numPendingTestSuites":0,"numTotalTests":9,"numPassedTests":5,"numFailedTests":4,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1752825843852,"success":false,"testResults":[{"assertionResults":[{"ancestorTitles":["M4 Workflow Integration Tests","M4 Dialogue Processing Workflow"],"fullName":"M4 Workflow Integration Tests M4 Dialogue Processing Workflow should complete full dialogue processing with test data","status":"failed","title":"should complete full dialogue processing with test data","duration":62.73983899999996,"failureMessages":["AssertionError: expected undefined to be 100 // Object.is equality\n    at /home/jkcho/repository/sebastian/tests/integration/m4-workflow.test.ts:60:69\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at file:///home/jkcho/repository/sebastian/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","M4 Dialogue Processing Workflow"],"fullName":"M4 Workflow Integration Tests M4 Dialogue Processing Workflow should handle missing files gracefully","status":"passed","title":"should handle missing files gracefully","duration":0.9370030000000042,"failureMessages":[],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","M4 Dialogue Processing Workflow"],"fullName":"M4 Workflow Integration Tests M4 Dialogue Processing Workflow should track memory usage during processing","status":"passed","title":"should track memory usage during processing","duration":26.2346,"failureMessages":[],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","M4 String Processing Workflow"],"fullName":"M4 Workflow Integration Tests M4 String Processing Workflow should complete full string processing with test data","status":"failed","title":"should complete full string processing with test data","duration":26.686400999999933,"failureMessages":["AssertionError: expected false to be true // Object.is equality\n    at /home/jkcho/repository/sebastian/tests/integration/m4-workflow.test.ts:113:30\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at file:///home/jkcho/repository/sebastian/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","M4 String Processing Workflow"],"fullName":"M4 Workflow Integration Tests M4 String Processing Workflow should filter rows based on EN column","status":"failed","title":"should filter rows based on EN column","duration":26.135199000000057,"failureMessages":["AssertionError: expected false to be true // Object.is equality\n    at /home/jkcho/repository/sebastian/tests/integration/m4-workflow.test.ts:139:30\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at file:///home/jkcho/repository/sebastian/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","Error Handling and Recovery"],"fullName":"M4 Workflow Integration Tests Error Handling and Recovery should handle corrupted Excel files","status":"passed","title":"should handle corrupted Excel files","duration":1.3527050000000145,"failureMessages":[],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","Error Handling and Recovery"],"fullName":"M4 Workflow Integration Tests Error Handling and Recovery should handle empty worksheets","status":"failed","title":"should handle empty worksheets","duration":12.0082460000001,"failureMessages":["AssertionError: expected false to be true // Object.is equality\n    at /home/jkcho/repository/sebastian/tests/integration/m4-workflow.test.ts:188:30\n    at file:///home/jkcho/repository/sebastian/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","Performance and Memory"],"fullName":"M4 Workflow Integration Tests Performance and Memory should process large files within acceptable time","status":"passed","title":"should process large files within acceptable time","duration":489.567761,"failureMessages":[],"meta":{}},{"ancestorTitles":["M4 Workflow Integration Tests","Performance and Memory"],"fullName":"M4 Workflow Integration Tests Performance and Memory should not leak memory during processing","status":"passed","title":"should not leak memory during processing","duration":32.068821999999955,"failureMessages":[],"meta":{}}],"startTime":1752825844329,"endTime":1752825845007.0688,"status":"failed","message":"","name":"/home/jkcho/repository/sebastian/tests/integration/m4-workflow.test.ts"}]}
+{
+  "timestamp": "2025-07-19T01:26:49.849Z",
+  "version": "0.2.0",
+  "platform": "linux",
+  "nodeVersion": "v22.17.0",
+  "totalDuration": 3805,
+  "results": [
+    {
+      "name": "Basic Infrastructure Tests",
+      "status": "PASS",
+      "duration": 3341,
+      "message": "Test suite passed",
+      "details": "🧪 LocalErrorReporter 통합 테스트 시작\n\n✅ ErrorReport 타입 구조 검증\n✅ LocalErrorReporter 클래스 파일 존재\n✅ 유틸리티 모듈들 존재 확인\n✅ 모듈 임포트 및 기본 인스턴스 생성\n✅ 에러 리포팅 설정 검증\n✅ 기본 데이터 마스킹 패턴 검증\n✅ 로그 로테이션 로직 구현 확인\n✅ TypeScript 컴파일 호환성\n\n📊 테스트 결과:\n   통과: 8/8\n   실패: 0/8\n\n🎉 모든 테스트 통과!\n"
+    },
+    {
+      "name": "Schema Compatibility Tests",
+      "status": "PASS",
+      "duration": 17,
+      "message": "Test suite passed",
+      "details": "🧪 JSON Schema Compatibility 테스트 시작\n\n✅ Error Report Schema 파일 존재 확인\n✅ Config Schema 파일 존재 확인\n✅ Serialization 유틸리티 모듈 존재 확인\n✅ Schema Validation 유틸리티 모듈 존재 확인\n✅ 유효한 에러 리포트 데이터 구조 검증\n✅ 유효한 설정 데이터 구조 검증\n✅ JSON 직렬화/역직렬화 호환성\n✅ 스키마 버전 호환성\n✅ 에지 케이스 처리\n✅ 직렬화 성능 테스트\n\n📊 테스트 결과:\n   통과: 10/10\n   실패: 0/10\n\n🎉 모든 스키마 호환성 테스트 통과!\n"
+    },
+    {
+      "name": "Report Error Functionality",
+      "status": "PASS",
+      "duration": 3,
+      "message": "Test suite passed"
+    },
+    {
+      "name": "Error Scenarios Validation",
+      "status": "PASS",
+      "duration": 405,
+      "message": "Test suite passed"
+    },
+    {
+      "name": "Dialog Automation Tests",
+      "status": "PASS",
+      "duration": 16,
+      "message": "Test suite passed"
+    },
+    {
+      "name": "File System & Log Rotation",
+      "status": "PASS",
+      "duration": 22,
+      "message": "Test suite passed"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "successRate": "100.0"
+  }
+}
