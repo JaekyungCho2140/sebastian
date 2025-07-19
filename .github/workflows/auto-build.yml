@@ -52,9 +52,9 @@ jobs:
               const fs = require('fs');
               fs.writeFileSync('ci-artifacts.zip', Buffer.from(download.data));
               
-              console.log('✅ CI artifacts downloaded successfully');
+              console.log('CI artifacts downloaded successfully');
             } else {
-              console.log('⚠️ No CI artifacts found, will build from scratch');
+              console.log('No CI artifacts found, will build from scratch');
             }
           
       - name: Extract CI artifacts
@@ -62,13 +62,13 @@ jobs:
         run: |
           if (Test-Path "ci-artifacts.zip") {
             Expand-Archive -Path "ci-artifacts.zip" -DestinationPath "." -Force
-            echo "✅ CI artifacts extracted"
+            echo "CI artifacts extracted"
             
             # Check if dist folder exists from CI
             if (Test-Path "dist") {
-              echo "✅ Using dist folder from CI build"
+              echo "Using dist folder from CI build"
             } else {
-              echo "⚠️ No dist folder in artifacts, will rebuild"
+              echo "No dist folder in artifacts, will rebuild"
             }
           }
         shell: powershell
@@ -90,10 +90,10 @@ jobs:
         run: |
           # Only rebuild if dist folder doesn't exist
           if (!(Test-Path "dist")) {
-            echo "📦 Building application..."
+            echo "Building application..."
             npm run build
           } else {
-            echo "✅ Using existing build from CI"
+            echo "Using existing build from CI"
           }
         shell: powershell
         
@@ -123,9 +123,9 @@ jobs:
             echo "INSTALLER_NAME=$fileName" >> $env:GITHUB_OUTPUT
             echo "INSTALLER_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
             
-            echo "✅ Installer file found: $fileName ($fileSize MB)"
+            echo "Installer file found: $fileName ($fileSize MB)"
           } else {
-            echo "❌ No installer file found"
+            echo "No installer file found"
             exit 1
           }
         shell: powershell
@@ -195,24 +195,24 @@ jobs:
           }
           
           if ($releaseExists) {
-            echo "🔄 Release $tagName already exists. Deleting and recreating..."
+            echo "Release $tagName already exists. Deleting and recreating..."
             try {
               gh release delete $tagName --yes
-              echo "✅ Existing release deleted"
+              echo "Existing release deleted"
             } catch {
-              echo "❌ Failed to delete existing release: $_"
+              echo "Failed to delete existing release: $_"
               exit 1
             }
           } else {
-            echo "✅ Release $tagName does not exist. Creating new release..."
+            echo "Release $tagName does not exist. Creating new release..."
           }
           
           # Create new release
           try {
             gh release create $tagName --title "Sebastian v$version (Auto-Release)" --notes $releaseNotes "${{ steps.find_installer.outputs.INSTALLER_PATH }}"
-            echo "✅ GitHub Release created: $tagName"
+            echo "GitHub Release created: $tagName"
           } catch {
-            echo "❌ Failed to create GitHub Release: $_"
+            echo "Failed to create GitHub Release: $_"
             exit 1
           }
         shell: powershell

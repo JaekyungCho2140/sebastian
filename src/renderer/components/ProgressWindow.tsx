@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { MergeProgress } from '../services/m4DialogueMerger'
+import { M4DialogueMergeProgress, M4StringMergeProgress } from '../../shared/types'
 import './ProgressWindow.css'
 
 interface ProgressWindowProps {
   isOpen: boolean
   onClose: () => void
-  progress: MergeProgress | null
+  progress: M4DialogueMergeProgress | M4StringMergeProgress | null
+  type?: 'dialogue' | 'string'
 }
 
 const ProgressWindow: React.FC<ProgressWindowProps> = ({ isOpen, onClose, progress }) => {

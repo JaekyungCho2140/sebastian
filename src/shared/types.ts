@@ -2004,6 +2004,10 @@ export interface M4DialogueMergeProgress {
   total: number
   status: string
   percentage: number
+  currentStep?: number
+  totalSteps?: number
+  currentFile?: string
+  filesProcessed?: number
 }
 
 /**

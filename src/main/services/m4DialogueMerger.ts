@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs'
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import { BrowserWindow } from 'electron'
+import { format } from 'date-fns'
 import { 
   M4DialogueMergeRequest, 
   M4DialogueMergeProgress, 
@@ -11,29 +12,21 @@ import {
 
 export class M4DialogueMergerService {
   private static readonly REQUIRED_FILES = [
-    'M4_Dialogue_EN.xlsx',
-    'M4_Dialogue_JAP.xlsx',
-    'M4_Dialogue_KOR.xlsx',
-    'M4_Dialogue_SC.xlsx',
-    'M4_Dialogue_TC.xlsx'
+    'CINEMATIC_DIALOGUE.xlsm',
+    'SMALLTALK_DIALOGUE.xlsm', 
+    'NPC.xlsm'
   ]
-
-  private static readonly LANGUAGE_MAP: Record<string, string> = {
-    'EN': 'English',
-    'JAP': 'Japanese',
-    'KOR': 'Korean',
-    'SC': 'Simplified Chinese',
-    'TC': 'Traditional Chinese'
-  }
 
   /**
    * M4 Dialog 파일들을 병합하는 메인 함수
+   * Python의 run_merge 함수를 TypeScript로 포팅
    */
   static async runMerge(
     request: M4DialogueMergeRequest,
     mainWindow: BrowserWindow | null
   ): Promise<M4DialogueMergeResult> {
     const { inputFolder, outputFolder } = request
+    const startTime = Date.now()
     
     try {
       // 진행률 보고 함수
@@ -48,7 +41,11 @@ export class M4DialogueMergerService {
         current: 0,
         total: 100,
         status: 'Starting merge process...',
-        percentage: 0
+        percentage: 0,
+        currentStep: 1,
+        totalSteps: 3,
+        currentFile: '',
+        filesProcessed: 0
       })
 
       // 필수 파일 존재 확인
@@ -57,48 +54,161 @@ export class M4DialogueMergerService {
       // 출력 폴더 생성
       await fs.mkdir(outputFolder, { recursive: true })
 
-      // 병합된 데이터를 저장할 Map
-      const mergedData = new Map<string, Map<string, string>>()
+      // 단계 1: CINEMATIC_DIALOGUE 읽기
+      reportProgress({
+        current: 10,
+        total: 100,
+        status: 'Reading CINEMATIC_DIALOGUE.xlsm...',
+        percentage: 10,
+        currentStep: 1,
+        totalSteps: 3,
+        currentFile: 'CINEMATIC_DIALOGUE.xlsm',
+        filesProcessed: 0
+      })
+
+      const cinematicPath = path.join(inputFolder, 'CINEMATIC_DIALOGUE.xlsm')
+      const cinematicData = await this.readExcelFile(cinematicPath, 1, 1, 9)
       
-      // 각 언어별 파일 읽기
-      let processedFiles = 0
-      for (const fileName of this.REQUIRED_FILES) {
-        const langCode = fileName.match(/M4_Dialogue_(\w+)\.xlsx/)?.[1] || ''
-        const language = this.LANGUAGE_MAP[langCode] || langCode
+      reportProgress({
+        current: 20,
+        total: 100,
+        status: 'CINEMATIC_DIALOGUE.xlsm processed',
+        percentage: 20,
+        currentStep: 1,
+        totalSteps: 3,
+        currentFile: 'CINEMATIC_DIALOGUE.xlsm',
+        filesProcessed: 1
+      })
 
-        reportProgress({
-          current: processedFiles * 15,
-          total: 100,
-          status: `Reading ${language} file...`,
-          percentage: processedFiles * 15
-        })
+      // SMALLTALK_DIALOGUE 읽기
+      reportProgress({
+        current: 30,
+        total: 100,
+        status: 'Reading SMALLTALK_DIALOGUE.xlsm...',
+        percentage: 30,
+        currentStep: 1,
+        totalSteps: 3,
+        currentFile: 'SMALLTALK_DIALOGUE.xlsm',
+        filesProcessed: 1
+      })
 
-        const filePath = path.join(inputFolder, fileName)
-        await this.readDialogueFile(filePath, langCode, mergedData)
-        
-        processedFiles++
-      }
+      const smalltalkPath = path.join(inputFolder, 'SMALLTALK_DIALOGUE.xlsm')
+      const smalltalkData = await this.readExcelFile(smalltalkPath, 1, 1, 4)
+      
+      reportProgress({
+        current: 40,
+        total: 100,
+        status: 'SMALLTALK_DIALOGUE.xlsm processed',
+        percentage: 40,
+        currentStep: 1,
+        totalSteps: 3,
+        currentFile: 'SMALLTALK_DIALOGUE.xlsm',
+        filesProcessed: 2
+      })
 
-      // 병합된 Excel 파일 생성
+      // 단계 2: 데이터 병합
+      reportProgress({
+        current: 50,
+        total: 100,
+        status: 'Merging data...',
+        percentage: 50,
+        currentStep: 2,
+        totalSteps: 3,
+        currentFile: 'Merging data...',
+        filesProcessed: 2
+      })
+
+      // 결과 데이터 생성
+      const mergedData = await this.mergeDialogueData(cinematicData, smalltalkData)
+
+      reportProgress({
+        current: 60,
+        total: 100,
+        status: 'Data merged successfully',
+        percentage: 60,
+        currentStep: 2,
+        totalSteps: 3,
+        currentFile: '',
+        filesProcessed: 2
+      })
+
+      // 단계 3: NPC 데이터 읽기 및 매핑
+      reportProgress({
+        current: 70,
+        total: 100,
+        status: 'Reading NPC.xlsm...',
+        percentage: 70,
+        currentStep: 3,
+        totalSteps: 3,
+        currentFile: 'NPC.xlsm',
+        filesProcessed: 2
+      })
+
+      const npcPath = path.join(inputFolder, 'NPC.xlsm')
+      const npcData = await this.readNPCData(npcPath)
+      
+      // NPC ID를 Speaker Name으로 매핑
+      await this.mapNPCNames(mergedData, npcData)
+
       reportProgress({
         current: 80,
         total: 100,
-        status: 'Creating merged Excel file...',
-        percentage: 80
+        status: 'NPC names mapped',
+        percentage: 80,
+        currentStep: 3,
+        totalSteps: 3,
+        currentFile: 'NPC.xlsm',
+        filesProcessed: 3
       })
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0]
-      const outputFileName = `M4_Dialogue_Merged_${timestamp}.xlsx`
-      const outputPath = path.join(outputFolder, outputFileName)
+      // EN (M) 열이 빈 값인 행 제거
+      const filteredData = mergedData.filter(row => {
+        const enValue = row['EN (M)']
+        return enValue && enValue !== 0 && enValue !== '미사용'
+      })
+
+      // 인덱스 재할당
+      filteredData.forEach((row, index) => {
+        row['#'] = index + 1
+      })
+
+      // 결과 파일 저장
+      reportProgress({
+        current: 90,
+        total: 100,
+        status: 'Saving result file...',
+        percentage: 90,
+        currentStep: 3,
+        totalSteps: 3,
+        currentFile: 'Saving...',
+        filesProcessed: 3
+      })
+
+      const dateStr = format(new Date(), 'MMdd')
+      let outputFileName = `${dateStr}_MIR4_MASTER_DIALOGUE.xlsx`
+      let outputPath = path.join(outputFolder, outputFileName)
       
-      await this.createMergedExcel(mergedData, outputPath)
+      // 파일이 이미 존재하면 번호 추가
+      let counter = 1
+      while (await this.fileExists(outputPath)) {
+        outputFileName = `${dateStr}_MIR4_MASTER_DIALOGUE_${counter}.xlsx`
+        outputPath = path.join(outputFolder, outputFileName)
+        counter++
+      }
+
+      await this.saveResultFile(filteredData, outputPath)
 
       // 완료
+      const elapsedTime = Math.round((Date.now() - startTime) / 1000)
       reportProgress({
         current: 100,
         total: 100,
-        status: 'Merge completed successfully!',
-        percentage: 100
+        status: `Completed! File saved as ${outputFileName}. Time: ${elapsedTime}s`,
+        percentage: 100,
+        currentStep: 3,
+        totalSteps: 3,
+        currentFile: '',
+        filesProcessed: 3
       })
 
       return {
@@ -138,60 +248,195 @@ export class M4DialogueMergerService {
   }
 
   /**
-   * 개별 Dialog 파일 읽기
+   * Excel 파일 읽기
    */
-  private static async readDialogueFile(
+  private static async readExcelFile(
     filePath: string,
-    langCode: string,
-    mergedData: Map<string, Map<string, string>>
-  ): Promise<void> {
+    sheetIndex: number,
+    headerRow: number,
+    skipRows: number
+  ): Promise<any[]> {
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.readFile(filePath)
     
-    const worksheet = workbook.getWorksheet(1)
+    const worksheet = workbook.getWorksheet(sheetIndex + 1) // ExcelJS는 1-based index
     if (!worksheet) {
-      throw new Error(`No worksheet found in ${path.basename(filePath)}`)
+      throw new Error(`No worksheet found at index ${sheetIndex} in ${path.basename(filePath)}`)
     }
 
-    // 헤더 행 건너뛰고 데이터 읽기
+    const data: any[] = []
+    let headerRowData: string[] = []
+
     worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return // 헤더 건너뛰기
+      // Skip rows 설정
+      if (rowNumber <= skipRows) return
       
-      const id = row.getCell(1).value?.toString() || ''
-      const text = row.getCell(2).value?.toString() || ''
-      
-      if (id) {
-        if (!mergedData.has(id)) {
-          mergedData.set(id, new Map())
-        }
-        mergedData.get(id)?.set(langCode, text)
+      // Header row 처리
+      if (rowNumber === skipRows + headerRow + 1) {
+        headerRowData = row.values as string[]
+        headerRowData = headerRowData.slice(1) // 첫 번째 undefined 제거
+        return
+      }
+
+      // Data rows
+      if (rowNumber > skipRows + headerRow + 1) {
+        const rowData: any = {}
+        const values = row.values as any[]
+        
+        headerRowData.forEach((header, index) => {
+          rowData[index] = values[index + 1] // values는 1-based
+        })
+        
+        data.push(rowData)
       }
     })
+
+    return data
   }
 
   /**
-   * 병합된 Excel 파일 생성
+   * NPC 데이터 읽기
    */
-  private static async createMergedExcel(
-    mergedData: Map<string, Map<string, string>>,
-    outputPath: string
-  ): Promise<void> {
+  private static async readNPCData(filePath: string): Promise<Map<string, string>> {
     const workbook = new ExcelJS.Workbook()
+    await workbook.xlsx.readFile(filePath)
     
-    // 메인 데이터 시트
+    const worksheet = workbook.getWorksheet('NPC')
+    if (!worksheet) {
+      throw new Error('NPC sheet not found in NPC.xlsm')
+    }
+
+    const npcMap = new Map<string, string>()
+    
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber <= 2) return // Skip header rows
+      
+      const npcId = row.getCell(8).value?.toString() // H열 (index 7)
+      const npcName = row.getCell(10).value?.toString() // J열 (index 9)
+      
+      if (npcId && npcName) {
+        npcMap.set(npcId, npcName)
+      }
+    })
+
+    return npcMap
+  }
+
+  /**
+   * Dialogue 데이터 병합
+   */
+  private static async mergeDialogueData(
+    cinematicData: any[],
+    smalltalkData: any[]
+  ): Promise<any[]> {
+    const headers = [
+      '#', 'Table Name', 'String ID', 'Table/ID', 'NPC ID', 'Speaker Name',
+      'KO (M)', 'KO (F)', 'EN (M)', 'EN (F)', 'CT (M)', 'CT (F)', 'CS (M)',
+      'CS (F)', 'JA (M)', 'JA (F)', 'TH (M)', 'TH (F)', 'ES-LATAM (M)', 'ES-LATAM (F)',
+      'PT-BR (M)', 'PT-BR (F)', 'NOTE'
+    ]
+
+    const mergedData: any[] = []
+    let index = 1
+
+    // CINEMATIC_DIALOGUE 데이터 추가
+    for (const row of cinematicData) {
+      const mergedRow: any = {
+        '#': index++,
+        'Table Name': 'CINEMATIC_DIALOGUE',
+        'String ID': row[7],
+        'Table/ID': `CINEMATIC_DIALOGUE/${row[7]}`,
+        'NPC ID': row[8],
+        'Speaker Name': row[8], // 나중에 NPC 이름으로 매핑
+        'KO (M)': row[11],
+        'KO (F)': row[12],
+        'EN (M)': row[13],
+        'EN (F)': row[14],
+        'CT (M)': row[15],
+        'CT (F)': row[16],
+        'CS (M)': row[17],
+        'CS (F)': row[18],
+        'JA (M)': row[19],
+        'JA (F)': row[20],
+        'TH (M)': row[21],
+        'TH (F)': row[22],
+        'ES-LATAM (M)': row[23],
+        'ES-LATAM (F)': row[24],
+        'PT-BR (M)': row[25],
+        'PT-BR (F)': row[26],
+        'NOTE': row[29]
+      }
+      mergedData.push(mergedRow)
+    }
+
+    // SMALLTALK_DIALOGUE 데이터 추가
+    for (const row of smalltalkData) {
+      const mergedRow: any = {
+        '#': index++,
+        'Table Name': 'SMALLTALK_DIALOGUE',
+        'String ID': row[7],
+        'Table/ID': `SMALLTALK_DIALOGUE/${row[7]}`,
+        'NPC ID': row[8],
+        'Speaker Name': row[8], // 나중에 NPC 이름으로 매핑
+        'KO (M)': row[12],
+        'KO (F)': row[13],
+        'EN (M)': row[14],
+        'EN (F)': row[15],
+        'CT (M)': row[16],
+        'CT (F)': row[17],
+        'CS (M)': row[18],
+        'CS (F)': row[19],
+        'JA (M)': row[20],
+        'JA (F)': row[21],
+        'TH (M)': row[22],
+        'TH (F)': row[23],
+        'ES-LATAM (M)': row[24],
+        'ES-LATAM (F)': row[25],
+        'PT-BR (M)': row[26],
+        'PT-BR (F)': row[27],
+        'NOTE': row[30]
+      }
+      mergedData.push(mergedRow)
+    }
+
+    return mergedData
+  }
+
+  /**
+   * NPC ID를 NPC 이름으로 매핑
+   */
+  private static async mapNPCNames(mergedData: any[], npcMap: Map<string, string>): Promise<void> {
+    for (const row of mergedData) {
+      const npcId = row['NPC ID']?.toString()
+      if (npcId && npcMap.has(npcId)) {
+        row['Speaker Name'] = npcMap.get(npcId)
+      }
+    }
+  }
+
+  /**
+   * 결과 파일 저장
+   */
+  private static async saveResultFile(data: any[], outputPath: string): Promise<void> {
+    const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Merged Dialogue')
 
     // 헤더 추가
-    const headers = ['ID', 'English', 'Japanese', 'Korean', 'Simplified Chinese', 'Traditional Chinese']
+    const headers = Object.keys(data[0])
     const headerRow = worksheet.addRow(headers)
     
     // 헤더 스타일 적용
     headerRow.eachCell((cell) => {
-      cell.font = { bold: true, size: 12 }
+      cell.font = { 
+        name: '맑은 고딕',
+        size: 12,
+        bold: true,
+        color: { argb: 'FF9C5700' }
+      }
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' }
+        fgColor: { argb: 'FFFFEB9C' }
       }
       cell.border = {
         top: { style: 'thin' },
@@ -199,121 +444,56 @@ export class M4DialogueMergerService {
         bottom: { style: 'thin' },
         right: { style: 'thin' }
       }
-      cell.alignment = { vertical: 'middle', horizontal: 'center' }
     })
 
     // 데이터 추가
-    const sortedIds = Array.from(mergedData.keys()).sort((a, b) => {
-      // 숫자로 변환 가능한 경우 숫자로 정렬
-      const numA = parseInt(a)
-      const numB = parseInt(b)
-      if (!isNaN(numA) && !isNaN(numB)) {
-        return numA - numB
-      }
-      // 그렇지 않으면 문자열로 정렬
-      return a.localeCompare(b)
-    })
-
-    for (const id of sortedIds) {
-      const translations = mergedData.get(id)!
-      const row = worksheet.addRow([
-        id,
-        translations.get('EN') || '',
-        translations.get('JAP') || '',
-        translations.get('KOR') || '',
-        translations.get('SC') || '',
-        translations.get('TC') || ''
-      ])
-
+    for (const row of data) {
+      const values = headers.map(header => row[header])
+      const dataRow = worksheet.addRow(values)
+      
       // 데이터 행 스타일 적용
-      row.eachCell((cell) => {
+      dataRow.eachCell((cell) => {
+        cell.font = {
+          name: '맑은 고딕',
+          size: 10
+        }
         cell.border = {
           top: { style: 'thin' },
           left: { style: 'thin' },
           bottom: { style: 'thin' },
           right: { style: 'thin' }
         }
-        cell.alignment = { vertical: 'top', wrapText: true }
       })
     }
 
     // 열 너비 자동 조정
     worksheet.columns.forEach((column, index) => {
-      if (index === 0) {
-        column.width = 15 // ID 열
-      } else {
-        column.width = 40 // 텍스트 열
-      }
+      let maxLength = 10
+      column.eachCell!({ includeEmpty: true }, (cell) => {
+        const columnLength = cell.value ? cell.value.toString().length : 10
+        if (columnLength > maxLength) {
+          maxLength = columnLength
+        }
+      })
+      column.width = Math.min(maxLength + 2, 50)
     })
 
-    // 요약 시트 추가
-    await this.createSummarySheet(workbook, mergedData)
+    // 틀 고정
+    worksheet.views = [{ state: 'frozen', xSplit: 0, ySplit: 1 }]
 
     // 파일 저장
     await workbook.xlsx.writeFile(outputPath)
   }
 
   /**
-   * 스타일이 적용된 요약 시트 생성
+   * 파일 존재 여부 확인
    */
-  private static async createSummarySheet(
-    workbook: ExcelJS.Workbook,
-    mergedData: Map<string, Map<string, string>>
-  ): Promise<void> {
-    const summarySheet = workbook.addWorksheet('Summary', { 
-      properties: { tabColor: { argb: 'FF00B050' } } 
-    })
-
-    // 제목 추가
-    const titleRow = summarySheet.addRow(['M4 Dialogue Merge Summary'])
-    titleRow.getCell(1).font = { bold: true, size: 16 }
-    titleRow.getCell(1).alignment = { horizontal: 'center' }
-    summarySheet.mergeCells('A1:B1')
-
-    // 빈 행
-    summarySheet.addRow([])
-
-    // 통계 정보
-    const stats = [
-      ['Total IDs', mergedData.size],
-      ['Languages', Object.keys(this.LANGUAGE_MAP).length],
-      ['Generated', new Date().toLocaleString()]
-    ]
-
-    stats.forEach(([label, value]) => {
-      const row = summarySheet.addRow([label, value])
-      row.getCell(1).font = { bold: true }
-    })
-
-    // 언어별 번역 완성도
-    summarySheet.addRow([])
-    const langHeaderRow = summarySheet.addRow(['Language', 'Translated Count', 'Percentage'])
-    langHeaderRow.eachCell((cell) => {
-      cell.font = { bold: true }
-      cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' }
-      }
-    })
-
-    Object.entries(this.LANGUAGE_MAP).forEach(([code, name]) => {
-      let translatedCount = 0
-      mergedData.forEach((translations) => {
-        if (translations.get(code) && translations.get(code)!.trim()) {
-          translatedCount++
-        }
-      })
-      
-      const percentage = ((translatedCount / mergedData.size) * 100).toFixed(2)
-      summarySheet.addRow([name, translatedCount, `${percentage}%`])
-    })
-
-    // 열 너비 조정
-    summarySheet.columns = [
-      { width: 20 },
-      { width: 20 },
-      { width: 15 }
-    ]
+  private static async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath)
+      return true
+    } catch {
+      return false
+    }
   }
 }
