@@ -320,7 +320,7 @@ class M4ProcessWorker extends EventEmitter {
    */
   private async handleHealthCheck(message: WorkerMessage): Promise<void> {
     const isHealthy = this.state !== WorkerState.ERROR && 
-                     this.performanceMetrics.memoryUsage < this.config.maxMemoryUsage &&
+                     this.performanceMetrics.memoryUsage < (this.config.maxMemoryUsage ?? 512) &&
                      !this.isShuttingDown;
     
     this.sendMessage(createWorkerMessage(

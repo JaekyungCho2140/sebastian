@@ -72,9 +72,13 @@ export interface DialogueData {
 export interface M4DialogueProcessorResult {
   success: boolean;
   outputFilePath: string;
+  outputPath?: string; // alias for outputFilePath
   processedRows: number;
+  rowsProcessed?: number; // alias for processedRows
   errors: string[];
   processingTime: number;
+  filesProcessed?: number;
+  memoryUsed?: number;
 }
 
 /**
@@ -229,9 +233,13 @@ export class M4DialogueProcessor {
       return {
         success: true,
         outputFilePath,
+        outputPath: outputFilePath, // alias
         processedRows,
+        rowsProcessed: processedRows, // alias
         errors,
-        processingTime
+        processingTime,
+        filesProcessed: 3, // CINEMATIC, SMALLTALK, NPC
+        memoryUsed: process.memoryUsage().heapUsed
       };
       
     } catch (error) {
@@ -242,9 +250,13 @@ export class M4DialogueProcessor {
       return {
         success: false,
         outputFilePath: '',
+        outputPath: '', // alias
         processedRows,
+        rowsProcessed: processedRows, // alias
         errors,
-        processingTime: Date.now() - startTime
+        processingTime: Date.now() - startTime,
+        filesProcessed: 0,
+        memoryUsed: process.memoryUsage().heapUsed
       };
     }
   }
@@ -619,16 +631,16 @@ export class M4DialogueProcessor {
     // Convert result to M4ProcessResult format
     return {
       success: result.success,
-      outputPath: result.outputPath,
+      outputPath: result.outputPath ?? result.outputFilePath,
       error: result.errors.join('; '),
-      processedFileCount: result.filesProcessed,
+      processedFileCount: result.filesProcessed ?? 0,
       elapsedTime: result.processingTime / 1000,
       statistics: createEmptyM4ProcessStatistics(),
       logs: [],
-      generatedFiles: result.success ? [result.outputPath] : [],
-      rowsProcessed: result.rowsProcessed,
-      filesProcessed: result.filesProcessed,
-      memoryUsed: result.memoryUsed
+      generatedFiles: result.success ? [result.outputPath ?? result.outputFilePath] : [],
+      rowsProcessed: result.rowsProcessed ?? result.processedRows,
+      filesProcessed: result.filesProcessed ?? 0,
+      memoryUsed: result.memoryUsed ?? 0
     };
   }
 }

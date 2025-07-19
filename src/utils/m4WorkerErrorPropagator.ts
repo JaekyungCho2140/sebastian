@@ -261,6 +261,7 @@ export async function propagateM4ErrorFromWorker(
   // 일반 Error를 SerializableM4Error로 변환
   if (!(error instanceof M4ProcessingError) && !('errorType' in error)) {
     const serializedError: SerializableM4Error = {
+      errorId: randomUUID(),
       errorType: M4ErrorType.WORKER_THREAD,
       severity: M4ErrorSeverity.HIGH,
       message: error.message,
@@ -278,7 +279,9 @@ export async function propagateM4ErrorFromWorker(
       recoverable: true,
       retryable: true,
       userMessage: 'Worker 처리 중 오류가 발생했습니다',
-      technicalMessage: error.message
+      technicalMessage: error.message,
+      resolutionSteps: ['Check error logs', 'Verify input data', 'Restart the worker'],
+      serializedAt: Date.now()
     };
     
     return propagator.propagateM4ErrorFromWorker(serializedError, workerId, taskId);

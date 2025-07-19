@@ -33,7 +33,7 @@ export interface BatchResult<T> {
  * Adapter to integrate streaming with M4 processors
  */
 export class M4StreamingAdapter extends EventEmitter {
-  private config: M4StreamingConfig;
+  private config: Required<M4StreamingConfig>;
   private accumulator: any[] = [];
   private startMemory: number = 0;
   private startTime: number = 0;
@@ -44,7 +44,7 @@ export class M4StreamingAdapter extends EventEmitter {
       ...config,
       accumulationThreshold: config.accumulationThreshold || 5000,
       streamOutput: config.streamOutput !== false
-    };
+    } as Required<M4StreamingConfig>;
   }
 
   /**
@@ -371,7 +371,7 @@ export class M4StreamingWriter {
   private async flushBatch(): Promise<void> {
     for (const rowData of this.batchBuffer) {
       const row = this.worksheet.getRow(this.currentRow++);
-      rowData.forEach((value, index) => {
+      rowData.forEach((value: any, index: number) => {
         row.getCell(index + 1).value = value;
       });
       row.commit();

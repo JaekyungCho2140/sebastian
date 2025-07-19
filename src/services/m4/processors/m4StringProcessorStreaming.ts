@@ -6,7 +6,9 @@ import { ProcessingMonitor } from '../optimization/processingMonitor';
 import { 
   M4StringRow, 
   M4ProcessorResult, 
-  M4ProgressInfo 
+  M4ProgressInfo,
+  ProcessStep,
+  M4ProcessProgress 
 } from '../../../types/m4Processing';
 import { EventEmitter } from 'events';
 import { 
@@ -29,6 +31,23 @@ interface FileConfig {
     index: number;
     field: string;
   }>;
+}
+
+/**
+ * Extended string row type for internal processing
+ */
+interface ExtendedStringRow extends M4StringRow {
+  category?: string;
+  subCategory?: string;
+  speaker?: string;
+  text_en?: string;
+  text_ko?: string;
+  text_ja?: string;
+  text_zh_CN?: string;
+  text_zh_TW?: string;
+  text_es?: string;
+  text_de?: string;
+  text_fr?: string;
 }
 
 /**
@@ -277,13 +296,20 @@ export class M4StringProcessorStreaming extends EventEmitter {
         });
 
         // Update monitor progress
+        const now = Date.now();
         this.monitor.updateProgress({
           current: this.processedFiles,
           total: this.totalFiles,
           percentage: Math.round((this.processedFiles / this.totalFiles) * 100),
           currentFile: filename,
-          currentStep: `Processed ${filename}`
-        });
+          currentStep: ProcessStep.PROCESSING_DATA,
+          processedFiles: this.processedFiles,
+          totalFiles: this.totalFiles,
+          estimatedTimeRemaining: 0,
+          startTime: now,
+          currentTime: now,
+          statusMessage: `Processing ${filename}...`
+        } as M4ProcessProgress);
       }
       this.monitor.endPhase();
 
@@ -307,7 +333,21 @@ export class M4StringProcessorStreaming extends EventEmitter {
         outputPath,
         filesProcessed: this.processedFiles,
         processingTime: endTime - startTime,
-        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0
+        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0,
+        processedFileCount: this.processedFiles,
+        elapsedTime: (endTime - startTime) / 1000,
+        statistics: {
+          totalRowsProcessed: this.totalRows,
+          totalColumnsProcessed: 9,
+          validatedRowsCount: this.totalRows,
+          errorRowsCount: 0,
+          filteredRowsCount: 0,
+          mappedDataCount: this.totalRows,
+          averageProcessingTime: (endTime - startTime) / this.totalRows,
+          peakMemoryUsage: metrics ? (metrics.endMemory?.heapUsed || 0) : 0
+        },
+        logs: [],
+        generatedFiles: [outputPath]
       };
 
       this.emit('complete', result);
@@ -324,7 +364,26 @@ export class M4StringProcessorStreaming extends EventEmitter {
         filesProcessed: this.processedFiles,
         error: error instanceof Error ? error.message : 'Unknown error',
         processingTime: Date.now() - startTime,
-        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0
+        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0,
+        processedFileCount: 0,
+        elapsedTime: (Date.now() - startTime) / 1000,
+        statistics: {
+          totalRowsProcessed: this.totalRows,
+          totalColumnsProcessed: 0,
+          validatedRowsCount: 0,
+          errorRowsCount: 1,
+          filteredRowsCount: 0,
+          mappedDataCount: 0,
+          averageProcessingTime: 0,
+          peakMemoryUsage: metrics ? (metrics.endMemory?.heapUsed || 0) : 0
+        },
+        logs: [{
+          timestamp: Date.now(),
+          level: 'error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+          // details: error instanceof Error ? { stack: error.stack } : undefined
+        }],
+        generatedFiles: []
       };
 
       this.emit('error', error);
@@ -450,7 +509,7 @@ export class M4StringProcessorStreaming extends EventEmitter {
     row: any,
     config: FileConfig,
     category: string
-  ): M4StringRow | null {
+  ): ExtendedStringRow | null {
     const values = row.values;
     const data: any = {};
 
@@ -466,7 +525,12 @@ export class M4StringProcessorStreaming extends EventEmitter {
       return null;
     }
 
-    return {
+    const extendedRow: ExtendedStringRow = {
+      rowNumber: row.rowNumber || 0,
+      fileName: category,
+      columns: [],
+      table: category,
+      id: data.stringID,
       assetID: data.assetID,
       stringID: data.stringID,
       text_en: data.text_en,
@@ -476,6 +540,7 @@ export class M4StringProcessorStreaming extends EventEmitter {
       text_zh_TW: '',
       category
     };
+    return extendedRow;
   }
 
   /**
@@ -519,9 +584,11 @@ export class M4StringProcessorStreaming extends EventEmitter {
       sortedArray.push(value);
     }
     
-    sortedArray.sort((a: M4StringRow, b: M4StringRow) => {
+    sortedArray.sort((a: ExtendedStringRow, b: ExtendedStringRow) => {
+      if (!a.assetID || !b.assetID) return 0;
       const assetCompare = a.assetID.localeCompare(b.assetID);
       if (assetCompare !== 0) return assetCompare;
+      if (!a.stringID || !b.stringID) return 0;
       return a.stringID.localeCompare(b.stringID);
     });
 
@@ -589,13 +656,19 @@ export class M4StringProcessorStreaming extends EventEmitter {
 
     const overallProgress = fileProgress + (currentFileProgress / this.totalFiles);
 
+    const now = Date.now();
     return {
       current: progress.currentRow,
       total: progress.estimatedTotal || 0,
       percentage: Math.round(overallProgress),
       currentFile: this.currentFile,
-      currentStep: `Processing ${this.currentFile} (${this.processedFiles + 1}/${this.totalFiles})`,
-      memoryUsage: progress.memoryUsage.heapUsed
+      currentStep: ProcessStep.PROCESSING_DATA,
+      processedFiles: this.processedFiles,
+      totalFiles: this.totalFiles,
+      estimatedTimeRemaining: 0,
+      startTime: now,
+      currentTime: now,
+      statusMessage: `Processing ${this.currentFile} (${this.processedFiles + 1}/${this.totalFiles})`
     };
   }
 

@@ -402,10 +402,10 @@ export class BenchmarkSuite extends EventEmitter {
           scenario: scenario.name,
           fileSize: fileConfig.size,
           fileSizeBytes: fileConfig.sizeBytes,
-          rowCount: result.rowsProcessed,
+          rowCount: result.rowsProcessed ?? 0,
           iteration,
           processingTime,
-          throughput: result.rowsProcessed / (processingTime / 1000), // rows per second
+          throughput: (result.rowsProcessed ?? 0) / (processingTime / 1000), // rows per second
           memoryUsed,
           peakMemory,
           averageMemory,

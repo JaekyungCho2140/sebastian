@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { ErrorDialogData } from '../components/ErrorDialog'
+import { ErrorDialogData } from '../../types/errorDialog'
 
 interface UseErrorDialogReturn {
   isOpen: boolean

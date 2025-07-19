@@ -34,7 +34,7 @@ program
       const iterations = parseInt(options.iterations);
       
       // Create file configs based on sizes
-      const fileConfigs: TestFileConfig[] = sizes.map(size => {
+      const fileConfigs: TestFileConfig[] = sizes.map((size: string) => {
         const sizeMap: { [key: string]: { bytes: number, rows: number, sheets: number } } = {
           '1MB': { bytes: 1024 * 1024, rows: 5000, sheets: 2 },
           '10MB': { bytes: 10 * 1024 * 1024, rows: 50000, sheets: 3 },
@@ -236,9 +236,9 @@ program
         const metric2 = metricsMap2.get(key);
         if (!metric2) continue;
         
-        const timeChange = ((metric2.avgProcessingTime - metric1.avgProcessingTime) / metric1.avgProcessingTime) * 100;
-        const throughputChange = ((metric2.avgThroughput - metric1.avgThroughput) / metric1.avgThroughput) * 100;
-        const memoryChange = ((metric2.avgMemoryUsed - metric1.avgMemoryUsed) / metric1.avgMemoryUsed) * 100;
+        const timeChange = (((metric2 as any).avgProcessingTime - (metric1 as any).avgProcessingTime) / (metric1 as any).avgProcessingTime) * 100;
+        const throughputChange = (((metric2 as any).avgThroughput - (metric1 as any).avgThroughput) / (metric1 as any).avgThroughput) * 100;
+        const memoryChange = (((metric2 as any).avgMemoryUsed - (metric1 as any).avgMemoryUsed) / (metric1 as any).avgMemoryUsed) * 100;
         
         console.log(`\n${key}:`);
         console.log(`  Processing Time: ${timeChange > 0 ? '+' : ''}${timeChange.toFixed(1)}%`);

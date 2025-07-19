@@ -108,8 +108,8 @@ export class StreamingExcelReader extends EventEmitter {
     for await (const worksheetReader of workbookReader) {
       // Check if this is the worksheet we want
       const sheetMatch = typeof this.options.sheetId === 'string'
-        ? worksheetReader.name === this.options.sheetId
-        : worksheetReader.id === this.options.sheetId;
+        ? (worksheetReader as any).name === this.options.sheetId
+        : (worksheetReader as any).id === this.options.sheetId;
 
       if (!sheetMatch) {
         continue;
@@ -360,7 +360,7 @@ export function createStreamingReader(options?: StreamingOptions): StreamingExce
  */
 export class ExcelRowTransformer extends Readable {
   private reader: StreamingExcelReader;
-  private iterator: AsyncIterator<StreamingRowData>;
+  private rowIterator?: AsyncGenerator<StreamingRowData, void, unknown>;
   private filePath: string;
 
   constructor(filePath: string, options?: StreamingOptions) {
@@ -370,12 +370,12 @@ export class ExcelRowTransformer extends Readable {
   }
 
   async _read(): Promise<void> {
-    if (!this.iterator) {
-      this.iterator = this.reader.readRows(this.filePath)[Symbol.asyncIterator]();
+    if (!this.rowIterator) {
+      this.rowIterator = this.reader.readRows(this.filePath);
     }
 
     try {
-      const { value, done } = await this.iterator.next();
+      const { value, done } = await this.rowIterator.next();
       if (done) {
         this.push(null);
       } else {

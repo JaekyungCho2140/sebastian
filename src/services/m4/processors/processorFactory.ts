@@ -55,7 +55,7 @@ export class M4ProcessorFactory {
           });
           
           try {
-            const processor = new M4DialogueProcessorStreaming(profiler || undefined);
+            const processor = new M4DialogueProcessorStreaming();
             if (options.onProgress) {
               processor.on('progress', options.onProgress);
             }
@@ -105,7 +105,7 @@ export class M4ProcessorFactory {
           });
           
           try {
-            const processor = new M4StringProcessorStreaming(profiler || undefined);
+            const processor = new M4StringProcessorStreaming();
             if (options.onProgress) {
               processor.on('progress', options.onProgress);
             }
@@ -125,7 +125,10 @@ export class M4ProcessorFactory {
           });
           
           try {
-            const processor = new M4StringProcessor();
+            const processor = new M4StringProcessor({
+              folderPath: inputFolder,
+              outputPath: outputPath
+            });
             return await processor.processFolder(inputFolder, outputPath, options.onProgress);
           } finally {
             if (measurementId) profiler?.end(measurementId);

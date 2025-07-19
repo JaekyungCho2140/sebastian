@@ -89,7 +89,7 @@ export interface MemoryAlert {
  * Memory monitor for tracking and managing memory usage
  */
 export class MemoryMonitor extends EventEmitter {
-  private config: Required<MemoryMonitorConfig>;
+  private config: Required<Omit<MemoryMonitorConfig, 'thresholds'>> & { thresholds: MemoryThresholds };
   private timer: NodeJS.Timeout | null = null;
   private lastStats: MemoryStats | null = null;
   private statsHistory: MemoryStats[] = [];
@@ -455,7 +455,7 @@ export class MemoryMonitor extends EventEmitter {
   getStatus(): MemoryMonitorStatus {
     return {
       isMonitoring: this.isMonitoring,
-      config: this.config,
+      config: this.config as Required<MemoryMonitorConfig>,
       historySize: this.statsHistory.length,
       gcCount: this.gcCount,
       uptime: Date.now() - this.startTime

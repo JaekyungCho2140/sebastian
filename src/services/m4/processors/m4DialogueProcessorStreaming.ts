@@ -6,7 +6,8 @@ import {
   M4DialogueRow, 
   M4ProcessorResult, 
   M4ProgressInfo,
-  NPCMappingRow 
+  NPCMappingRow,
+  ProcessStep 
 } from '../../../types/m4Processing';
 import { EventEmitter } from 'events';
 import { 
@@ -19,12 +20,26 @@ import {
 import { BatchProcessor, BatchProcessorState, BatchProgress } from '../performance/batch-processor';
 
 /**
+ * Extended dialogue row type for internal processing
+ */
+interface ExtendedDialogueRow extends M4DialogueRow {
+  speakerID?: string;
+  line?: string | number;
+  emotion?: string;
+  text_en?: string;
+  text_ko?: string;
+  text_ja?: string;
+  text_zh_CN?: string;
+  text_zh_TW?: string;
+}
+
+/**
  * Streaming version of M4 Dialogue Processor
  * Processes large Excel files without loading entire content into memory
  */
 export class M4DialogueProcessorStreaming extends EventEmitter {
   private npcMappings: Map<string, string> = new Map();
-  private processedDialogues: M4DialogueRow[] = [];
+  private processedDialogues: ExtendedDialogueRow[] = [];
   private adapter: M4StreamingAdapter;
   private monitor: ProcessingMonitor;
   private totalRows = 0;
@@ -32,8 +47,8 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
   
   // Object pools
   private rowPool: RowObjectPool;
-  private arrayPool: ArrayPool<M4DialogueRow>;
-  private mapPool: MapPool<string, M4DialogueRow[]>;
+  private arrayPool: ArrayPool<ExtendedDialogueRow>;
+  private mapPool: MapPool<string, ExtendedDialogueRow[]>;
   private stringBuilderPool: StringBuilderPool;
   
   // Batch processor
@@ -166,7 +181,21 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
         rowsProcessed: this.processedRows,
         outputPath,
         processingTime: endTime - startTime,
-        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0
+        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0,
+        processedFileCount: 1,
+        elapsedTime: (endTime - startTime) / 1000,
+        statistics: {
+          totalRowsProcessed: this.processedRows,
+          totalColumnsProcessed: 8,
+          validatedRowsCount: this.processedRows,
+          errorRowsCount: 0,
+          filteredRowsCount: 0,
+          mappedDataCount: this.processedRows,
+          averageProcessingTime: (endTime - startTime) / this.processedRows,
+          peakMemoryUsage: metrics ? (metrics.endMemory?.heapUsed || 0) : 0
+        },
+        logs: [],
+        generatedFiles: [outputPath]
       };
 
       this.emit('complete', result);
@@ -182,7 +211,25 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
         outputPath,
         error: error instanceof Error ? error.message : 'Unknown error',
         processingTime: Date.now() - startTime,
-        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0
+        memoryUsed: metrics ? (metrics.endMemory?.heapUsed || 0) - metrics.startMemory.heapUsed : 0,
+        processedFileCount: 0,
+        elapsedTime: (Date.now() - startTime) / 1000,
+        statistics: {
+          totalRowsProcessed: this.processedRows,
+          totalColumnsProcessed: 0,
+          validatedRowsCount: 0,
+          errorRowsCount: 1,
+          filteredRowsCount: 0,
+          mappedDataCount: 0,
+          averageProcessingTime: 0,
+          peakMemoryUsage: metrics ? (metrics.endMemory?.heapUsed || 0) : 0
+        },
+        logs: [{
+          timestamp: Date.now(),
+          level: 'error',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        }],
+        generatedFiles: []
       };
 
       this.emit('error', error);
@@ -217,8 +264,8 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
   /**
    * Process dialogue sheets in streaming mode
    */
-  private async processDialogues(filePath: string): Promise<M4DialogueRow[]> {
-    const allDialogues: M4DialogueRow[] = [];
+  private async processDialogues(filePath: string): Promise<ExtendedDialogueRow[]> {
+    const allDialogues: ExtendedDialogueRow[] = [];
     
     // Process CINEMATIC_DIALOGUE sheet
     const cinematicDialogues = await this.processDialogueSheet(
@@ -238,8 +285,10 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
 
     // Sort by dlgID and stringID
     allDialogues.sort((a, b) => {
+      if (!a.dlgID || !b.dlgID) return 0;
       const dlgCompare = a.dlgID.localeCompare(b.dlgID);
       if (dlgCompare !== 0) return dlgCompare;
+      if (!a.stringID || !b.stringID) return 0;
       return a.stringID.localeCompare(b.stringID);
     });
 
@@ -253,7 +302,7 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
     filePath: string,
     sheetName: string,
     type: 'cinematic' | 'smalltalk'
-  ): Promise<M4DialogueRow[]> {
+  ): Promise<ExtendedDialogueRow[]> {
     const dialogues = this.arrayPool.acquire();
     const reader = new StreamingExcelReader({
       sheetId: sheetName,
@@ -287,10 +336,11 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
             const dialogue = this.parseDialogueRow(row, prefix);
             if (dialogue) {
               // Group by dlgID for efficient processing
-              let group = dlgGroups.get(dialogue.dlgID);
+              const dlgID = dialogue.dlgID || `${type}_unknown`;
+              let group = dlgGroups.get(dlgID);
               if (!group) {
                 group = this.arrayPool.acquire();
-                dlgGroups.set(dialogue.dlgID, group);
+                dlgGroups.set(dlgID, group);
               }
               group.push(dialogue);
               
@@ -346,7 +396,7 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
   /**
    * Parse a dialogue row
    */
-  private parseDialogueRow(row: any, prefix: string): M4DialogueRow | null {
+  private parseDialogueRow(row: any, prefix: string): ExtendedDialogueRow | null {
     const values = row.values;
     
     // Skip empty rows
@@ -364,7 +414,10 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
     // Apply NPC mapping
     const mappedSpeaker = this.npcMappings.get(speakerID) || speakerID;
 
-    return {
+    const extendedRow: ExtendedDialogueRow = {
+      rowNumber: row.rowNumber || 0,
+      columns: [],
+      isFiltered: false,
       comment,
       assetID: `${prefix}_${assetID}`,
       dlgID: `${prefix}_${dlgID}`,
@@ -378,6 +431,7 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
       text_zh_CN: '',
       text_zh_TW: ''
     };
+    return extendedRow;
   }
 
   /**
@@ -385,7 +439,7 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
    */
   private async writeOutputFile(
     outputPath: string,
-    dialogues: M4DialogueRow[]
+    dialogues: ExtendedDialogueRow[]
   ): Promise<void> {
     const writer = new M4StreamingWriter(outputPath, 'M4_Dialogue', {
       batchSize: this.batchProcessor.getCurrentBatchSize()
@@ -405,11 +459,11 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
     await this.batchProcessor.processBatches(
       dialogues,
       async (batch, batchIndex) => {
-        const rows = this.arrayPool.acquire();
+        const rows: any[][] = [];
         
         try {
           for (const dialogue of batch) {
-            const row = this.arrayPool.acquire();
+            const row: any[] = [];
             row.push(
               dialogue.comment,
               dialogue.assetID,
@@ -430,14 +484,9 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
           
           await writer.writeRows(rows);
           
-          // Release row arrays back to pool
-          for (const rowArray of rows) {
-            this.arrayPool.release(rowArray as any[]);
-          }
-          
           return []; // No results needed for writing
         } finally {
-          this.arrayPool.release(rows);
+          // Cleanup if needed
         }
       },
       {
@@ -458,6 +507,7 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
    * Create progress info
    */
   private createProgressInfo(progress: any): M4ProgressInfo {
+    const now = Date.now();
     return {
       current: progress.currentRow,
       total: progress.estimatedTotal || 0,
@@ -465,7 +515,13 @@ export class M4DialogueProcessorStreaming extends EventEmitter {
         ? Math.round((progress.currentRow / progress.estimatedTotal) * 100)
         : 0,
       currentFile: progress.fileType || '',
-      currentStep: `Processing ${progress.subType || 'data'}`
+      currentStep: ProcessStep.PROCESSING_DATA,
+      processedFiles: this.processedRows,
+      totalFiles: 1,
+      estimatedTimeRemaining: 0,
+      startTime: now,
+      currentTime: now,
+      statusMessage: 'Processing dialogues...'
     };
   }
 
