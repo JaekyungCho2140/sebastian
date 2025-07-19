@@ -31,14 +31,44 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+          
       - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
         
-      - name: TypeScript type check
-        run: npx tsc --noEmit --project tsconfig.json
-        
-      - name: TypeScript main check
-        run: npx tsc --noEmit --project tsconfig.main.json
+      - name: TypeScript checks (parallel)
+        run: |
+          echo "Running TypeScript checks in parallel..."
+          npx tsc --noEmit --project tsconfig.json &
+          PID1=$!
+          npx tsc --noEmit --project tsconfig.main.json &
+          PID2=$!
+          
+          # Wait for both processes and capture exit codes
+          wait $PID1
+          RESULT1=$?
+          wait $PID2
+          RESULT2=$?
+          
+          # Check results
+          if [ $RESULT1 -ne 0 ]; then
+            echo "❌ TypeScript check failed for tsconfig.json"
+            exit 1
+          fi
+          if [ $RESULT2 -ne 0 ]; then
+            echo "❌ TypeScript check failed for tsconfig.main.json"
+            exit 1
+          fi
+          
+          echo "✅ All TypeScript checks passed"
         
       - name: Validate source files
         run: |
@@ -52,8 +82,8 @@ jobs:
         run: |
           echo "key=build-${{ github.sha }}-${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-  build-verification:
-    name: Build Verification
+  build-and-test:
+    name: Build and Test
     needs: code-quality
     runs-on: windows-latest
     
@@ -67,39 +97,71 @@ jobs:
           node-version: '20'
           cache: 'npm'
           
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+          
       - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
+        
+      - name: Cache build output
+        uses: actions/cache@v4
+        id: build-cache
+        with:
+          path: |
+            dist/
+            .vite/
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-build-
         
       - name: Build application
         run: npm run build
         
       - name: Verify build output
         run: |
-          if [ ! -d "dist" ]; then
+          if (!(Test-Path "dist")) {
             echo "❌ Build failed: dist directory not found"
             exit 1
-          fi
+          }
           echo "✅ Build successful: dist directory created"
           
           # Check for essential files
-          if [ ! -f "dist/main/index.js" ]; then
+          if (!(Test-Path "dist/main/index.js")) {
             echo "❌ Main process build failed"
             exit 1
-          fi
+          }
           echo "✅ Main process built successfully"
           
-          if [ ! -d "dist/renderer" ]; then
+          if (!(Test-Path "dist/renderer")) {
             echo "❌ Renderer build failed"
             exit 1
-          fi
+          }
           echo "✅ Renderer built successfully"
           
-          if [ ! -f "dist/preload/index.js" ]; then
+          if (!(Test-Path "dist/preload/index.js")) {
             echo "❌ Preload script build failed"
             exit 1
-          fi
+          }
           echo "✅ Preload script built successfully"
-        shell: bash
+        shell: powershell
+        
+      - name: Run tests
+        run: |
+          echo "Running test suite..."
+          npm test
+          if ($LASTEXITCODE -ne 0) {
+            echo "❌ Tests failed"
+            exit 1
+          }
+          echo "✅ All tests passed"
+        shell: powershell
         
       - name: Test electron packaging
         run: |
@@ -119,33 +181,39 @@ jobs:
           name: build-artifacts-${{ needs.code-quality.outputs.build-cache-key }}
           path: |
             dist/
-            release/
+            test-report.json
           retention-days: 7
+          if-no-files-found: error
 
   status-check:
     name: CI Status Check
-    needs: [code-quality, build-verification]
+    needs: [code-quality, build-and-test]
     runs-on: ubuntu-latest
     if: always()
+    outputs:
+      ci-success: ${{ steps.check.outputs.success }}
     
     steps:
       - name: Check CI status
+        id: check
         run: |
           if [ "${{ needs.code-quality.result }}" != "success" ]; then
             echo "❌ Code quality check failed"
+            echo "success=false" >> $GITHUB_OUTPUT
             exit 1
           fi
           
-          if [ "${{ needs.build-verification.result }}" != "success" ]; then
-            echo "❌ Build verification failed"
+          if [ "${{ needs.build-and-test.result }}" != "success" ]; then
+            echo "❌ Build and test failed"
+            echo "success=false" >> $GITHUB_OUTPUT
             exit 1
           fi
           
           echo "✅ All CI checks passed successfully"
-          echo "🎉 CI workflow completed - ready for manual release"
+          echo "🎉 CI workflow completed - ready for build"
+          echo "success=true" >> $GITHUB_OUTPUT
 
       - name: Create status indicator
         run: |
           echo "CI_STATUS=success" >> $GITHUB_ENV
           echo "BUILD_CACHE_KEY=${{ needs.code-quality.outputs.build-cache-key }}" >> $GITHUB_ENV
-

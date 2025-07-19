@@ -1,0 +1,254 @@
+name: Auto Build and Release
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  check-and-build:
+    name: Auto Build on CI Success
+    runs-on: windows-latest
+    # Only run if CI succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Download CI artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }}
+            });
+            
+            const matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name.startsWith('build-artifacts-');
+            })[0];
+            
+            if (matchArtifact) {
+              const download = await github.rest.actions.downloadArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: matchArtifact.id,
+                archive_format: 'zip',
+              });
+              
+              const fs = require('fs');
+              fs.writeFileSync('ci-artifacts.zip', Buffer.from(download.data));
+              
+              console.log('✅ CI artifacts downloaded successfully');
+            } else {
+              console.log('⚠️ No CI artifacts found, will build from scratch');
+            }
+          
+      - name: Extract CI artifacts
+        if: success()
+        run: |
+          if (Test-Path "ci-artifacts.zip") {
+            Expand-Archive -Path "ci-artifacts.zip" -DestinationPath "." -Force
+            echo "✅ CI artifacts extracted"
+            
+            # Check if dist folder exists from CI
+            if (Test-Path "dist") {
+              echo "✅ Using dist folder from CI build"
+            } else {
+              echo "⚠️ No dist folder in artifacts, will rebuild"
+            }
+          }
+        shell: powershell
+          
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+          
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+        
+      - name: Build application (if needed)
+        run: |
+          # Only rebuild if dist folder doesn't exist
+          if (!(Test-Path "dist")) {
+            echo "📦 Building application..."
+            npm run build
+          } else {
+            echo "✅ Using existing build from CI"
+          }
+        shell: powershell
+        
+      - name: Create NSIS installer
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run dist:win-nsis
+        
+      - name: Get version
+        id: get_version
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Build version: $version"
+        shell: powershell
+        
+      - name: Find installer file
+        id: find_installer
+        run: |
+          $installerFile = Get-ChildItem -Path "release" -Filter "*.exe" -Recurse | Select-Object -First 1
+          if ($installerFile) {
+            $fullPath = $installerFile.FullName
+            $fileName = $installerFile.Name
+            $fileSize = [math]::Round($installerFile.Length / 1MB, 2)
+            
+            echo "INSTALLER_PATH=$fullPath" >> $env:GITHUB_OUTPUT
+            echo "INSTALLER_NAME=$fileName" >> $env:GITHUB_OUTPUT
+            echo "INSTALLER_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
+            
+            echo "✅ Installer file found: $fileName ($fileSize MB)"
+          } else {
+            echo "❌ No installer file found"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sebastian-v${{ steps.get_version.outputs.VERSION }}-installer-auto
+          path: ${{ steps.find_installer.outputs.INSTALLER_PATH }}
+          retention-days: 30
+          
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $installerSize = "${{ steps.find_installer.outputs.INSTALLER_SIZE }}"
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm UTC"
+          $ciRunUrl = "https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+          
+          $releaseNotes = @"
+          ## Sebastian v$version
+          
+          ### 📦 Release Information
+          - **Build Date**: $buildDate
+          - **Installer Size**: $installerSize MB
+          - **Platform**: Windows x64
+          - **Build Type**: Automated CI/CD
+          - **CI Run**: [#${{ github.event.workflow_run.id }}]($ciRunUrl)
+          - **Commit**: ${{ github.sha }}
+          
+          ### 🚀 Auto-Release Notes
+          This release was automatically generated after successful CI tests.
+          
+          ### 📥 Installation
+          1. Download the Sebastian-$version-Setup.exe file below
+          2. Run the installer and follow the setup wizard
+          3. Launch Sebastian from Start Menu or Desktop shortcut
+          
+          ### 💻 System Requirements
+          - **OS**: Windows 10 (1903) or later
+          - **Architecture**: x64 (64-bit)
+          - **Memory**: 4GB RAM minimum
+          - **Storage**: 200MB available space
+          
+          ### ✅ Quality Assurance
+          This build has passed all automated tests including:
+          - TypeScript type checking
+          - Build verification
+          - Unit tests
+          - Packaging tests
+          "@
+          
+          $tagName = "v$version"
+          
+          # Check if release already exists
+          $releaseExists = $false
+          try {
+            $existingRelease = gh release view $tagName --json tagName 2>$null
+            if ($LASTEXITCODE -eq 0) {
+              $releaseExists = $true
+            }
+          } catch {
+            # Release doesn't exist, which is fine
+            $releaseExists = $false
+          }
+          
+          if ($releaseExists) {
+            echo "🔄 Release $tagName already exists. Deleting and recreating..."
+            try {
+              gh release delete $tagName --yes
+              echo "✅ Existing release deleted"
+            } catch {
+              echo "❌ Failed to delete existing release: $_"
+              exit 1
+            }
+          } else {
+            echo "✅ Release $tagName does not exist. Creating new release..."
+          }
+          
+          # Create new release
+          try {
+            gh release create $tagName --title "Sebastian v$version (Auto-Release)" --notes $releaseNotes "${{ steps.find_installer.outputs.INSTALLER_PATH }}"
+            echo "✅ GitHub Release created: $tagName"
+          } catch {
+            echo "❌ Failed to create GitHub Release: $_"
+            exit 1
+          }
+        shell: powershell
+        
+      - name: Build Summary
+        run: |
+          echo "🎉 Auto-build completed successfully!"
+          echo ""
+          echo "📋 Build Summary:"
+          echo "   Version: ${{ steps.get_version.outputs.VERSION }}"
+          echo "   Installer File: ${{ steps.find_installer.outputs.INSTALLER_NAME }}"
+          echo "   File Size: ${{ steps.find_installer.outputs.INSTALLER_SIZE }} MB"
+          echo "   Build Type: Automated (CI Success)"
+          echo ""
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.VERSION }}"
+          echo "📎 Artifact: sebastian-v${{ steps.get_version.outputs.VERSION }}-installer-auto"
+          echo ""
+          echo "✅ All CI tests passed before this build"
+        shell: bash
+
+  notify-skip:
+    name: Notify Build Skip
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'success' }}
+    
+    steps:
+      - name: Skip notification
+        run: |
+          echo "⏭️ Auto-build skipped because CI workflow did not succeed"
+          echo "CI workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "CI workflow URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}"
+          
+          if [ "${{ github.event.workflow_run.conclusion }}" = "failure" ]; then
+            echo "❌ CI tests failed - fix the issues before build can proceed"
+          elif [ "${{ github.event.workflow_run.conclusion }}" = "cancelled" ]; then
+            echo "🚫 CI was cancelled - no auto-build triggered"
+          else
+            echo "❓ CI status: ${{ github.event.workflow_run.conclusion }}"
+          fi
