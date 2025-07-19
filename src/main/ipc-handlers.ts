@@ -27,7 +27,13 @@ import {
   M4ErrorStats,
   M4ErrorLogExportRequest,
   M4ErrorReportedEvent,
-  ErrorBreadcrumb
+  ErrorBreadcrumb,
+  M4DialogueMergeRequest,
+  M4DialogueMergeProgress,
+  M4DialogueMergeResult,
+  M4StringMergeRequest,
+  M4StringMergeProgress,
+  M4StringMergeResult
 } from '../shared/types'
 import { getStateManager } from './state-manager'
 import { UpdateService } from './services/updateService'
@@ -46,6 +52,8 @@ import {
   PerformanceReport,
   ProfilerConfig as ProfilingConfig
 } from '../services/m4/performance/profiler'
+import { M4DialogueMergerService } from './services/m4DialogueMerger'
+import { M4StringMerger } from './services/m4StringMerger'
 
 // Error handler wrapper
 function createErrorResponse(error: unknown, channel?: string): IpcErrorResponse {
@@ -1071,6 +1079,68 @@ export function setupIpcHandlers(): void {
       throw new IpcError(
         error instanceof Error ? error.message : 'Failed to validate M4 folder',
         'M4_FOLDER_VALIDATION_FAILED'
+      )
+    }
+  })
+  
+  // M4 Dialogue merge handler
+  createHandler(IPC_CHANNELS.START_M4_DIALOGUE_MERGE, async (request: M4DialogueMergeRequest) => {
+    console.log('Starting M4 Dialogue merge:', request)
+    
+    try {
+      const mainWindow = BrowserWindow.getAllWindows()[0] || null
+      const result = await M4DialogueMergerService.runMerge(request, mainWindow)
+      
+      if (!result.success) {
+        throw new IpcError(
+          result.error || 'M4 Dialogue merge failed',
+          'M4_DIALOGUE_MERGE_FAILED'
+        )
+      }
+      
+      console.log('M4 Dialogue merge completed successfully:', result.outputPath)
+      return result
+    } catch (error) {
+      console.error('M4 Dialogue merge error:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'M4 Dialogue merge failed',
+        'M4_DIALOGUE_MERGE_FAILED'
+      )
+    }
+  })
+  
+  // M4 String merge handler
+  createHandler(IPC_CHANNELS.START_M4_STRING_MERGE, async (request: M4StringMergeRequest) => {
+    console.log('Starting M4 String merge:', request)
+    
+    try {
+      const mainWindow = BrowserWindow.getAllWindows()[0] || null
+      if (!mainWindow) {
+        throw new Error('No main window found')
+      }
+      
+      // Create merger instance
+      const merger = new M4StringMerger()
+      
+      // Set up progress reporting
+      const result = await merger.mergeStringFiles(request, (progress) => {
+        mainWindow.webContents.send(IPC_CHANNELS.M4_STRING_MERGE_PROGRESS, progress)
+      })
+      
+      if (!result.success) {
+        throw new IpcError(
+          result.error || 'M4 String merge failed',
+          'M4_STRING_MERGE_FAILED'
+        )
+      }
+      
+      console.log('M4 String merge completed successfully:', result.outputPath)
+      return result
+    } catch (error) {
+      console.error('M4 String merge error:', error)
+      throw new IpcError(
+        error instanceof Error ? error.message : 'M4 String merge failed',
+        'M4_STRING_MERGE_FAILED'
       )
     }
   })

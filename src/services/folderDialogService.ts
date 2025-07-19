@@ -23,14 +23,14 @@ export const M4_DIALOGUE_FILES = [
 
 // M4 String 처리에 필요한 파일들
 export const M4_STRING_FILES = [
-  'STRING_ARTIFACT.xlsm',
-  'STRING_ITEM.xlsm',
-  'STRING_MONSTER.xlsm',
+  'SEQUENCE_DIALOGUE.xlsm',
+  'STRING_BUILTIN.xlsm',
+  'STRING_MAIL.xlsm',
+  'STRING_MESSAGE.xlsm',
   'STRING_NPC.xlsm',
-  'STRING_QUEST.xlsm',
-  'STRING_SKILL.xlsm',
-  'STRING_TITLE.xlsm',
-  'STRING_UI.xlsm'
+  'STRING_QUESTTEMPLATE.xlsm',
+  'STRING_TEMPLATE.xlsm',
+  'STRING_TOOLTIP.xlsm'
 ];
 
 export class FolderDialogService {

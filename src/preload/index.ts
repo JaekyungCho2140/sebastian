@@ -42,7 +42,13 @@ const IPC_CHANNELS = {
   CLEAR_M4_ERROR_LOGS: 'clear-m4-error-logs',
   // M4 error events (Main -> Renderer)
   M4_ERROR_REPORTED: 'm4-error-reported',
-  M4_ERROR_CONTEXT_UPDATED: 'm4-error-context-updated'
+  M4_ERROR_CONTEXT_UPDATED: 'm4-error-context-updated',
+  // M4 Dialogue merge channels
+  START_M4_DIALOGUE_MERGE: 'start-m4-dialogue-merge',
+  M4_DIALOGUE_MERGE_PROGRESS: 'm4-dialogue-merge-progress',
+  // M4 String merge channels
+  START_M4_STRING_MERGE: 'start-m4-string-merge',
+  M4_STRING_MERGE_PROGRESS: 'm4-string-merge-progress'
 } as const
 
 // NOTE: The following types are imported from shared/types.ts in the actual build.
@@ -304,6 +310,50 @@ interface M4ErrorReportedEvent {
   retryable?: boolean
 }
 
+// M4 Dialogue merge types
+interface M4DialogueMergeRequest {
+  inputFolder: string
+  outputFolder: string
+}
+
+interface M4DialogueMergeProgress {
+  current: number
+  total: number
+  status: string
+  percentage: number
+}
+
+interface M4DialogueMergeResult {
+  success: boolean
+  outputPath?: string
+  error?: string
+}
+
+// M4 String merge interfaces
+interface M4StringMergeRequest {
+  inputFolder: string
+  outputFolder: string
+}
+
+interface M4StringMergeProgress {
+  current: number
+  total: number
+  currentFile?: string
+  step?: string
+  processedFiles?: number
+  percentage: number
+  message?: string
+  status: string
+}
+
+interface M4StringMergeResult {
+  success: boolean
+  outputPath?: string
+  error?: string
+  processedFiles?: number
+  elapsedTime?: number
+}
+
 console.log('Preload script loaded')
 
 // Type-safe IPC invoke wrapper
@@ -397,6 +447,10 @@ const electronAPI = {
   selectM4Folder: (): Promise<M4FolderSelectionResult> => safeInvoke(IPC_CHANNELS.SELECT_M4_FOLDER),
   validateM4Folder: (request: M4FolderValidationRequest): Promise<M4FileValidationResult> => safeInvoke(IPC_CHANNELS.VALIDATE_M4_FOLDER, request),
   cancelM4Processing: (): Promise<void> => safeInvoke('cancel-m4-processing'),
+  startM4DialogueMerge: (request: M4DialogueMergeRequest): Promise<M4DialogueMergeResult> => safeInvoke(IPC_CHANNELS.START_M4_DIALOGUE_MERGE, request),
+  
+  // M4 String merge functions  
+  startM4StringMerge: (request: M4StringMergeRequest): Promise<M4StringMergeResult> => safeInvoke(IPC_CHANNELS.START_M4_STRING_MERGE, request),
   
   // M4 settings methods
   getM4Settings: (): Promise<M4Settings> => safeInvoke(IPC_CHANNELS.GET_M4_SETTINGS),
@@ -494,6 +548,15 @@ const electronAPI = {
   // M4 progress update listener
   onM4ProgressUpdate: (callback: (update: any) => void) => {
     safeOn('m4-progress-update', callback)
+  },
+  
+  // M4 Dialogue merge progress listener
+  onM4DialogueMergeProgress: (callback: (progress: M4DialogueMergeProgress) => void) => {
+    safeOn(IPC_CHANNELS.M4_DIALOGUE_MERGE_PROGRESS, callback)
+  },
+  
+  onM4StringMergeProgress: (callback: (progress: M4StringMergeProgress) => void) => {
+    safeOn(IPC_CHANNELS.M4_STRING_MERGE_PROGRESS, callback)
   },
   
   // Performance profiling methods

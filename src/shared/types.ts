@@ -98,6 +98,12 @@ export const IPC_CHANNELS = {
   START_M4_PROCESSING: 'start-m4-processing',
   CANCEL_M4_PROCESSING: 'cancel-m4-processing',
   M4_PROGRESS_UPDATE: 'm4-progress-update',
+  // M4 Dialogue merge channels
+  START_M4_DIALOGUE_MERGE: 'start-m4-dialogue-merge',
+  M4_DIALOGUE_MERGE_PROGRESS: 'm4-dialogue-merge-progress',
+  // M4 String merge channels
+  START_M4_STRING_MERGE: 'start-m4-string-merge',
+  M4_STRING_MERGE_PROGRESS: 'm4-string-merge-progress',
   // M4 settings channels
   GET_M4_SETTINGS: 'get-m4-settings',
   SET_M4_SETTINGS: 'set-m4-settings',
@@ -267,6 +273,8 @@ export interface IpcRequests {
   [IPC_CHANNELS.VALIDATE_M4_FOLDER]: M4FolderValidationRequest
   [IPC_CHANNELS.START_M4_PROCESSING]: M4ProcessingRequest
   [IPC_CHANNELS.CANCEL_M4_PROCESSING]: void
+  [IPC_CHANNELS.START_M4_DIALOGUE_MERGE]: M4DialogueMergeRequest
+  [IPC_CHANNELS.START_M4_STRING_MERGE]: M4StringMergeRequest
   // M4 settings requests
   [IPC_CHANNELS.GET_M4_SETTINGS]: void
   [IPC_CHANNELS.SET_M4_SETTINGS]: Partial<M4Settings>
@@ -327,6 +335,8 @@ export interface IpcResponses {
   [IPC_CHANNELS.VALIDATE_M4_FOLDER]: M4FileValidationResult
   [IPC_CHANNELS.START_M4_PROCESSING]: void
   [IPC_CHANNELS.CANCEL_M4_PROCESSING]: void
+  [IPC_CHANNELS.START_M4_DIALOGUE_MERGE]: M4DialogueMergeResult
+  [IPC_CHANNELS.START_M4_STRING_MERGE]: M4StringMergeResult
   // M4 settings responses
   [IPC_CHANNELS.GET_M4_SETTINGS]: M4Settings
   [IPC_CHANNELS.SET_M4_SETTINGS]: void
@@ -1026,6 +1036,10 @@ declare global {
       startM4Processing: (request: M4ProcessingRequest) => Promise<void>
       cancelM4Processing: () => Promise<void>
       onM4ProgressUpdate: (callback: (progress: M4ProgressUpdate) => void) => void
+      startM4DialogueMerge: (request: M4DialogueMergeRequest) => Promise<M4DialogueMergeResult>
+      onM4DialogueMergeProgress: (callback: (progress: M4DialogueMergeProgress) => void) => void
+      startM4StringMerge: (request: M4StringMergeRequest) => Promise<M4StringMergeResult>
+      onM4StringMergeProgress: (callback: (progress: M4StringMergeProgress) => void) => void
       
       // M4 settings functions
       getM4Settings: () => Promise<M4Settings>
@@ -1968,4 +1982,82 @@ export interface ProfilingStatus {
   startTime?: number
   measurementCount: number
   config: ProfilingConfig
+}
+
+// ============================================================================
+// M4 Dialogue Merge Types
+// ============================================================================
+
+/**
+ * M4 Dialogue merge request
+ */
+export interface M4DialogueMergeRequest {
+  inputFolder: string
+  outputFolder: string
+}
+
+/**
+ * M4 Dialogue merge progress update
+ */
+export interface M4DialogueMergeProgress {
+  current: number
+  total: number
+  status: string
+  percentage: number
+}
+
+/**
+ * M4 Dialogue merge result
+ */
+export interface M4DialogueMergeResult {
+  success: boolean
+  outputPath?: string
+  error?: string
+}
+
+// ============================================================================
+// M4 String Merge Types
+// ============================================================================
+
+/**
+ * M4 String merge request
+ */
+export interface M4StringMergeRequest {
+  inputFolder: string
+  outputFolder: string
+}
+
+/**
+ * M4 String merge progress update
+ */
+export interface M4StringMergeProgress {
+  current: number
+  total: number
+  currentFile?: string
+  step?: string
+  processedFiles?: number
+  percentage: number
+  message?: string
+  status: string
+}
+
+/**
+ * M4 String merge result
+ */
+export interface M4StringMergeResult {
+  success: boolean
+  outputPath?: string
+  error?: string
+  processedFiles?: number
+  elapsedTime?: number
+}
+
+/**
+ * M4 String file configuration
+ */
+export interface M4StringFileConfig {
+  filename: string
+  headerRow: number
+  startRow: number
+  matchingColumns: (number | null)[]
 }

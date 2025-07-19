@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "commander": "^12.0.0",
+    "date-fns": "^4.1.0",
     "electron-log": "^5.4.1",
     "electron-store": "^10.1.0",
     "exceljs": "^4.4.0",
@@ -116,6 +117,7 @@
     "productName": "Sebastian",
     "copyright": "Copyright © 2025 Jaekyung Cho",
     "icon": "src/assets/icons/icon.ico",
+    "forceCodeSigning": false,
     "asar": true,
     "electronUpdaterCompatibility": ">=2.16",
     "nativeRebuilder": "sequential",
@@ -167,7 +169,8 @@
       "artifactName": "${productName}-${version}-Setup.${ext}",
       "requestedExecutionLevel": "asInvoker",
       "appId": "com.sebastian.app",
-      "signAndEditExecutable": false
+      "signAndEditExecutable": false,
+      "icon": "src/assets/icons/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -179,6 +182,8 @@
       "runAfterFinish": true,
       "installerIcon": "src/assets/icons/icon.ico",
       "installerHeaderIcon": "src/assets/icons/icon.ico",
+      "uninstallerIcon": "src/assets/icons/icon.ico",
+      "uninstallDisplayName": "Sebastian",
       "installerLanguages": [
         "en_US"
       ],
