@@ -36,5 +36,5 @@ yarn-error.log*
 .mcp.json
 
 # Assets
-sebastian.ico
+# sebastian.ico  # 아이콘은 저장소에 포함되어야 함
 
