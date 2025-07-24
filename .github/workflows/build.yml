@@ -1,0 +1,81 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build Electron app
+      run: npm run dist
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: sebastian-builds
+        path: |
+          dist/Sebastian*.exe
+          dist/*.blockmap
+          dist/latest.yml
+        retention-days: 7
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: sebastian-builds
+        path: dist
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/Sebastian*.exe
+          dist/*.blockmap
+          dist/latest.yml
+        body: |
+          ## Sebastian v${{ github.ref_name }}
+          
+          ### 다운로드
+          - **Sebastian Setup ${{ github.ref_name }}.exe** - 설치 프로그램
+          - **Sebastian ${{ github.ref_name }}.exe** - 포터블 버전
+          
+          ### 변경사항
+          - 초기 릴리스
+          - 11개 기능 버튼 UI
+          - 로깅 시스템
+          
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
