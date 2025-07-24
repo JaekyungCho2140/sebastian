@@ -1,0 +1,48 @@
+{
+  "name": "sebastian",
+  "version": "0.1.0",
+  "description": "게임 현지화 팀을 위한 업무 자동화 도구",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaekyungCho2140/sebastian.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JaekyungCho2140/sebastian/issues"
+  },
+  "homepage": "https://github.com/JaekyungCho2140/sebastian#readme",
+  "devDependencies": {
+    "electron": "^37.2.4",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.sebastian.app",
+    "productName": "Sebastian",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

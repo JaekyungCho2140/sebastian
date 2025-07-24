@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebastian - 게임 현지화 자동화 도구</title>
+    <link rel="icon" href="sebastian.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sebastian</h1>
+            <p class="subtitle">게임 현지화 팀 업무 자동화 도구 v0.1</p>
+        </header>
+        
+        <main>
+            <div class="button-grid">
+                <!-- 11개 기능 버튼 -->
+                <button class="feature-btn" onclick="handleClick('m4-merge')">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">M4 테이블 병합</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('nc-merge')">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">NC 테이블 병합</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('ly-merge-split')">
+                    <span class="btn-icon">✂️</span>
+                    <span class="btn-text">LY 테이블 병합/분할</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('excel-format')">
+                    <span class="btn-icon">📝</span>
+                    <span class="btn-text">Excel 서식 변환</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('text-extract')">
+                    <span class="btn-icon">📄</span>
+                    <span class="btn-text">텍스트 추출</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('translation-check')">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-text">번역 검증</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('glossary-manage')">
+                    <span class="btn-icon">📚</span>
+                    <span class="btn-text">용어집 관리</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('file-batch')">
+                    <span class="btn-icon">📁</span>
+                    <span class="btn-text">파일 일괄 처리</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('report-generate')">
+                    <span class="btn-icon">📈</span>
+                    <span class="btn-text">리포트 생성</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('backup-restore')">
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">백업/복원</span>
+                </button>
+                
+                <button class="feature-btn" onclick="handleClick('settings')">
+                    <span class="btn-icon">⚙️</span>
+                    <span class="btn-text">설정</span>
+                </button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>© 2025 Sebastian - 게임 현지화 팀</p>
+        </footer>
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+</html>

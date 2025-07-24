@@ -1,0 +1,167 @@
+/**
+ * Sebastian v0.1 - 스타일시트
+ * 
+ * 게임 현지화 팀을 위한 간단하고 명확한 UI 스타일
+ */
+
+/* 기본 스타일 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 기본 body 스타일 */
+body {
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+/* 메인 컨테이너 */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* 헤더 스타일 */
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 1em;
+    color: #7f8c8d;
+}
+
+/* 메인 컨텐츠 영역 */
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 버튼 그리드 레이아웃 */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    max-width: 700px;
+    width: 100%;
+}
+
+/* 기능 버튼 스타일 */
+.feature-btn {
+    width: 150px;
+    height: 100px;
+    border: none;
+    border-radius: 10px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.feature-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.feature-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 버튼 아이콘 */
+.btn-icon {
+    font-size: 24px;
+}
+
+/* 버튼 텍스트 */
+.btn-text {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* 특정 버튼 색상 커스터마이징 */
+.feature-btn:nth-child(1),
+.feature-btn:nth-child(2),
+.feature-btn:nth-child(3) {
+    background-color: #e74c3c;
+}
+
+.feature-btn:nth-child(1):hover,
+.feature-btn:nth-child(2):hover,
+.feature-btn:nth-child(3):hover {
+    background-color: #c0392b;
+}
+
+.feature-btn:nth-child(10) {
+    background-color: #f39c12;
+}
+
+.feature-btn:nth-child(10):hover {
+    background-color: #e67e22;
+}
+
+.feature-btn:nth-child(11) {
+    background-color: #95a5a6;
+}
+
+.feature-btn:nth-child(11):hover {
+    background-color: #7f8c8d;
+}
+
+/* 푸터 스타일 */
+footer {
+    text-align: center;
+    padding: 10px;
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 700px) {
+    .button-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .feature-btn {
+        width: 120px;
+        height: 80px;
+    }
+    
+    .btn-icon {
+        font-size: 20px;
+    }
+    
+    .btn-text {
+        font-size: 12px;
+    }
+}
