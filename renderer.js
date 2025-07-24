@@ -84,7 +84,7 @@ function showNotification(featureName) {
         <div class="notification-content">
             <h3>알림</h3>
             <p>${featureName} 기능은 다음 버전에서 구현됩니다.</p>
-            <p class="version-info">현재 버전: v0.1 (기본 구조)</p>
+            <p class="version-info">현재 버전: v0.1.1 (기본 구조)</p>
             <button onclick="closeNotification(this)">확인</button>
         </div>
     `;

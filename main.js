@@ -49,7 +49,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false
         },
-        title: 'Sebastian v0.1',
+        title: 'Sebastian v0.1.1',
         icon: path.join(__dirname, 'sebastian.ico')
     });
 
