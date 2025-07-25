@@ -1,13 +1,16 @@
 {
   "name": "sebastian",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "게임 현지화 팀을 위한 업무 자동화 도구",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "dist": "electron-builder",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "verify-build": "node verify-build.js"
   },
   "repository": {
     "type": "git",
@@ -22,8 +25,15 @@
   },
   "homepage": "https://github.com/JaekyungCho2140/sebastian#readme",
   "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.0.5",
     "electron": "^37.2.4",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "electron-mocks": "^1.7.0",
+    "jest": "^30.0.5"
   },
   "build": {
     "appId": "com.sebastian.app",
@@ -32,7 +42,10 @@
       "output": "dist"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "build/icon.ico"
     },
     "nsis": {
@@ -44,5 +57,9 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     }
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5",
+    "xlsx-js-style": "^1.2.0"
   }
 }

@@ -1,0 +1,109 @@
+{
+  "inputFiles": [
+    {
+      "fileName": "CINEMATIC_DIALOGUE.xlsm",
+      "sheetIndex": 2,
+      "sheetName": "CINEMATIC_DIALOGUE",
+      "headerRow": 2,
+      "dataStartRow": 10,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "int" },
+        "8": { "to": "NPC ID", "type": "int" },
+        "11": { "to": "KO (M)", "type": "string" },
+        "12": { "to": "KO (F)", "type": "string" },
+        "13": { "to": "EN (M)", "type": "string" },
+        "14": { "to": "EN (F)", "type": "string" },
+        "15": { "to": "CT (M)", "type": "string" },
+        "16": { "to": "CT (F)", "type": "string" },
+        "17": { "to": "CS (M)", "type": "string" },
+        "18": { "to": "CS (F)", "type": "string" },
+        "19": { "to": "JA (M)", "type": "string" },
+        "20": { "to": "JA (F)", "type": "string" },
+        "21": { "to": "TH (M)", "type": "string" },
+        "22": { "to": "TH (F)", "type": "string" },
+        "23": { "to": "ES-LATAM (M)", "type": "string" },
+        "24": { "to": "ES-LATAM (F)", "type": "string" },
+        "25": { "to": "PT-BR (M)", "type": "string" },
+        "26": { "to": "PT-BR (F)", "type": "string" },
+        "0": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "SMALLTALK_DIALOGUE.xlsm",
+      "sheetIndex": 2,
+      "sheetName": "SMALLTALK_DIALOGUE",
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "int" },
+        "8": { "to": "NPC ID", "type": "int" },
+        "12": { "to": "KO (M)", "type": "string" },
+        "13": { "to": "KO (F)", "type": "string" },
+        "14": { "to": "EN (M)", "type": "string" },
+        "15": { "to": "EN (F)", "type": "string" },
+        "16": { "to": "CT (M)", "type": "string" },
+        "17": { "to": "CT (F)", "type": "string" },
+        "18": { "to": "CS (M)", "type": "string" },
+        "19": { "to": "CS (F)", "type": "string" },
+        "20": { "to": "JA (M)", "type": "string" },
+        "21": { "to": "JA (F)", "type": "string" },
+        "22": { "to": "TH (M)", "type": "string" },
+        "23": { "to": "TH (F)", "type": "string" },
+        "24": { "to": "ES-LATAM (M)", "type": "string" },
+        "25": { "to": "ES-LATAM (F)", "type": "string" },
+        "26": { "to": "PT-BR (M)", "type": "string" },
+        "27": { "to": "PT-BR (F)", "type": "string" },
+        "30": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "NPC.xlsm",
+      "sheetIndex": 2,
+      "sheetName": "NPC",
+      "headerRow": 1,
+      "dataStartRow": 2,
+      "purpose": "NPC ID to Name mapping",
+      "keyColumn": 7,
+      "valueColumn": 9
+    }
+  ],
+  "outputFile": {
+    "namePattern": "{date}_MIR4_MASTER_DIALOGUE.xlsx",
+    "columns": [
+      "#", "Table Name", "String ID", "Table/ID", "NPC ID", "Speaker Name",
+      "KO (M)", "KO (F)", "EN (M)", "EN (F)", "CT (M)", "CT (F)", "CS (M)",
+      "CS (F)", "JA (M)", "JA (F)", "TH (M)", "TH (F)", "ES-LATAM (M)", 
+      "ES-LATAM (F)", "PT-BR (M)", "PT-BR (F)", "NOTE"
+    ],
+    "formatting": {
+      "headerFont": {
+        "name": "맑은 고딕",
+        "size": 12,
+        "bold": true,
+        "color": "#9C5700"
+      },
+      "headerBgColor": "#FFEB9C",
+      "bodyFont": {
+        "name": "맑은 고딕",
+        "size": 10
+      },
+      "border": "all",
+      "freezePane": "A2",
+      "readOnly": true
+    }
+  },
+  "processingRules": {
+    "filterRows": {
+      "column": "EN (M)",
+      "removeIf": ["empty", "0", "미사용"]
+    },
+    "additionalColumns": {
+      "Table Name": "sourceFileName",
+      "Table/ID": "concatenate('Table Name', '/', 'String ID')"
+    },
+    "indexColumn": {
+      "name": "#",
+      "startFrom": 1
+    }
+  }
+}

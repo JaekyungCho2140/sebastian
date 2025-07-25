@@ -1,0 +1,186 @@
+{
+  "inputFiles": [
+    {
+      "fileName": "SEQUENCE_DIALOGUE.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 10,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "10": { "to": "KO", "type": "string" },
+        "11": { "to": "EN", "type": "string" },
+        "12": { "to": "CT", "type": "string" },
+        "13": { "to": "CS", "type": "string" },
+        "14": { "to": "JA", "type": "string" },
+        "15": { "to": "TH", "type": "string" },
+        "16": { "to": "ES-LATAM", "type": "string" },
+        "17": { "to": "PT-BR", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_BUILTIN.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "8": { "to": "KO", "type": "string" },
+        "9": { "to": "EN", "type": "string" },
+        "10": { "to": "CT", "type": "string" },
+        "11": { "to": "CS", "type": "string" },
+        "12": { "to": "JA", "type": "string" },
+        "13": { "to": "TH", "type": "string" },
+        "14": { "to": "ES-LATAM", "type": "string" },
+        "15": { "to": "PT-BR", "type": "string" },
+        "21": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_MAIL.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "8": { "to": "KO", "type": "string" },
+        "9": { "to": "EN", "type": "string" },
+        "10": { "to": "CT", "type": "string" },
+        "11": { "to": "CS", "type": "string" },
+        "12": { "to": "JA", "type": "string" },
+        "13": { "to": "TH", "type": "string" },
+        "14": { "to": "ES-LATAM", "type": "string" },
+        "15": { "to": "PT-BR", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_MESSAGE.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "8": { "to": "KO", "type": "string" },
+        "9": { "to": "EN", "type": "string" },
+        "10": { "to": "CT", "type": "string" },
+        "11": { "to": "CS", "type": "string" },
+        "12": { "to": "JA", "type": "string" },
+        "13": { "to": "TH", "type": "string" },
+        "14": { "to": "ES-LATAM", "type": "string" },
+        "15": { "to": "PT-BR", "type": "string" },
+        "21": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_NPC.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "9": { "to": "KO", "type": "string" },
+        "10": { "to": "EN", "type": "string" },
+        "11": { "to": "CT", "type": "string" },
+        "12": { "to": "CS", "type": "string" },
+        "13": { "to": "JA", "type": "string" },
+        "14": { "to": "TH", "type": "string" },
+        "15": { "to": "ES-LATAM", "type": "string" },
+        "16": { "to": "PT-BR", "type": "string" },
+        "18": { "to": "NPC 이름", "type": "string" },
+        "19": { "to": "비고", "type": "string" },
+        "20": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_QUESTTEMPLATE.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 7,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "12": { "to": "KO", "type": "string" },
+        "13": { "to": "EN", "type": "string" },
+        "14": { "to": "CT", "type": "string" },
+        "15": { "to": "CS", "type": "string" },
+        "16": { "to": "JA", "type": "string" },
+        "17": { "to": "TH", "type": "string" },
+        "18": { "to": "ES-LATAM", "type": "string" },
+        "19": { "to": "PT-BR", "type": "string" },
+        "0": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_TEMPLATE.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "8": { "to": "KO", "type": "string" },
+        "9": { "to": "EN", "type": "string" },
+        "10": { "to": "CT", "type": "string" },
+        "11": { "to": "CS", "type": "string" },
+        "12": { "to": "JA", "type": "string" },
+        "13": { "to": "TH", "type": "string" },
+        "14": { "to": "ES-LATAM", "type": "string" },
+        "15": { "to": "PT-BR", "type": "string" },
+        "18": { "to": "비고", "type": "string" },
+        "19": { "to": "NOTE", "type": "string" }
+      }
+    },
+    {
+      "fileName": "STRING_TOOLTIP.xlsm",
+      "sheetIndex": 2,
+      "headerRow": 2,
+      "dataStartRow": 5,
+      "columnMapping": {
+        "7": { "to": "String ID", "type": "string" },
+        "11": { "to": "KO", "type": "string" },
+        "12": { "to": "EN", "type": "string" },
+        "13": { "to": "CT", "type": "string" },
+        "14": { "to": "CS", "type": "string" },
+        "15": { "to": "JA", "type": "string" },
+        "16": { "to": "TH", "type": "string" },
+        "17": { "to": "ES-LATAM", "type": "string" },
+        "18": { "to": "PT-BR", "type": "string" },
+        "8": { "to": "NOTE", "type": "string" }
+      }
+    }
+  ],
+  "outputFile": {
+    "namePattern": "{date}_MIR4_MASTER_STRING.xlsx",
+    "columns": [
+      "#", "Table Name", "String ID", "Table/ID", "NOTE", "KO", "EN", 
+      "CT", "CS", "JA", "TH", "ES-LATAM", "PT-BR", "NPC 이름", "비고"
+    ],
+    "formatting": {
+      "headerFont": {
+        "name": "맑은 고딕",
+        "size": 12,
+        "bold": true,
+        "color": "#9C5700"
+      },
+      "headerBgColor": "#FFEB9C",
+      "bodyFont": {
+        "name": "맑은 고딕",
+        "size": 10
+      },
+      "border": "all",
+      "freezePane": "A2",
+      "readOnly": true
+    }
+  },
+  "processingRules": {
+    "filterRows": {
+      "column": "EN",
+      "removeIf": ["empty", "0", "미사용"]
+    },
+    "additionalColumns": {
+      "Table Name": "sourceFileName",
+      "Table/ID": "concatenate('Table Name', '/', 'String ID')"
+    },
+    "indexColumn": {
+      "name": "#",
+      "startFrom": 1
+    }
+  }
+}

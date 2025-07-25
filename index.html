@@ -11,20 +11,20 @@
     <div class="container">
         <header>
             <h1>Sebastian</h1>
-            <p class="subtitle">게임 현지화 팀 업무 자동화 도구 v0.1.1</p>
+            <p class="subtitle">게임 현지화 팀 업무 자동화 도구 v0.2.0</p>
         </header>
         
         <main>
             <div class="button-grid">
                 <!-- 11개 기능 버튼 -->
-                <button class="feature-btn" onclick="handleClick('m4-merge')">
+                <button class="feature-btn" onclick="handleClick('m4-dialogue')">
                     <span class="btn-icon">📊</span>
-                    <span class="btn-text">M4 테이블 병합</span>
+                    <span class="btn-text">M4 Dialogue</span>
                 </button>
                 
-                <button class="feature-btn" onclick="handleClick('nc-merge')">
+                <button class="feature-btn" onclick="handleClick('m4-string')">
                     <span class="btn-icon">📊</span>
-                    <span class="btn-text">NC 테이블 병합</span>
+                    <span class="btn-text">M4 String</span>
                 </button>
                 
                 <button class="feature-btn" onclick="handleClick('ly-merge-split')">
@@ -77,6 +77,27 @@
         <footer>
             <p>© 2025 Sebastian - 게임 현지화 팀</p>
         </footer>
+    </div>
+    
+    <!-- 진행률 표시 모달 -->
+    <div id="progress-modal" class="modal" style="display: none;">
+        <div class="modal-content progress-content">
+            <h2 id="progress-title">처리 중...</h2>
+            <div class="progress-info">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="progress-details">
+                    <p><strong>전체 진행률:</strong> <span id="progress-percentage">0%</span></p>
+                    <p><strong>현재 작업:</strong> <span id="current-step">준비 중</span></p>
+                    <p><strong>현재 파일:</strong> <span id="current-file">-</span></p>
+                    <p><strong>진행 상황:</strong> <span id="file-progress">0/0</span></p>
+                    <p><strong>경과 시간:</strong> <span id="elapsed-time">0초</span></p>
+                    <p><strong>예상 시간:</strong> <span id="remaining-time">계산 중</span></p>
+                </div>
+            </div>
+            <button id="cancel-btn" class="cancel-btn" onclick="cancelOperation()">취소</button>
+        </div>
     </div>
     
     <script src="renderer.js"></script>
