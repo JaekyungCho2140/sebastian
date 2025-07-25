@@ -31,10 +31,31 @@ yarn-error.log*
 
 # Claude
 .claude/
-
-# taskmaster
+CLAUDE.md
 .mcp.json
 
 # Assets
 # sebastian.ico  # 아이콘은 저장소에 포함되어야 함
+
+# superclaude
+SuperClaude/
+
+# test
+tests/
+
+# Test coverage
+coverage/
+
+# Debug and test files (outside tests folder)
+debug-*.js
+test-*.js
+check-*.js
+
+# Backup files
+*.backup.js
+*-backup.js
+*-optimized.js
+
+# Windows artifacts
+nul
 
