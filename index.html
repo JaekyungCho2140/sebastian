@@ -18,18 +18,15 @@
             <div class="button-grid">
                 <!-- 11개 기능 버튼 -->
                 <button class="feature-btn" onclick="handleClick('m4-dialogue')">
-                    <span class="btn-icon">📊</span>
-                    <span class="btn-text">M4 Dialogue</span>
+                    <span class="btn-text">M4 Dialogue 병합</span>
                 </button>
                 
                 <button class="feature-btn" onclick="handleClick('m4-string')">
-                    <span class="btn-icon">📊</span>
-                    <span class="btn-text">M4 String</span>
+                    <span class="btn-text">M4 String 병합</span>
                 </button>
                 
-                <button class="feature-btn" onclick="handleClick('ly-merge-split')">
-                    <span class="btn-icon">✂️</span>
-                    <span class="btn-text">LY 테이블 병합/분할</span>
+                <button class="feature-btn" onclick="handleClick('nc-merge')">
+                    <span class="btn-text">NC 테이블 병합</span>
                 </button>
                 
                 <button class="feature-btn" onclick="handleClick('excel-format')">
@@ -93,10 +90,35 @@
                     <p><strong>현재 파일:</strong> <span id="current-file">-</span></p>
                     <p><strong>진행 상황:</strong> <span id="file-progress">0/0</span></p>
                     <p><strong>경과 시간:</strong> <span id="elapsed-time">0초</span></p>
-                    <p><strong>예상 시간:</strong> <span id="remaining-time">계산 중</span></p>
+                    <p><strong>남은 시간:</strong> <span id="remaining-time">계산 중</span></p>
                 </div>
             </div>
             <button id="cancel-btn" class="cancel-btn" onclick="cancelOperation()">취소</button>
+        </div>
+    </div>
+    
+    <!-- NC 테이블 병합 날짜/마일스톤 입력 모달 -->
+    <div id="nc-input-modal" class="modal" style="display: none;">
+        <div class="modal-content nc-input-content">
+            <h2>NC 테이블 병합 정보 입력</h2>
+            <div class="nc-input-form">
+                <div class="input-group">
+                    <label for="nc-date">날짜 (YYMMDD):</label>
+                    <input type="text" id="nc-date" maxlength="6" placeholder="예: 250725">
+                    <span class="error-message" id="nc-date-error"></span>
+                </div>
+                
+                <div class="input-group">
+                    <label for="nc-milestone">마일스톤 차수 (01-99):</label>
+                    <input type="text" id="nc-milestone" maxlength="2" placeholder="예: 01">
+                    <span class="error-message" id="nc-milestone-error"></span>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="closeNCInputModal()">취소</button>
+                    <button class="btn-primary" id="nc-confirm-btn" onclick="confirmNCInput()" disabled>확인</button>
+                </div>
+            </div>
         </div>
     </div>
     

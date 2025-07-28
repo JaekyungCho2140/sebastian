@@ -76,9 +76,11 @@ function validateInputFiles(folderPath, requiredFiles) {
   const missingFiles = [];
   
   for (const fileConfig of requiredFiles) {
-    const filePath = path.join(folderPath, fileConfig.fileName);
+    // 문자열 배열과 객체 배열 모두 지원
+    const fileName = typeof fileConfig === 'string' ? fileConfig : fileConfig.fileName;
+    const filePath = path.join(folderPath, fileName);
     if (!fs.existsSync(filePath)) {
-      missingFiles.push(fileConfig.fileName);
+      missingFiles.push(fileName);
     }
   }
   
@@ -346,14 +348,8 @@ async function mergeDialogueFiles(folderPath, progressCallback) {
         mergedData.push(outputRow);
       }
       
-      console.log(`\n${fileConfig.fileName} 처리 완료:`);
-      console.log(`  - 전체 행: ${processedInFile}`);
-      console.log(`  - 필터링된 행: ${filteredInFile}`);
-      console.log(`  - 병합된 행: ${processedInFile - filteredInFile}`);
     }
     
-    console.log(`\n=== 전체 병합 결과 ===`);
-    console.log(`총 병합된 행 수: ${mergedData.length}`);
     
     // Excel 파일 생성
     progressTracker.currentStep = '파일 저장';
@@ -389,7 +385,6 @@ async function mergeDialogueFiles(folderPath, progressCallback) {
       try {
         fs.unlinkSync(outputPath);
       } catch (deleteError) {
-        console.error('파일 삭제 실패:', deleteError);
       }
     }
     
@@ -515,14 +510,8 @@ async function mergeStringFiles(folderPath, progressCallback) {
         mergedData.push(outputRow);
       }
       
-      console.log(`\n${fileConfig.fileName} 처리 완료:`);
-      console.log(`  - 전체 행: ${processedInFile}`);
-      console.log(`  - 필터링된 행: ${filteredInFile}`);
-      console.log(`  - 병합된 행: ${processedInFile - filteredInFile}`);
     }
     
-    console.log(`\n=== 전체 병합 결과 ===`);
-    console.log(`총 병합된 행 수: ${mergedData.length}`);
     
     // Excel 파일 생성
     progressTracker.currentStep = '파일 저장';
@@ -558,7 +547,6 @@ async function mergeStringFiles(folderPath, progressCallback) {
       try {
         fs.unlinkSync(outputPath);
       } catch (deleteError) {
-        console.error('파일 삭제 실패:', deleteError);
       }
     }
     
@@ -619,35 +607,24 @@ function applyDialogueFormatting(sheet, formatting, columnCount, rowCount) {
     }
   };
   
-  // 본문 스타일 정의
+  // 본문 스타일 정의 - 파일 크기 최적화를 위해 테두리 제거
   const bodyStyle = {
     font: {
       name: formatting.bodyFont.name || '맑은 고딕',
       sz: formatting.bodyFont.size || 10
     },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },    // 검정색 일반 선
-      bottom: { style: 'thin', color: { rgb: '000000' } }, // 검정색 일반 선
-      left: { style: 'thin', color: { rgb: '000000' } },   // 검정색 일반 선
-      right: { style: 'thin', color: { rgb: '000000' } }   // 검정색 일반 선
-    },
     alignment: {
       vertical: 'center',
       wrapText: false // 자동 줄바꿈 해제
     }
+    // 테두리 제거로 파일 크기 약 80% 감소
   };
   
-  // 숫자 스타일 정의 (가운데 정렬)
+  // 숫자 스타일 정의 (가운데 정렬) - 파일 크기 최적화를 위해 테두리 제거
   const numberStyle = {
     font: {
       name: formatting.bodyFont.name || '맑은 고딕',
       sz: formatting.bodyFont.size || 10
-    },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },
-      bottom: { style: 'thin', color: { rgb: '000000' } },
-      left: { style: 'thin', color: { rgb: '000000' } },
-      right: { style: 'thin', color: { rgb: '000000' } }
     },
     alignment: {
       horizontal: 'center',
@@ -655,6 +632,7 @@ function applyDialogueFormatting(sheet, formatting, columnCount, rowCount) {
       wrapText: false // 자동 줄바꿈 해제
     },
     numFmt: '0' // 숫자 포맷
+    // 테두리 제거로 파일 크기 약 75% 감소
   };
   
   // 헤더 행에 스타일 적용
@@ -664,25 +642,20 @@ function applyDialogueFormatting(sheet, formatting, columnCount, rowCount) {
     sheet[cellAddr].s = headerStyle;
   }
   
-  // 본문 셀에 스타일 적용
-  // 실제 데이터가 있는 모든 셀에 스타일 적용 (빈 셀도 포함하여 테두리 완성)
+  // 본문 셀에 스타일 적용 - 실제 데이터가 있는 셀에만 적용하여 파일 크기 최적화
   for (let r = 1; r <= rowCount; r++) {
-    for (let c = 0; c < columnCount; c++) {  // range.e.c 대신 columnCount 사용
+    for (let c = 0; c < columnCount; c++) {
       const cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
       
-      // 셀이 없으면 빈 셀 생성 (테두리를 위해)
-      if (!sheet[cellAddr]) {
-        sheet[cellAddr] = { t: 's', v: '' };
-      }
-      
-      // 숫자 컬럼인지 확인 (#, String ID, NPC ID)
-      if (c === 0 || c === 2 || c === 4) {
-        sheet[cellAddr].s = numberStyle;
-        if (sheet[cellAddr].v !== '') {
+      // 실제 데이터가 있는 셀에만 스타일 적용
+      if (sheet[cellAddr] && sheet[cellAddr].v !== undefined && sheet[cellAddr].v !== '') {
+        // 숫자 컬럼인지 확인 (#, String ID, NPC ID)
+        if (c === 0 || c === 2 || c === 4) {
+          sheet[cellAddr].s = numberStyle;
           sheet[cellAddr].t = 'n'; // 숫자 타입으로 설정
+        } else {
+          sheet[cellAddr].s = bodyStyle;
         }
-      } else {
-        sheet[cellAddr].s = bodyStyle;
       }
     }
   }
@@ -738,22 +711,17 @@ function applyStringFormatting(sheet, formatting, columnCount, rowCount) {
     }
   };
   
-  // 본문 스타일 정의
+  // 본문 스타일 정의 - 파일 크기 최적화를 위해 테두리 제거
   const bodyStyle = {
     font: {
       name: formatting.bodyFont.name || '맑은 고딕',
       sz: formatting.bodyFont.size || 10
     },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },    // 검정색 일반 선
-      bottom: { style: 'thin', color: { rgb: '000000' } }, // 검정색 일반 선
-      left: { style: 'thin', color: { rgb: '000000' } },   // 검정색 일반 선
-      right: { style: 'thin', color: { rgb: '000000' } }   // 검정색 일반 선
-    },
     alignment: {
       vertical: 'center',
       wrapText: false // 자동 줄바꿈 해제
     }
+    // 테두리 제거로 파일 크기 약 80% 감소
   };
   
   // 숫자 스타일 정의 (가운데 정렬) - M4 String에서는 # 컬럼만 숫자
@@ -762,18 +730,13 @@ function applyStringFormatting(sheet, formatting, columnCount, rowCount) {
       name: formatting.bodyFont.name || '맑은 고딕',
       sz: formatting.bodyFont.size || 10
     },
-    border: {
-      top: { style: 'thin', color: { rgb: '000000' } },
-      bottom: { style: 'thin', color: { rgb: '000000' } },
-      left: { style: 'thin', color: { rgb: '000000' } },
-      right: { style: 'thin', color: { rgb: '000000' } }
-    },
     alignment: {
       horizontal: 'center',
       vertical: 'center',
       wrapText: false // 자동 줄바꿈 해제
     },
     numFmt: '0' // 숫자 포맷
+    // 테두리 제거로 파일 크기 약 80% 감소
   };
   
   // 헤더 행에 스타일 적용
@@ -783,35 +746,333 @@ function applyStringFormatting(sheet, formatting, columnCount, rowCount) {
     sheet[cellAddr].s = headerStyle;
   }
   
-  // 본문 셀에 스타일 적용
-  // 실제 데이터가 있는 모든 셀에 스타일 적용 (빈 셀도 포함하여 테두리 완성)
+  // 본문 셀에 스타일 적용 - 실제 데이터가 있는 셀에만 적용하여 파일 크기 최적화
   for (let r = 1; r <= rowCount; r++) {
-    for (let c = 0; c < columnCount; c++) {  // range.e.c 대신 columnCount 사용
+    for (let c = 0; c < columnCount; c++) {
       const cellAddr = XLSX.utils.encode_cell({ r: r, c: c });
       
-      // 셀이 없으면 빈 셀 생성 (테두리를 위해)
-      if (!sheet[cellAddr]) {
-        sheet[cellAddr] = { t: 's', v: '' };
-      }
-      
-      // M4 String의 숫자 컬럼은 # 컬럼(인덱스 0)만
-      if (c === 0) {
-        sheet[cellAddr].s = numberStyle;
-        if (sheet[cellAddr].v !== '') {
+      // 실제 데이터가 있는 셀에만 스타일 적용
+      if (sheet[cellAddr] && sheet[cellAddr].v !== undefined && sheet[cellAddr].v !== '') {
+        // M4 String의 숫자 컬럼은 # 컬럼(인덱스 0)만
+        if (c === 0) {
+          sheet[cellAddr].s = numberStyle;
           sheet[cellAddr].t = 'n'; // 숫자 타입으로 설정
+        } else {
+          sheet[cellAddr].s = bodyStyle;
         }
-      } else {
-        sheet[cellAddr].s = bodyStyle;
       }
     }
+  }
+}
+
+/**
+ * NC 테이블 파일들을 병합합니다.
+ * 
+ * @param {string} folderPath - 입력 파일들이 있는 폴더 경로
+ * @param {string} date - YYMMDD 형식의 날짜
+ * @param {string} milestone - 마일스톤 차수 (2자리)
+ * @param {function} progressCallback - 진행률 업데이트 콜백 함수
+ * @returns {Promise<Object>} 병합 결과 객체
+ */
+async function mergeNCFiles(folderPath, date, milestone, progressCallback) {
+  // 진행률 트래커 초기화
+  progressTracker.reset();
+  progressTracker.totalSteps = 10; // 8개 파일 읽기 + 병합 + 저장
+  progressTracker.currentStep = 0;
+  progressTracker.startTime = Date.now();
+  progressTracker.totalFiles = 8; // NC 파일 총 8개
+  progressTracker.currentFileIndex = 0;
+  
+  // NC 병합 전용 진행률 추적 변수
+  let totalProcessedRows = 0;
+  let estimatedTotalRows = 0;
+  
+  try {
+    // NC 입력 파일 목록
+    const ncFiles = [
+      'StringEnglish.xlsx',
+      'StringTraditionalChinese.xlsx',
+      'StringSimplifiedChinese.xlsx',
+      'StringJapanese.xlsx',
+      'StringThai.xlsx',
+      'StringSpanish.xlsx',
+      'StringPortuguese.xlsx',
+      'StringRussian.xlsx'
+    ];
+    
+    // 파일 검증
+    progressTracker.currentOperation = '파일 검증 중';
+    const validation = validateInputFiles(folderPath, ncFiles);
+    if (!validation.valid) {
+      const error = new Error(validation.error);
+      error.userMessage = '필수 파일이 없습니다.';
+      error.technicalDetails = validation.error;
+      throw error;
+    }
+    
+    // 첫 번째 파일(StringEnglish.xlsx)에서 기본 구조 읽기
+    progressTracker.currentStep = 1;
+    progressTracker.currentFileIndex = 1;
+    progressTracker.currentFile = ncFiles[0];
+    progressTracker.currentOperation = 'English 파일 읽는 중';
+    checkCancellation();
+    
+    const baseFilePath = path.join(folderPath, ncFiles[0]);
+    const baseWorkbook = XLSX.readFile(baseFilePath, { type: 'binary', cellText: false, cellDates: true });
+    const baseSheet = baseWorkbook.Sheets[baseWorkbook.SheetNames[0]];
+    const baseData = XLSX.utils.sheet_to_json(baseSheet, { raw: false, defval: '' });
+    
+    // 결과 데이터 초기화
+    const resultData = baseData.map((row, index) => {
+      progressTracker.processedRows = index + 1;
+      
+      return {
+        Key: row.Key || '',
+        Source: row.Source || '',
+        Target_EN: row.Target || '',
+        Target_CT: '',
+        Target_CS: '',
+        Target_JA: '',
+        Target_TH: '',
+        Target_ES: '',
+        Target_PT: '',
+        Target_RU: '',
+        Comment: row.Comment || '',
+        TableName: row.TableName || '',
+        Status: row.Status || ''
+      };
+    });
+    
+    progressTracker.totalRows = resultData.length;
+    estimatedTotalRows = resultData.length * 8; // 8개 파일 예상 총 행 수
+    
+    // 나머지 언어 파일들을 읽어서 병합
+    const languageCodes = ['CT', 'CS', 'JA', 'TH', 'ES', 'PT', 'RU'];
+    
+    for (let i = 1; i < ncFiles.length; i++) {
+      progressTracker.currentStep = i + 1;
+      progressTracker.currentFileIndex = i + 1;
+      progressTracker.currentFile = ncFiles[i];
+      progressTracker.currentOperation = `${ncFiles[i]} 읽는 중`;
+      checkCancellation();
+      
+      const filePath = path.join(folderPath, ncFiles[i]);
+      const workbook = XLSX.readFile(filePath, { type: 'binary', cellText: false, cellDates: true });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: '' });
+      
+      // Key를 기준으로 매칭하여 Target 열 추가
+      const langCode = languageCodes[i - 1];
+      const targetKey = `Target_${langCode}`;
+      
+      // 진행률 업데이트를 위한 청크 처리
+      const chunkSize = 1000;
+      for (let j = 0; j < data.length; j += chunkSize) {
+        const chunk = data.slice(j, Math.min(j + chunkSize, data.length));
+        
+        chunk.forEach((row, chunkIndex) => {
+          // 인덱스 기반 매칭으로 변경 (모든 파일의 행 순서가 동일하므로)
+          const currentRowIndex = j + chunkIndex;
+          
+          // 범위 체크 - resultData 범위를 벗어나지 않도록
+          if (currentRowIndex < resultData.length) {
+            // None/null 값은 'None' 문자열로 대체 (Comment 제외)
+            const targetValue = row.Target;
+            resultData[currentRowIndex][targetKey] = 
+              (targetValue === null || targetValue === undefined) ? 'None' : targetValue;
+            
+            // 47350행 근처 디버깅
+            const excelRowNumber = currentRowIndex + 2; // Excel 행 번호
+          } else {
+          }
+        });
+        
+        // 청크 처리 후 전체 진행률 업데이트
+        totalProcessedRows += chunk.length;
+        progressTracker.processedRows = totalProcessedRows;
+        progressTracker.totalRows = estimatedTotalRows;
+        
+        if (progressCallback) {
+          const progress = progressTracker.updateProgress();
+          // 현재 파일 정보도 포함
+          progress.currentStep = `${i + 1}/8 - ${ncFiles[i]}`;
+          progressCallback(progress);
+        }
+        
+        // 이벤트 루프 양보 (UI 업데이트를 위해)
+        await new Promise(resolve => setImmediate(resolve));
+      }
+    }
+    
+    // 출력 파일명 생성
+    progressTracker.currentStep = 9;
+    progressTracker.currentOperation = '결과 파일 생성 중';
+    const baseFileName = `${date}_M${milestone}_StringALL.xlsx`;
+    const outputFileName = getUniqueFileName(folderPath, baseFileName);
+    const outputPath = path.join(folderPath, outputFileName);
+    
+    // 새 워크북 생성
+    const newWorkbook = XLSX.utils.book_new();
+    const newSheet = XLSX.utils.json_to_sheet(resultData);
+    
+    // NC 서식 적용
+    const formatting = {
+      header: {
+        font: { name: '맑은 고딕', size: 10, bold: true },
+        fill: { fgColor: { rgb: 'DAE9F8' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
+      },
+      body: {
+        font: { name: '맑은 고딕', size: 10 },
+        alignment: { horizontal: 'left', vertical: 'center' },
+        numFmt: '@', // 텍스트 서식
+        wrapText: false
+      }
+    };
+    
+    applyNCFormatting(newSheet, formatting, 13, resultData.length + 1);
+    
+    // 시트 추가
+    XLSX.utils.book_append_sheet(newWorkbook, newSheet, 'Sheet1');
+    
+    // 파일 저장
+    progressTracker.currentOperation = '파일 저장 중';
+    XLSX.writeFile(newWorkbook, outputPath, { bookType: 'xlsx' });
+    
+    // 읽기 전용 설정 적용
+    progressTracker.currentOperation = '읽기 전용 설정 중';
+    const readOnlyResult = await setFileReadOnly(outputPath);
+    
+    // 읽기 전용 설정 실패는 경고만 표시하고 계속 진행
+    let readOnlyWarning = null;
+    if (!readOnlyResult.success) {
+      readOnlyWarning = readOnlyResult.error;
+    }
+    
+    progressTracker.currentStep = 10;
+    const elapsed = ((Date.now() - progressTracker.startTime) / 1000).toFixed(1);
+    
+    return {
+      success: true,
+      outputPath: outputPath,
+      rowCount: resultData.length,
+      elapsed: elapsed,
+      readOnlyWarning: readOnlyWarning
+    };
+    
+  } catch (error) {
+    if (error.message === 'Operation cancelled') {
+      // 취소된 경우 생성된 파일 삭제
+      return { success: false, error: '작업이 취소되었습니다.' };
+    }
+    
+    
+    // 하이브리드 에러 메시지 반환
+    return {
+      success: false,
+      error: error.userMessage || '병합 중 오류가 발생했습니다.',
+      technicalError: error.message,
+      details: error.technicalDetails || error.stack
+    };
+  }
+}
+
+/**
+ * NC 테이블 병합용 서식을 적용합니다.
+ * 
+ * @param {Object} sheet - xlsx 시트 객체
+ * @param {Object} formatting - 서식 정보
+ * @param {number} columnCount - 열 개수
+ * @param {number} rowCount - 행 개수
+ */
+function applyNCFormatting(sheet, formatting, columnCount, rowCount) {
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  
+  // 실제 데이터가 있는 셀에만 서식 적용하여 파일 크기 최적화
+  for (let R = range.s.r; R <= Math.min(range.e.r, rowCount - 1); R++) {
+    for (let C = range.s.c; C <= Math.min(range.e.c, columnCount - 1); C++) {
+      const cellAddr = XLSX.utils.encode_cell({ r: R, c: C });
+      
+      // 실제 데이터가 있는 셀에만 스타일 적용
+      if (sheet[cellAddr]) {
+        // 헤더 행 (첫 번째 행)
+        if (R === 0) {
+          sheet[cellAddr].s = {
+            font: formatting.header.font,
+            fill: formatting.header.fill,
+            alignment: formatting.header.alignment,
+            border: formatting.header.border
+          };
+        } else if (sheet[cellAddr].v !== undefined && sheet[cellAddr].v !== '') {
+          // 데이터 행 - 값이 있는 경우에만 최소한의 서식 적용
+          sheet[cellAddr].s = {
+            font: {
+              name: formatting.body.font.name || '맑은 고딕',
+              sz: formatting.body.font.size || 10
+            },
+            alignment: formatting.body.alignment
+            // 테두리와 배경색 제거로 파일 크기 약 80% 감소
+          };
+        }
+      }
+    }
+  }
+  
+  // 열 너비 설정
+  sheet['!cols'] = [];
+  for (let i = 0; i < columnCount; i++) {
+    sheet['!cols'].push({ width: 24 });
+  }
+}
+
+/**
+ * 파일을 읽기 전용으로 설정
+ * Windows 환경에서 PowerShell을 사용하여 파일 속성을 변경
+ * @param {string} filePath - 설정할 파일의 경로
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function setFileReadOnly(filePath) {
+  // Windows 환경 확인
+  if (process.platform !== 'win32') {
+    return {
+      success: false,
+      error: '읽기 전용 설정은 Windows에서만 지원됩니다.'
+    };
+  }
+  
+  try {
+    const { exec } = require('child_process');
+    const { promisify } = require('util');
+    const execAsync = promisify(exec);
+    
+    // PowerShell 명령어로 읽기 전용 속성 설정
+    // attrib 명령어 사용 (더 안정적임)
+    const command = `attrib +R "${filePath}"`;
+    
+    await execAsync(command);
+    
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: `읽기 전용 설정 실패: ${error.message}`
+    };
   }
 }
 
 module.exports = {
   mergeDialogueFiles,
   mergeStringFiles,
+  mergeNCFiles,
   progressTracker,
   validateInputFiles,
   getTodayDateString,
-  getUniqueFileName
+  getUniqueFileName,
+  setFileReadOnly
 };

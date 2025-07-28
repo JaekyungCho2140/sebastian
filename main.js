@@ -91,7 +91,7 @@ function setupIpcHandlers() {
     
     // 파일 병합 작업
     ipcMain.handle('merge-files', async (event, options) => {
-        const { type, folderPath } = options;
+        const { type, folderPath, date, milestone } = options;
         
         logToFile(`병합 작업 시작: ${type} - ${folderPath}`);
         
@@ -119,6 +119,10 @@ function setupIpcHandlers() {
             } else if (type === 'm4-string') {
                 currentOperation = require('./merge').progressTracker;
                 result = await mergeStringFiles(folderPath, progressCallback);
+            } else if (type === 'nc-merge') {
+                const { mergeNCFiles } = require('./merge');
+                currentOperation = require('./merge').progressTracker;
+                result = await mergeNCFiles(folderPath, date, milestone, progressCallback);
             } else {
                 throw new Error(`알 수 없는 병합 타입: ${type}`);
             }

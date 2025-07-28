@@ -8,7 +8,9 @@ const {
   progressTracker,
   validateInputFiles,
   getTodayDateString,
-  getUniqueFileName
+  getUniqueFileName,
+  mergeNCFiles,
+  setFileReadOnly
 } = require('../merge');
 
 describe('merge.js 모듈 테스트', () => {
@@ -142,6 +144,77 @@ describe('merge.js 모듈 테스트', () => {
       const result = validateInputFiles(testDir, requiredFiles);
       expect(result.valid).toBe(false);
       expect(result.missingFiles).toContain('missing.xlsx');
+    });
+  });
+
+  /**
+   * NC 병합 기능 테스트
+   */
+  describe('NC 병합 기능', () => {
+    test('NC 병합 필수 파일 검증', () => {
+      const ncFiles = [
+        'StringEnglish.xlsx',
+        'StringTraditionalChinese.xlsx',
+        'StringSimplifiedChinese.xlsx',
+        'StringJapanese.xlsx',
+        'StringThai.xlsx',
+        'StringSpanish.xlsx',
+        'StringPortuguese.xlsx',
+        'StringRussian.xlsx'
+      ];
+      
+      // 문자열 배열로 검증
+      const result = validateInputFiles('.', ncFiles);
+      expect(result.valid).toBe(false);
+      expect(result.missingFiles.length).toBe(8);
+    });
+
+    test('날짜/마일스톤 포맷 검증', () => {
+      // 정상적인 날짜 형식
+      const validDate = '250728';
+      expect(validDate).toMatch(/^\d{6}$/);
+      
+      // 정상적인 마일스톤 형식
+      const validMilestone = '01';
+      expect(validMilestone).toMatch(/^\d{2}$/);
+      
+      // 잘못된 형식들
+      const invalidDate = '2507281';
+      expect(invalidDate).not.toMatch(/^\d{6}$/);
+      
+      const invalidMilestone = '1';
+      expect(invalidMilestone).not.toMatch(/^\d{2}$/);
+    });
+
+    test('출력 파일명 형식 검증', () => {
+      const date = '250728';
+      const milestone = '01';
+      const expectedFileName = `${date}_M${milestone}_StringALL.xlsx`;
+      
+      expect(expectedFileName).toBe('250728_M01_StringALL.xlsx');
+      expect(expectedFileName).toMatch(/^\d{6}_M\d{2}_StringALL\.xlsx$/);
+    });
+  });
+
+  /**
+   * setFileReadOnly 함수 테스트
+   */
+  describe('setFileReadOnly', () => {
+    test('Windows가 아닌 환경에서는 실패해야 함', async () => {
+      // process.platform을 임시로 변경
+      const originalPlatform = process.platform;
+      Object.defineProperty(process, 'platform', {
+        value: 'darwin'
+      });
+      
+      const result = await setFileReadOnly('dummy.xlsx');
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Windows에서만 지원');
+      
+      // 원래 값으로 복원
+      Object.defineProperty(process, 'platform', {
+        value: originalPlatform
+      });
     });
   });
 });

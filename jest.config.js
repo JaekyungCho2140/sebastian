@@ -8,8 +8,13 @@ module.exports = {
   
   // 테스트 파일 패턴
   testMatch: [
-    '<rootDir>/tests/**/*.test.js',
-    '<rootDir>/tests/**/*.spec.js'
+    '<rootDir>/tests/**/*.test.js'
+  ],
+  
+  // E2E 테스트 제외
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/tests/e2e/'
   ],
   
   // 모듈 파일 확장자

@@ -1,0 +1,186 @@
+{
+  "description": "NC 테이블 병합 기능의 매핑 정보",
+  "version": "1.0",
+  "lastUpdated": "2025-07-25",
+  
+  "NC_Table": {
+    "description": "8개 언어별 문자열 파일을 하나로 병합하여 통합 번역 데이터 생성",
+    "estimatedRows": "파일에 따라 다름",
+    "processingTime": "약 10-15초",
+    
+    "inputFiles": {
+      "StringEnglish.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "EN",
+        "columns": {
+          "Key": "문자열 키",
+          "Source": "원본 텍스트",
+          "Target": "영어 번역",
+          "Comment": "주석",
+          "TableName": "테이블명",
+          "Status": "상태"
+        }
+      },
+      "StringTraditionalChinese.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "CT",
+        "columns": {
+          "Target": "중국어 번체 번역"
+        }
+      },
+      "StringSimplifiedChinese.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "CS",
+        "columns": {
+          "Target": "중국어 간체 번역"
+        }
+      },
+      "StringJapanese.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "JA",
+        "columns": {
+          "Target": "일본어 번역"
+        }
+      },
+      "StringThai.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "TH",
+        "columns": {
+          "Target": "태국어 번역"
+        }
+      },
+      "StringSpanish.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "ES",
+        "columns": {
+          "Target": "스페인어 번역"
+        }
+      },
+      "StringPortuguese.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "PT",
+        "columns": {
+          "Target": "포르투갈어 번역"
+        }
+      },
+      "StringRussian.xlsx": {
+        "sheetIndex": 0,
+        "sheetName": "Sheet1",
+        "language": "RU",
+        "columns": {
+          "Target": "러시아어 번역"
+        }
+      }
+    },
+    
+    "outputFile": {
+      "namePattern": "{YYMMDD}_M{nn}_StringALL.xlsx",
+      "exampleName": "250725_M01_StringALL.xlsx",
+      "columns": [
+        "Key",
+        "Source",
+        "Target_EN",
+        "Target_CT",
+        "Target_CS",
+        "Target_JA",
+        "Target_TH",
+        "Target_ES",
+        "Target_PT",
+        "Target_RU",
+        "Comment",
+        "TableName",
+        "Status"
+      ],
+      "columnMappings": {
+        "Key": "A",
+        "Source": "B",
+        "Target_EN": "C",
+        "Target_CT": "D",
+        "Target_CS": "E",
+        "Target_JA": "F",
+        "Target_TH": "G",
+        "Target_ES": "H",
+        "Target_PT": "I",
+        "Target_RU": "J",
+        "Comment": "K",
+        "TableName": "L",
+        "Status": "M"
+      }
+    },
+    
+    "processingRules": {
+      "dataSource": "첫 번째 파일(StringEnglish.xlsx)에서 기본 구조 가져오기",
+      "languageMapping": "각 언어 파일의 Target 열을 Target_[언어코드] 형식으로 매핑",
+      "nullHandling": "None/null 값은 'None' 문자열로 대체 (Comment 열 제외)",
+      "duplicateHandling": "출력 파일명 중복 시 _01, _02 형식으로 넘버링",
+      "fileAttributes": "생성 후 읽기 전용 속성 설정"
+    }
+  },
+  
+  "formatting": {
+    "description": "NC 테이블 출력 파일 서식",
+    "header": {
+      "font": "맑은 고딕",
+      "fontSize": 10,
+      "bold": true,
+      "fontColor": "#000000",
+      "backgroundColor": "#DAE9F8",
+      "border": "all sides, black",
+      "alignment": "center",
+      "wrapText": true
+    },
+    "body": {
+      "font": "맑은 고딕",
+      "fontSize": 10,
+      "fontColor": "#000000",
+      "border": "none",
+      "alignment": "left",
+      "verticalAlignment": "center",
+      "numberFormat": "@",
+      "wrapText": false
+    },
+    "sheet": {
+      "columnWidth": 24,
+      "sheetName": "Sheet1",
+      "readOnly": true
+    }
+  },
+  
+  "validation": {
+    "dateFormat": {
+      "pattern": "^\\d{6}$",
+      "example": "250725",
+      "errorMessage": "날짜는 6자리 숫자여야 합니다 (예: 250725)"
+    },
+    "milestoneFormat": {
+      "pattern": "^\\d{2}$",
+      "example": "01",
+      "errorMessage": "마일스톤은 2자리 숫자여야 합니다 (예: 01, 13)"
+    }
+  },
+  
+  "requiredFiles": [
+    "StringEnglish.xlsx",
+    "StringTraditionalChinese.xlsx",
+    "StringSimplifiedChinese.xlsx",
+    "StringJapanese.xlsx",
+    "StringThai.xlsx",
+    "StringSpanish.xlsx",
+    "StringPortuguese.xlsx",
+    "StringRussian.xlsx"
+  ],
+  
+  "notes": {
+    "fileStructure": "Python pandas DataFrame 구조를 JavaScript 배열로 변환하여 처리",
+    "performanceOptimization": "병렬 처리 대신 순차 처리로 Electron 환경 안정성 확보",
+    "errorHandling": "하이브리드 에러 메시지 (사용자 친화적 + 기술적 상세)",
+    "compatibility": "기존 M4 기능과 동일한 진행률 표시 및 취소 메커니즘 사용"
+  }
+}
