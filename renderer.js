@@ -39,7 +39,9 @@ function logAction(action) {
         fs.appendFileSync(logFile, logMessage, 'utf8');
         
         // 개발 모드에서는 콘솔에도 출력
-        console.log(`[UI] ${action}`);
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`[UI] ${action}`);
+        }
     } catch (error) {
         console.error('로그 기록 실패:', error);
     }

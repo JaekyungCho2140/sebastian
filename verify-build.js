@@ -8,15 +8,19 @@ const path = require('path');
 
 console.log('빌드 검증 시작...\n');
 
+// package.json에서 버전 읽기
+const packageJson = require('./package.json');
+const version = packageJson.version;
+
 // 검증할 파일 목록
 const filesToVerify = [
   {
-    path: 'dist/Sebastian 0.2.0.exe',
+    path: `dist/Sebastian ${version}.exe`,
     minSize: 100 * 1024 * 1024, // 최소 100MB
     type: '포터블 실행 파일'
   },
   {
-    path: 'dist/Sebastian Setup 0.2.0.exe',
+    path: `dist/Sebastian Setup ${version}.exe`,
     minSize: 100 * 1024 * 1024, // 최소 100MB
     type: 'NSIS 설치 프로그램'
   },

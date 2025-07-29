@@ -198,45 +198,14 @@ async function mergeDialogueFiles(folderPath, progressCallback) {
     let totalRowCount = 0;
     for (const fileConfig of dialogueFiles) {
       const filePath = path.join(folderPath, fileConfig.fileName);
-      console.log(`\n=== ${fileConfig.fileName} 디버깅 ===`);
-      console.log(`파일 경로: ${filePath}`);
-      console.log(`매핑 설정:`, {
-        sheetIndex: fileConfig.sheetIndex,
-        headerRow: fileConfig.headerRow,
-        dataStartRow: fileConfig.dataStartRow
-      });
-      
       const workbook = XLSX.readFile(filePath, { dense: true });
-      console.log(`시트 이름들:`, workbook.SheetNames);
-      
       const sheetIndex = fileConfig.sheetIndex - 1;
-      console.log(`선택된 시트 인덱스: ${sheetIndex}`);
-      console.log(`선택된 시트 이름: "${workbook.SheetNames[sheetIndex]}"`);
-      
       const sheet = workbook.Sheets[workbook.SheetNames[sheetIndex]];
-      console.log(`시트 범위:`, sheet['!ref'] || '범위 없음');
       
-      // 전체 데이터를 먼저 읽어보기
-      const allData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      console.log(`전체 데이터 행 수: ${allData.length}`);
-      if (allData.length > 0) {
-        console.log(`첫 번째 행 (헤더):`, allData[0].slice(0, 5));
-        if (allData.length > 1) {
-          console.log(`두 번째 행 (데이터):`, allData[1].slice(0, 5));
-        }
-      }
-      
-      // range 옵션으로 데이터 읽기
-      console.log(`\nsheet_to_json 호출 - range: ${fileConfig.dataStartRow - 1}`);
       const data = XLSX.utils.sheet_to_json(sheet, {
         header: 1,
         range: fileConfig.dataStartRow - 1
       });
-      
-      console.log(`range 옵션으로 읽은 행 수: ${data.length}`);
-      if (data.length > 0) {
-        console.log(`첫 번째 데이터 행:`, data[0].slice(0, 5));
-      }
       
       totalRowCount += data.length;
       checkCancellation();
@@ -274,21 +243,7 @@ async function mergeDialogueFiles(folderPath, progressCallback) {
       for (const [sourceCol, mapping] of Object.entries(fileConfig.columnMapping)) {
         if (mapping.to === 'EN (M)') {
           enMColumn = parseInt(sourceCol);
-          console.log(`\nEN (M) 컬럼 인덱스: ${enMColumn}`);
           break;
-        }
-      }
-      
-      /**
-       * 디버깅을 위해 처음 10개 행의 EN (M) 값을 확인합니다.
-       * 필터링이 제대로 작동하는지 검증하기 위한 로그입니다.
-       */
-      console.log(`\n처음 10개 행 분석:`);
-      for (let debugIdx = 0; debugIdx < Math.min(10, data.length); debugIdx++) {
-        const debugRow = data[debugIdx];
-        if (debugRow && enMColumn !== null) {
-          const enMValue = debugRow[enMColumn];
-          console.log(`  행 ${debugIdx}: EN (M) = "${enMValue}" (유효: ${enMValue && enMValue !== '0' && enMValue !== '미사용'})`);
         }
       }
       
