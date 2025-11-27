@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>M4GL DIALOGUE Merge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2196F3",
+              "success": "#4CAF50",
+              "error": "#F44336",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101922",
+              "neutral": {
+                100: "#FAFAFA",
+                200: "#F9F9F9",
+                300: "#F5F5F5",
+                400: "#E0E0E0",
+                500: "#CCCCCC",
+                600: "#999999",
+                700: "#666666",
+                800: "#333333"
+              }
+            },
+            fontFamily: {
+              "display": ["Inter", "Noto Sans KR", "sans-serif"],
+              "mono": ["monospace"]
+            },
+            borderRadius: {
+              "DEFAULT": "4px",
+              "lg": "8px",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 1,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 20
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark flex items-center justify-center min-h-screen p-4">
+<!-- Main Container -->
+<div class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-400 p-6 shadow-lg" style="width: 700px; max-width: 100%;">
+<!-- Title -->
+<div class="mb-5 pb-3 border-b-2 border-primary">
+<h1 class="text-neutral-800 dark:text-white text-base font-bold">M4GL DIALOGUE 병합</h1>
+</div>
+<!-- File Selector Section -->
+<div class="mb-5">
+<div class="flex items-center gap-2">
+<label class="text-neutral-700 dark:text-neutral-300 text-[13px] font-medium w-20 shrink-0" for="file-path">파일 폴더:</label>
+<input class="form-input flex-grow h-9 rounded border-neutral-500 bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400 placeholder:text-neutral-600 text-xs px-2" id="file-path" placeholder="경로 선택..." readonly="" type="text"/>
+<button class="flex shrink-0 items-center justify-center rounded h-9 w-20 bg-primary text-white text-xs font-bold hover:bg-[#1976D2] transition-colors">
+<span class="truncate">선택</span>
+</button>
+</div>
+</div>
+<!-- Required Files Section -->
+<div class="mb-5 p-4 bg-neutral-200 dark:bg-neutral-700/50 border border-neutral-400 rounded">
+<h3 class="text-neutral-700 dark:text-neutral-300 text-[13px] font-medium mb-3">필요 파일:</h3>
+<div class="space-y-2">
+<!-- File Item: Found -->
+<div class="flex items-center h-7">
+<span class="material-symbols-outlined text-success text-base" style="font-size: 16px;">check_circle</span>
+<p class="ml-2 font-mono text-xs text-neutral-800 dark:text-neutral-200">dialogue_main.xlsx</p>
+</div>
+<!-- File Item: Missing -->
+<div class="flex items-center h-7">
+<span class="material-symbols-outlined text-error text-base" style="font-size: 16px;">cancel</span>
+<p class="ml-2 font-mono text-xs text-neutral-800 dark:text-neutral-200">character_map.csv</p>
+</div>
+<!-- File Item: Pending -->
+<div class="flex items-center h-7">
+<span class="material-symbols-outlined text-neutral-500 text-base" style="font-size: 16px;">circle</span>
+<p class="ml-2 font-mono text-xs text-neutral-800 dark:text-neutral-200">metadata.json</p>
+</div>
+</div>
+</div>
+<!-- Start Button -->
+<div class="flex justify-center my-5">
+<button class="flex w-[120px] h-10 cursor-not-allowed items-center justify-center overflow-hidden rounded bg-neutral-500 text-white text-[13px] font-bold" disabled="">
+<span class="truncate">병합 시작</span>
+</button>
+</div>
+<!-- Progress Section -->
+<div class="pt-5 border-t border-neutral-400">
+<!-- Progress Bar -->
+<div class="mb-3">
+<div class="w-full bg-neutral-400 rounded-full h-6 dark:bg-neutral-600">
+<div class="bg-gradient-to-r from-success to-[#45A049] h-6 rounded-full flex items-center justify-center" style="width: 45%">
+<span class="text-white text-xs font-bold">45%</span>
+</div>
+</div>
+</div>
+<p class="text-xs text-neutral-700 dark:text-neutral-300 text-center mb-4">파일 검증 중...</p>
+<!-- Log Section -->
+<div class="h-[140px] bg-neutral-100 dark:bg-neutral-900/50 border border-neutral-400 rounded p-3 overflow-y-auto">
+<div class="font-mono text-[11px] text-neutral-800 dark:text-neutral-200 space-y-1" style="line-height: 1.5;">
+<p>[14:22:01] 병합 프로세스를 시작합니다.</p>
+<p>[14:22:01] 선택된 폴더: C:\Projects\M4GL_Data</p>
+<p>[14:22:02] 필요 파일 목록을 확인합니다...</p>
+<p>[14:22:02] ✓ dialogue_main.xlsx 파일 찾음.</p>
+<p class="text-error dark:text-error/90">[14:22:02] ✗ character_map.csv 파일을 찾을 수 없습니다.</p>
+<p>[14:22:02] ✓ metadata.json 파일 찾음.</p>
+<p class="text-error dark:text-error/90">[14:22:03] 오류: 모든 필요 파일이 존재하지 않아 병합을 중단합니다.</p>
+<p>[14:22:04] 대기 중...</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

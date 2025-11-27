@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Scrum Progress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#9b27b0",
+              "background-light": "#f8f6f8",
+              "background-dark": "#1e131f",
+            },
+            fontFamily: {
+              "display": ["Inter", "Malgun Gothic", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .progress-gradient {
+            background-image: linear-gradient(to right, #9C27B0, #7B1FA2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-screen min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root" style="font-family: 'Inter', 'Malgun Gothic', sans-serif;">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 flex flex-1 justify-center items-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-md">
+<!-- In-Progress State Dialog -->
+<div class="flex flex-col gap-6 rounded-xl border border-zinc-200/50 bg-white dark:bg-zinc-900/50 dark:border-zinc-800/50 shadow-lg p-6 text-center">
+<div class="flex flex-col gap-2">
+<div class="flex justify-center items-center mb-2">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="sync">sync</span>
+</div>
+</div>
+<h3 class="text-zinc-800 dark:text-zinc-200 tracking-light text-2xl font-bold leading-tight">Daily Scrum 실행 중...</h3>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between">
+<p class="text-zinc-600 dark:text-zinc-400 text-sm font-medium leading-normal">작업 실행 중...</p>
+<p class="text-zinc-800 dark:text-zinc-200 text-sm font-bold leading-normal">45%</p>
+</div>
+<div class="rounded-full h-2 bg-zinc-200 dark:bg-zinc-700">
+<div class="h-2 rounded-full progress-gradient" style="width: 45%;"></div>
+</div>
+</div>
+</div>
+<div class="h-12"></div> <!-- Spacer between the two dialogs -->
+<!-- Completed State Dialog -->
+<div class="flex flex-col gap-6 rounded-xl border border-zinc-200/50 bg-white dark:bg-zinc-900/50 dark:border-zinc-800/50 shadow-lg p-6 text-center">
+<div class="flex flex-col gap-2">
+<div class="flex justify-center items-center mb-2">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<h3 class="text-zinc-800 dark:text-zinc-200 tracking-light text-2xl font-bold leading-tight">Daily Scrum 완료</h3>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex gap-6 justify-between"><p class="text-zinc-600 dark:text-zinc-400 text-base font-medium leading-normal">완료: 페이지 업데이트 완료</p></div>
+<div class="rounded-full h-2 bg-zinc-200 dark:bg-zinc-700">
+<div class="h-2 rounded-full progress-gradient" style="width: 100%;"></div>
+</div>
+</div>
+<div class="flex px-4 py-3 justify-center">
+<button class="flex w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-[4px] h-10 px-4 bg-white text-[#666666] text-[13px] font-medium leading-normal tracking-[0.015em] border border-[#CCCCCC] hover:bg-[#F5F5F5] dark:bg-zinc-800 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700">
+<span class="truncate">닫기</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

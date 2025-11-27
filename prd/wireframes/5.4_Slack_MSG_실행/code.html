@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Slack Message Execution</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4CAF50",
+              "background-light": "#f8f9fa",
+              "background-dark": "#1a1a1a",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="font-display">
+<!-- 
+      This is a wrapper to showcase the two states of the dialog.
+      In a real application, only one of these dialogs would be visible at a time.
+    -->
+<div class="flex h-screen w-full flex-col items-center justify-center space-y-12 bg-gray-300 dark:bg-gray-800 p-8">
+<!-- In-Progress State Dialog -->
+<div class="flex h-auto w-full max-w-lg flex-col rounded-xl bg-background-light dark:bg-background-dark shadow-2xl">
+<div class="flex flex-col p-8">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl">chat</span>
+</div>
+<h3 class="flex-1 text-2xl font-bold leading-tight tracking-tight text-gray-800 dark:text-gray-100">Slack MSG 실행 중...</h3>
+</div>
+<div class="mt-8 flex flex-col gap-3">
+<div class="flex justify-between">
+<p class="text-base font-medium text-gray-700 dark:text-gray-300">처리 중...</p>
+<p class="text-sm font-normal text-gray-500 dark:text-gray-400">75%</p>
+</div>
+<div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+<div class="h-2 rounded-full bg-gradient-to-r from-[#4CAF50] to-[#45A049]" style="width: 75%;"></div>
+</div>
+</div>
+</div>
+<div class="flex justify-end border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-4 rounded-b-xl">
+<button class="flex h-10 min-w-[84px] cursor-not-allowed items-center justify-center overflow-hidden rounded-lg bg-gray-300 px-4 text-sm font-bold leading-normal text-gray-500 dark:bg-gray-600 dark:text-gray-400" disabled="">
+<span class="truncate">Close</span>
+</button>
+</div>
+</div>
+<!-- Completed State Dialog -->
+<div class="flex h-auto w-full max-w-lg flex-col rounded-xl bg-background-light dark:bg-background-dark shadow-2xl">
+<div class="flex flex-col p-8">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl">task_alt</span>
+</div>
+<h3 class="flex-1 text-2xl font-bold leading-tight tracking-tight text-gray-800 dark:text-gray-100">Slack MSG 완료</h3>
+</div>
+<div class="mt-8 flex flex-col gap-3">
+<div class="flex justify-between">
+<p class="text-base font-medium text-gray-700 dark:text-gray-300">완료: 메시지 발송 완료 (2개)</p>
+<p class="text-sm font-normal text-gray-500 dark:text-gray-400">100%</p>
+</div>
+<div class="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+<div class="h-2 rounded-full bg-gradient-to-r from-[#4CAF50] to-[#45A049]" style="width: 100%;"></div>
+</div>
+</div>
+</div>
+<div class="flex justify-end border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-4 rounded-b-xl">
+<button class="flex h-10 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-4 text-sm font-bold leading-normal text-white transition-colors hover:bg-opacity-90">
+<span class="truncate">Close</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

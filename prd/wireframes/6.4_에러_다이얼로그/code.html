@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Error Dialog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2094f3",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101a22",
+              "error": "#F44336",
+              "error-text": "#333333",
+              "secondary-text": "#666666",
+              "tertiary-text": "#999999",
+              "border-light": "#E0E0E0",
+              "border-medium": "#CCCCCC",
+              "detail-bg": "#FAFAFA"
+            },
+            fontFamily: {
+              "display": ["Inter", "Malgun Gothic", "sans-serif"],
+              "mono": ["Consolas", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "4px", "lg": "8px", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display">
+<div class="relative flex h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden p-4">
+<!-- Modal Container -->
+<div class="flex flex-col w-[500px] min-h-[250px] max-h-[500px] bg-white dark:bg-background-dark rounded-lg border border-error p-6 shadow-[0_4px_12px_rgba(244,67,54,0.2)]">
+<!-- Title Bar -->
+<div class="flex h-8 items-center justify-between mb-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error" style="font-size: 24px;">warning</span>
+<h3 class="text-error text-base font-bold">네트워크 연결 실패</h3>
+</div>
+<button class="flex h-6 w-6 cursor-pointer items-center justify-center text-tertiary-text hover:text-error-text">
+<span class="material-symbols-outlined" style="font-size: 24px;">close</span>
+</button>
+</div>
+<!-- Main Content Area with Scroll -->
+<div class="flex-grow overflow-y-auto pr-2">
+<!-- Message Section -->
+<p class="text-error-text text-[13px] font-normal leading-[1.6] mb-5">
+                서버에 연결할 수 없습니다. 네트워크 연결을 확인하고 다시 시도해 주세요. 문제가 지속되면 지원팀에 문의하세요.
+            </p>
+<!-- Error Detail Box -->
+<div class="flex flex-col rounded border border-border-light bg-detail-bg p-3 mb-5">
+<p class="text-secondary-text text-[11px] font-bold mb-1">오류 상세:</p>
+<p class="font-mono text-error text-[11px] leading-[1.4] break-all">
+                    ErrorCode: NET::ERR_CERT_AUTHORITY_INVALID Timestamp: 2023-10-27T10:30:00Z RequestID: 8f4e2a1b-7c3d-4f5a-9b1e-6d0a7c3b1e9d
+                </p>
+</div>
+<!-- Solution Section -->
+<div class="flex flex-col">
+<p class="text-secondary-text text-[13px] font-medium mb-2">해결 방법:</p>
+<ol class="list-decimal list-inside text-error-text text-xs leading-[1.8] space-y-1">
+<li>장치가 인터넷에 연결되어 있는지 확인하십시오.</li>
+<li>애플리케이션을 다시 시작하고 작업을 다시 시도하십시오.</li>
+<li>방화벽 또는 프록시 설정이 연결을 차단하고 있지 않은지 확인하십시오.</li>
+</ol>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex justify-center pt-5 gap-3 border-t border-t-slate-200 mt-auto">
+<button class="flex w-[120px] h-10 cursor-pointer items-center justify-center overflow-hidden rounded border border-primary bg-white text-primary text-[13px] font-medium leading-normal hover:bg-primary/10">
+<span class="truncate">설정 열기</span>
+</button>
+<button class="flex w-[100px] h-10 cursor-pointer items-center justify-center overflow-hidden rounded border border-border-medium bg-white text-secondary-text text-[13px] font-medium leading-normal hover:bg-gray-100">
+<span class="truncate">취소</span>
+</button>
+<button class="flex w-[100px] h-10 cursor-pointer items-center justify-center overflow-hidden rounded bg-primary text-white text-[13px] font-bold leading-normal hover:bg-blue-700">
+<span class="truncate">재시도</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

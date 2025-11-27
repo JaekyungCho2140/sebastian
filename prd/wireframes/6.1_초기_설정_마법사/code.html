@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sebastian Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2094f3",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101a22",
+          },
+          fontFamily: {
+            "display": ["Inter", "Malgun Gothic", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem", // 4px
+            "lg": "0.5rem", // 8px
+            "xl": "0.75rem", // 12px
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 20;
+    }
+
+    /* Additional styles to match the prompt's font sizes and specific colors */
+    .malgun-16-bold {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .malgun-14-medium {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .malgun-13-regular {
+      font-size: 13px;
+    }
+
+    .malgun-13-medium {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .malgun-13-bold {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .malgun-24-bold {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .malgun-12-regular {
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-screen min-h-screen w-full flex-col items-center justify-center bg-gray-500/30 group/design-root" style='font-family: Inter, "Malgun Gothic", sans-serif;'>
+<!-- Step 1: PIN Setup -->
+<div class="flex flex-col w-[600px] h-[400px] bg-white rounded-lg border border-[#E0E0E0] shadow-lg p-6">
+<!-- Header -->
+<div class="flex justify-between items-center h-8 mb-5">
+<h2 class="text-[#333333] malgun-16-bold">Sebastian 초기 설정</h2>
+<span class="text-[#999999] malgun-14-medium">(1/5)</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-[#E0E0E0] rounded-full mb-6">
+<div class="h-full bg-[#2196F3] rounded-full" style="width: 20%;"></div>
+</div>
+<!-- Content -->
+<div class="flex flex-col flex-grow">
+<p class="text-[#666666] malgun-13-regular mb-8">Sebastian을 보호할 4자리 PIN을 설정하세요.</p>
+<div class="space-y-4">
+<div class="flex items-center space-x-4">
+<label class="w-[60px] text-right text-[#666666] malgun-13-medium">PIN:</label>
+<input class="w-[80px] h-10 text-center malgun-24-bold border border-[#CCCCCC] rounded focus:ring-[#2196F3] focus:border-[#2196F3]" inputmode="numeric" maxlength="4" pattern="[0-9]*" type="password"/>
+</div>
+<div class="flex items-center space-x-4">
+<label class="w-[60px] text-right text-[#666666] malgun-13-medium">확인:</label>
+<input class="w-[80px] h-10 text-center malgun-24-bold border border-[#CCCCCC] rounded focus:ring-[#2196F3] focus:border-[#2196F3]" inputmode="numeric" maxlength="4" pattern="[0-9]*" type="password"/>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<div class="flex justify-end">
+<button class="w-[100px] h-10 bg-[#CCCCCC] text-white malgun-13-bold rounded cursor-not-allowed" disabled="">다음</button>
+<!-- Example of enabled state:
+        <button class="w-[100px] h-10 bg-[#2196F3] hover:bg-[#1976D2] text-white malgun-13-bold rounded">다음</button>
+        -->
+</div>
+</div>
+<!-- Step 2: Service Integration (JIRA) - Example, would be shown instead of Step 1 -->
+<div class="hidden flex-col w-[600px] h-[400px] bg-white rounded-lg border border-[#E0E0E0] shadow-lg p-6">
+<!-- Header -->
+<div class="flex justify-between items-center h-8 mb-5">
+<h2 class="text-[#333333] malgun-16-bold">Sebastian 초기 설정</h2>
+<span class="text-[#999999] malgun-14-medium">(2/5)</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-[#E0E0E0] rounded-full mb-6">
+<div class="h-full bg-[#2196F3] rounded-full" style="width: 40%;"></div>
+</div>
+<!-- Content -->
+<div class="flex flex-col flex-grow">
+<p class="text-[#666666] malgun-13-regular mb-8">JIRA 인증 정보를 입력하세요.</p>
+<div class="space-y-4">
+<div class="flex items-center">
+<label class="w-[100px] text-right pr-4 text-[#666666] malgun-13-medium">Email:</label>
+<input class="flex-1 h-9 px-2 malgun-12-regular border border-[#CCCCCC] rounded focus:ring-[#2196F3] focus:border-[#2196F3]" type="email"/>
+</div>
+<div class="flex items-center">
+<label class="w-[100px] text-right pr-4 text-[#666666] malgun-13-medium">API Token:</label>
+<input class="flex-1 h-9 px-2 malgun-12-regular border border-[#CCCCCC] rounded focus:ring-[#2196F3] focus:border-[#2196F3]" type="password"/>
+</div>
+</div>
+<div class="flex justify-center items-center my-6">
+<button class="w-[120px] h-10 bg-white text-[#2196F3] border border-[#2196F3] hover:bg-[#E3F2FD] malgun-13-medium rounded">연결 테스트</button>
+<span class="material-symbols-outlined text-[#4CAF50] text-xl ml-2 opacity-0">check_circle</span>
+<!-- Success indicator example: 
+            <span class="material-symbols-outlined text-[#4CAF50] text-xl ml-2 opacity-100">check_circle</span>
+           -->
+</div>
+</div>
+<!-- Footer -->
+<div class="flex justify-end space-x-3">
+<button class="w-[100px] h-10 bg-white text-[#666666] border border-[#CCCCCC] hover:bg-[#F5F5F5] malgun-13-medium rounded">건너뛰기</button>
+<button class="w-[100px] h-10 bg-[#2196F3] hover:bg-[#1976D2] text-white malgun-13-bold rounded">다음</button>
+</div>
+</div>
+<!-- Step 5: Default Project - Example, would be shown instead of Step 1 -->
+<div class="hidden flex-col w-[600px] h-[400px] bg-white rounded-lg border border-[#E0E0E0] shadow-lg p-6">
+<!-- Header -->
+<div class="flex justify-between items-center h-8 mb-5">
+<h2 class="text-[#333333] malgun-16-bold">Sebastian 초기 설정</h2>
+<span class="text-[#999999] malgun-14-medium">(5/5)</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-[#E0E0E0] rounded-full mb-6">
+<div class="h-full bg-[#2196F3] rounded-full" style="width: 100%;"></div>
+</div>
+<!-- Content -->
+<div class="flex flex-col flex-grow">
+<p class="text-[#666666] malgun-13-regular mb-8">주로 사용할 프로젝트를 선택하세요.</p>
+<div class="space-y-3">
+<label class="flex items-center h-9 cursor-pointer">
+<input class="h-5 w-5 border-2 border-[#CCCCCC] text-[#2196F3] focus:ring-offset-0 focus:ring-2 focus:ring-[#2196F3]" name="project" type="radio"/>
+<span class="ml-3 text-[#333333] malgun-13-medium">M4GL</span>
+</label>
+<label class="flex items-center h-9 cursor-pointer">
+<input class="h-5 w-5 border-2 border-[#CCCCCC] text-[#2196F3] focus:ring-offset-0 focus:ring-2 focus:ring-[#2196F3]" name="project" type="radio"/>
+<span class="ml-3 text-[#333333] malgun-13-medium">NCGL</span>
+</label>
+<label class="flex items-center h-9 cursor-pointer">
+<input class="h-5 w-5 border-2 border-[#CCCCCC] text-[#2196F3] focus:ring-offset-0 focus:ring-2 focus:ring-[#2196F3]" name="project" type="radio"/>
+<span class="ml-3 text-[#333333] malgun-13-medium">FBGL</span>
+</label>
+<label class="flex items-center h-9 cursor-pointer">
+<input class="h-5 w-5 border-2 border-[#CCCCCC] text-[#2196F3] focus:ring-offset-0 focus:ring-2 focus:ring-[#2196F3]" name="project" type="radio"/>
+<span class="ml-3 text-[#333333] malgun-13-medium">LYGL</span>
+</label>
+</div>
+</div>
+<!-- Footer -->
+<div class="flex justify-end">
+<button class="w-[100px] h-10 bg-[#4CAF50] hover:bg-[#45A049] text-white malgun-13-bold rounded">완료</button>
+</div>
+</div>
+</div>
+</body></html>

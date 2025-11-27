@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JIRA Issue Creation Progress</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1e94f6",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101a22",
+          },
+          fontFamily: {
+            "display": ["Inter", "Noto Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+      'FILL' 1,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 20
+    }
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    .animate-pulse-custom {
+      animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark group/design-root" style='font-family: Inter, "Noto Sans", sans-serif;'>
+<!-- This is a simulated background for the modal to sit on top of -->
+<div class="absolute inset-0 bg-gray-500/30 backdrop-blur-sm"></div>
+<!-- JIRA Issue Creation Progress Dialog -->
+<div class="relative flex flex-col w-[600px] h-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6">
+<!-- Title -->
+<h3 class="text-gray-800 dark:text-gray-100 text-base font-bold leading-tight mb-6">JIRA 일감 생성 중...</h3>
+<!-- Current Task -->
+<p class="text-gray-800 dark:text-gray-200 text-sm font-medium leading-normal mb-2">현재: Task 생성 중 - '250115 업데이트 REGULAR'</p>
+<!-- Progress Bar -->
+<div class="flex flex-col gap-1 mb-5">
+<div class="relative h-6 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+<div class="h-full rounded-full bg-gradient-to-r from-[#2196F3] to-[#1976D2]" style="width: 60%;"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<p class="text-white text-xs font-bold leading-normal">60%</p>
+</div>
+</div>
+</div>
+<!-- Task List -->
+<div class="flex flex-col border-t border-b border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 max-h-[200px] overflow-y-auto mb-5">
+<!-- Task Item: Complete -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-[#4CAF50] text-lg">check_circle</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal flex-1 truncate">Initialize connection</p>
+</div>
+<!-- Task Item: Complete -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-[#4CAF50] text-lg">check_circle</span>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal flex-1 truncate">Verify credentials</p>
+</div>
+<!-- Task Item: In Progress -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-[#FF9800] text-lg animate-pulse-custom">circle</span>
+<p class="text-gray-800 dark:text-gray-100 text-sm font-bold leading-normal flex-1 truncate">Create parent issue</p>
+</div>
+<!-- Task Item: Pending -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-gray-300 dark:text-gray-600 text-lg">radio_button_unchecked</span>
+<p class="text-gray-400 dark:text-gray-500 text-sm font-normal leading-normal flex-1 truncate">Create sub-task: Design</p>
+</div>
+<!-- Task Item: Pending -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-gray-300 dark:text-gray-600 text-lg">radio_button_unchecked</span>
+<p class="text-gray-400 dark:text-gray-500 text-sm font-normal leading-normal flex-1 truncate">Create sub-task: Development</p>
+</div>
+<!-- Task Item: Pending -->
+<div class="flex items-center gap-3 bg-white dark:bg-gray-800 px-2 min-h-10">
+<span class="material-symbols-outlined text-gray-300 dark:text-gray-600 text-lg">radio_button_unchecked</span>
+<p class="text-gray-400 dark:text-gray-500 text-sm font-normal leading-normal flex-1 truncate">Attach files</p>
+</div>
+</div>
+<!-- Summary Footer -->
+<div class="flex justify-end">
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal">생성된 일감: 2/11</p>
+</div>
+</div>
+</div>
+</body></html>

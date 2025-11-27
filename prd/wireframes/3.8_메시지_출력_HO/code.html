@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HO Message Dialog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1e94f6",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101a22",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
+<!-- Modal Dialog -->
+<div class="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-2xl">
+<!-- Header -->
+<div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4">
+<p class="text-lg font-bold text-[#111518] dark:text-white">HO 메시지</p>
+<button class="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<!-- Content Area -->
+<div class="flex flex-col gap-6 p-6">
+<!-- Subject Section -->
+<div class="flex flex-col">
+<p class="pb-2 text-base font-medium text-[#111518] dark:text-gray-200">Subject</p>
+<div class="flex w-full items-stretch rounded-lg bg-[#f0f2f5] dark:bg-gray-700">
+<input class="form-input h-14 flex-1 resize-none overflow-hidden rounded-l-lg border-none bg-transparent p-4 text-base font-normal leading-normal text-[#111518] dark:text-gray-100 placeholder:text-[#60778a] focus:outline-0 focus:ring-0" readonly="" value="M4GL 250115 REGULAR HO"/>
+<button aria-label="Copy subject" class="flex w-14 cursor-pointer items-center justify-center text-[#60778a] transition-colors hover:text-primary dark:text-gray-400 dark:hover:text-primary">
+<span class="material-symbols-outlined text-2xl">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Body Section -->
+<div class="relative flex flex-col">
+<div class="flex items-center justify-between pb-2">
+<p class="text-base font-medium text-[#111518] dark:text-gray-200">Body</p>
+<button aria-label="Copy body" class="flex h-8 w-8 items-center justify-center rounded-full text-[#60778a] transition-colors hover:bg-gray-200 hover:text-primary dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-primary">
+<span class="material-symbols-outlined text-xl">content_copy</span>
+</button>
+</div>
+<textarea class="form-input flex w-full flex-1 resize-none overflow-hidden rounded-lg border-none bg-[#f0f2f5] dark:bg-gray-700 p-4 text-base font-normal leading-normal text-[#111518] dark:text-gray-100 placeholder:text-[#60778a] focus:outline-0 focus:ring-0" readonly="" rows="6">배치: 250115 REGULAR
+전달일: 2024-05-20
+마감일: 2024-05-22
+폴더 위치: Project/M4GL/250115_REGULAR_HO</textarea>
+</div>
+</div>
+<!-- Footer/Action Area -->
+<div class="flex justify-end border-t border-gray-200 dark:border-gray-700 p-4">
+<button class="flex h-12 min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-primary px-6 text-base font-bold leading-normal text-white transition-opacity hover:opacity-90">
+<span class="truncate">확인</span>
+</button>
+</div>
+</div>
+<!-- Toast Notification -->
+<div class="fixed bottom-10 flex items-center gap-3 rounded-full bg-gray-900 dark:bg-gray-100 px-5 py-3 text-white dark:text-gray-900 shadow-lg">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<p class="text-sm font-medium">Copied to clipboard!</p>
+</div>
+</div>
+</body></html>

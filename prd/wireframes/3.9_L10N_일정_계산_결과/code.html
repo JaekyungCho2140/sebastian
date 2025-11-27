@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Schedule Calculation Result</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#1e94f6",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101a22",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="flex h-full grow flex-row">
+<!-- SideNavBar -->
+<div class="w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark p-4 flex flex-col gap-4 flex-shrink-0">
+<div class="flex gap-3 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Project Tool Logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYNRREJD1b7J-N8_TOOmf_D2-ZwdpPETwKIBOm3ToWnCfBNC-UFPbZpgaMcQuFPEYiHvAjO3yyF-b_39AKtty11m_qc7wx95oonZW8Ey1qqSe_WLwf3IPIoX5ygtLc2M7mNhZT_47zQuX7OjHq8YUCMW9vqcgqLY9GAGOCQnVZxIrlt2x1EXH2ypSkBOnojCTibsC9g3Nj-QfVVTAuQ4jp2FUV9QwcUAszdpRQMU3kDcoKWzsoAUyPHmdiYVvkEOHN1Dx9N1eoNOd0");'></div>
+<div class="flex flex-col">
+<h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Project Tool</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Workspace</p>
+</div>
+</div>
+<div class="flex flex-col gap-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-primary bg-primary/10 dark:bg-primary/20 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>
+<p class="text-sm font-medium leading-normal">Projects</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">view_kanban</span>
+<p class="text-sm font-medium leading-normal">JIRA Issues</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<p class="text-sm font-medium leading-normal">Folders</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" href="#">
+<span class="material-symbols-outlined">mail</span>
+<p class="text-sm font-medium leading-normal">Messages</p>
+</a>
+</div>
+</div>
+<!-- Main Content -->
+<main class="flex-1 p-8">
+<div class="mx-auto flex flex-col gap-6">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between gap-3">
+<div class="flex min-w-72 flex-col gap-2">
+<p class="text-gray-900 dark:text-white tracking-tight text-[32px] font-bold leading-tight">Schedule Calculation Result</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">프로젝트: L10N | 정산 마감일: 2024-10-31</p>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-background-dark/50">
+<table class="w-full text-left">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 w-1/2">Summary</th>
+<th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Start</th>
+<th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Due</th>
+<th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Assignee</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+<!-- Epic -->
+<tr class="bg-[#E3F2FD] dark:bg-blue-900/40">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-base" style="font-variation-settings: 'FILL' 1;">square</span>
+                      Epic: L10N 정산 프로세스
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-01</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-31</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm"></td>
+</tr>
+<!-- Task 1 -->
+<tr class="bg-[#F5F5F5] dark:bg-gray-800">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+<div class="flex items-center gap-2 pl-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-lg">arrow_drop_down</span>
+                      Task: M4/NC/FB/LY 정산
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-01</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-15</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+<div class="inline-flex items-center gap-2 rounded-full bg-teal-100 dark:bg-teal-900 px-3 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
+                      김민준
+                    </div>
+</td>
+</tr>
+<!-- Subtasks for Task 1 -->
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                      Subtask: 견적서 요청
+                    </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-01</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-03</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                      Subtask: 세금계산서 요청
+                    </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-04</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-07</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                      Subtask: 지결 상신
+                    </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-08</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-10</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<!-- Task 2 -->
+<tr class="bg-[#F5F5F5] dark:bg-gray-800">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+<div class="flex items-center gap-2 pl-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-lg opacity-20">arrow_right</span>
+                      Task: 견적서 크로스체크
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-16</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-18</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<div class="inline-flex items-center gap-2 rounded-full bg-purple-100 dark:bg-purple-900 px-3 py-1 text-xs font-semibold text-purple-800 dark:text-purple-200">
+                      이서연
+                    </div>
+</td>
+</tr>
+<!-- Task 3 -->
+<tr class="bg-[#F5F5F5] dark:bg-gray-800">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+<div class="flex items-center gap-2 pl-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-lg">arrow_drop_down</span>
+                      Task: Another Task 1
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-18</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-22</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<div class="inline-flex items-center gap-2 rounded-full bg-green-100 dark:bg-green-900 px-3 py-1 text-xs font-semibold text-green-800 dark:text-green-200">
+                      박도윤
+                    </div>
+</td>
+</tr>
+<!-- Subtasks for Task 3 -->
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 견적서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-18</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-19</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 세금계산서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-20</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-21</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 지결 상신
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-21</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-22</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<!-- Task 4 -->
+<tr class="bg-[#F5F5F5] dark:bg-gray-800">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+<div class="flex items-center gap-2 pl-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-lg">arrow_drop_down</span>
+                      Task: Another Task 2
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-23</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-27</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<div class="inline-flex items-center gap-2 rounded-full bg-teal-100 dark:bg-teal-900 px-3 py-1 text-xs font-semibold text-teal-800 dark:text-teal-200">
+                      김민준
+                    </div>
+</td>
+</tr>
+<!-- Subtasks for Task 4 -->
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 견적서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-23</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-24</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 세금계산서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-25</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-26</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 지결 상신
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-26</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-27</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<!-- Task 5 -->
+<tr class="bg-[#F5F5F5] dark:bg-gray-800">
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
+<div class="flex items-center gap-2 pl-4">
+<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-lg">arrow_drop_down</span>
+                      Task: Another Task 3
+                    </div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-28</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">2024-10-31</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm">
+<div class="inline-flex items-center gap-2 rounded-full bg-pink-100 dark:bg-pink-900 px-3 py-1 text-xs font-semibold text-pink-800 dark:text-pink-200">
+                      최아윤
+                    </div>
+</td>
+</tr>
+<!-- Subtasks for Task 5 -->
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 견적서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-28</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-29</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 세금계산서 요청
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-30</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-30</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+<tr class="bg-white dark:bg-background-dark/50">
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+<div class="flex items-center gap-2 pl-8">
+<span class="text-gray-400 text-lg leading-none">•</span>
+                            Subtask: 지결 상신
+                        </div>
+</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-31</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">2024-10-31</td>
+<td class="px-6 py-3 whitespace-nowrap text-sm"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- BodyText (Summary Section) -->
+<div class="p-3 rounded border border-[#FFB74D] bg-[#FFF3E0] dark:bg-orange-900/30 dark:border-orange-500/50">
+<p class="text-[#c26202] dark:text-orange-300 text-sm font-medium leading-normal">총 일감: Epic 1개 + Task 5개 + Subtask 12개 = 18개</p>
+</div>
+<!-- ButtonGroup -->
+<div class="flex justify-start">
+<div class="flex flex-1 gap-3 flex-wrap justify-start">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
+<span class="truncate">JIRA 일감 생성</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600">
+<span class="truncate">메시지 출력 (헤즈업)</span>
+</button>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600">
+<span class="truncate">메시지 출력 (HO)</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

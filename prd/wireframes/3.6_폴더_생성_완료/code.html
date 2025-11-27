@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Folder Creation Success Dialog</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400,FILL@0&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2094f3",
+            "background-light": "#f5f7f8",
+            "background-dark": "#101a22",
+          },
+          fontFamily: {
+            "display": ["Inter", "Malgun Gothic", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="font-display">
+<div class="relative flex h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark group/design-root overflow-hidden">
+<div class="flex flex-col w-[500px] h-auto bg-white dark:bg-gray-800 rounded-xl border border-[#E0E0E0] dark:border-gray-700 shadow-lg p-6">
+<!-- Header -->
+<div class="flex items-center pb-6">
+<span class="material-symbols-outlined text-[#4CAF50] text-xl mr-2">check_circle</span>
+<h3 class="text-[#4CAF50] text-base font-bold tracking-tight">폴더 생성 완료</h3>
+</div>
+<!-- Content -->
+<div class="flex flex-1 flex-col items-center">
+<!-- Success Icon -->
+<div class="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50">
+<span class="material-symbols-outlined text-[#4CAF50] text-3xl">check</span>
+</div>
+<!-- Info Section -->
+<div class="w-full mb-8">
+<div class="grid grid-cols-[100px_1fr] items-center gap-x-3 py-3 border-t border-t-[#E0E0E0] dark:border-t-gray-700">
+<p class="text-[#666666] dark:text-gray-400 text-[13px] font-medium text-right">생성 위치:</p>
+<p class="text-[#333333] dark:text-gray-200 text-[13px] font-normal">\\nas\m4gl\l10n\250115_UPDATE\</p>
+</div>
+<div class="grid grid-cols-[100px_1fr] items-center gap-x-3 py-3 border-t border-t-[#E0E0E0] dark:border-t-gray-700">
+<p class="text-[#666666] dark:text-gray-400 text-[13px] font-medium text-right">생성 개수:</p>
+<p class="text-[#333333] dark:text-gray-200 text-[13px] font-normal">16개 폴더</p>
+</div>
+<div class="grid grid-cols-[100px_1fr] items-center gap-x-3 py-3 border-t border-b border-t-[#E0E0E0] border-b-[#E0E0E0] dark:border-t-gray-700 dark:border-b-gray-700">
+<p class="text-[#666666] dark:text-gray-400 text-[13px] font-medium text-right">소요 시간:</p>
+<p class="text-[#333333] dark:text-gray-200 text-[13px] font-normal">2초</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex w-full items-center justify-center gap-3">
+<button class="flex h-10 w-[120px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary text-white text-[13px] font-bold leading-normal tracking-[0.015em] transition-colors hover:bg-blue-600 dark:hover:bg-blue-500">
+<span class="material-symbols-outlined text-base">folder_open</span>
+<span class="truncate">폴더 열기</span>
+</button>
+<button class="flex h-10 w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-[#CCCCCC] dark:border-gray-600 bg-white dark:bg-gray-700 text-[#666666] dark:text-gray-300 text-[13px] font-medium leading-normal tracking-[0.015em] transition-colors hover:bg-gray-100 dark:hover:bg-gray-600">
+<span class="truncate">닫기</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LY/GL 병합</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Noto+Sans+KR:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1e94f6",
+              "background-light": "#f5f7f8",
+              "background-dark": "#101a22",
+            },
+            fontFamily: {
+              "display": ["Inter", "Noto Sans KR", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans KR", sans-serif;'>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 sm:px-10 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between items-center gap-4 p-4">
+<div class="flex flex-col gap-1">
+<p class="text-gray-900 dark:text-gray-100 tracking-light text-[32px] font-bold leading-tight">LY/GL 병합</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">지정된 폴더에서 파일을 자동으로 감지합니다.</p>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-col mt-4">
+<!-- SectionHeader -->
+<div class="flex items-center gap-2 px-4 pb-3 pt-5">
+<h2 class="text-gray-900 dark:text-gray-100 text-[22px] font-bold leading-tight tracking-[-0.015em]">감지된 파일:</h2>
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-base cursor-help" title="필요한 파일은 지정된 폴더 위치 또는 명명 규칙을 따라야 합니다.">info</span>
+</div>
+<!-- File List Container -->
+<div class="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800/50 shadow-sm overflow-hidden">
+<div class="flex flex-col h-[210px] overflow-y-auto divide-y divide-gray-200 dark:divide-gray-700">
+<!-- ListItem: Found -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">check_circle</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_EN.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Found</p>
+</div>
+</div>
+<!-- ListItem: Missing -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">cancel</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_CT.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-red-600 dark:text-red-400 text-sm font-medium leading-normal">Missing</p>
+</div>
+</div>
+<!-- ListItem: Found -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">check_circle</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_CS.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Found</p>
+</div>
+</div>
+<!-- ListItem: Found -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">check_circle</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_JA.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Found</p>
+</div>
+</div>
+<!-- ListItem: Found -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">check_circle</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_TH.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Found</p>
+</div>
+</div>
+<!-- ListItem: Missing -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">cancel</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_PT.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-red-600 dark:text-red-400 text-sm font-medium leading-normal">Missing</p>
+</div>
+</div>
+<!-- ListItem: Found -->
+<div class="flex items-center gap-4 bg-white dark:bg-transparent px-4 min-h-14 justify-between">
+<div class="flex items-center gap-4 min-w-0">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center shrink-0 size-8">
+<span class="material-symbols-outlined !text-2xl">check_circle</span>
+</div>
+<p class="text-gray-800 dark:text-gray-200 text-base font-normal leading-normal flex-1 truncate">251104_RU.xlsx</p>
+</div>
+<div class="shrink-0">
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Found</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex justify-end items-center gap-3 p-4 mt-6">
+<button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-background-dark">취소</button>
+<button class="px-4 py-2 text-sm font-medium text-white bg-gray-400 dark:bg-gray-600 rounded-lg cursor-not-allowed" disabled="">병합</button>
+<!-- Example of an enabled button: <button class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-background-dark">병합</button> -->
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>
