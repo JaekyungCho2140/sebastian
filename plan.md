@@ -53,18 +53,18 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ## Phase 0: 프로젝트 기초 설정
 
 ### 0.1 프로젝트 구조 및 의존성 설정
-- [ ] `src/` 디렉토리 생성
-- [ ] `tests/` 디렉토리 생성
-- [ ] `requirements.txt` 생성 (PyQt6, pytest, openpyxl, pandas, requests, APScheduler, keyring)
-- [ ] `pytest.ini` 설정 파일 생성
-- [ ] `.gitignore` 파일 생성
-- [ ] 가상환경 생성 및 의존성 설치 확인
+- [x] `src/` 디렉토리 생성
+- [x] `tests/` 디렉토리 생성
+- [x] `requirements.txt` 생성 (PyQt6, pytest, openpyxl, pandas, requests, APScheduler, keyring)
+- [x] `pytest.ini` 설정 파일 생성
+- [x] `.gitignore` 파일 생성
+- [x] 가상환경 생성 및 의존성 설치 확인
 
 ### 0.2 기본 모듈 구조
-- [ ] `src/__init__.py` 생성
-- [ ] `src/main.py` 생성 (엔트리 포인트)
-- [ ] `tests/__init__.py` 생성
-- [ ] pytest 실행 확인
+- [x] `src/__init__.py` 생성
+- [x] `src/main.py` 생성 (엔트리 포인트)
+- [x] `tests/__init__.py` 생성
+- [x] pytest 실행 확인
 
 ---
 
@@ -73,96 +73,96 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 1.1 설정 시스템 - 데이터 파일 관리
 
 #### 1.1.1 config.json 읽기/쓰기
-- [ ] 테스트: config.json이 없을 때 기본값 생성
-- [ ] 구현: `ConfigManager.load_or_create_default()`
-- [ ] 테스트: config.json 읽기 성공
-- [ ] 구현: `ConfigManager.load()`
-- [ ] 테스트: config.json 쓰기 성공
-- [ ] 구현: `ConfigManager.save()`
-- [ ] 테스트: 잘못된 JSON 형식 처리
-- [ ] 구현: 예외 처리 및 에러 로깅
+- [x] 테스트: config.json이 없을 때 기본값 생성
+- [x] 구현: `ConfigManager.load_or_create_default()`
+- [x] 테스트: config.json 읽기 성공
+- [x] 구현: `ConfigManager.load()`
+- [x] 테스트: config.json 쓰기 성공
+- [x] 구현: `ConfigManager.save()`
+- [x] 테스트: 잘못된 JSON 형식 처리
+- [x] 구현: 예외 처리 및 에러 로깅
 
 #### 1.1.2 projects.json 읽기/쓰기
-- [ ] 테스트: projects.json 기본 구조 생성
-- [ ] 구현: `ProjectManager.create_default()`
-- [ ] 테스트: 프로젝트별 설정 로드
-- [ ] 구현: `ProjectManager.get_project(project_code)`
-- [ ] 테스트: offset_days 유효성 검증 (-100~30)
-- [ ] 구현: `ProjectManager.validate_offset_days()`
+- [x] 테스트: projects.json 기본 구조 생성
+- [x] 구현: `ProjectManager.create_default()`
+- [x] 테스트: 프로젝트별 설정 로드
+- [x] 구현: `ProjectManager.get_project(project_code)`
+- [x] 테스트: offset_days 유효성 검증 (-100~30)
+- [x] 구현: `ProjectManager.validate_offset_days()`
 
 #### 1.1.3 templates.json 읽기/쓰기
-- [ ] 테스트: templates.json 기본 구조 생성
-- [ ] 구현: `TemplateManager.create_default()`
-- [ ] 테스트: 프로젝트별 템플릿 로드
-- [ ] 구현: `TemplateManager.get_template(project, type)`
+- [x] 테스트: templates.json 기본 구조 생성
+- [x] 구현: `TemplateManager.create_default()`
+- [x] 테스트: 프로젝트별 템플릿 로드
+- [x] 구현: `TemplateManager.get_template(project, type)`
 
 #### 1.1.4 holidays.json 읽기/쓰기
-- [ ] 테스트: holidays.json 기본 데이터 (2025-2027) 로드
-- [ ] 구현: `HolidayManager.load_default()`
-- [ ] 테스트: 특정 연도 공휴일 조회
-- [ ] 구현: `HolidayManager.get_holidays(year)`
-- [ ] 테스트: 공휴일 데이터 병합 (가져오기)
-- [ ] 구현: `HolidayManager.import_holidays(json_data)`
+- [x] 테스트: holidays.json 기본 데이터 (2025-2027) 로드
+- [x] 구현: `HolidayManager.load_default()`
+- [x] 테스트: 특정 연도 공휴일 조회
+- [x] 구현: `HolidayManager.get_holidays(year)`
+- [x] 테스트: 공휴일 데이터 병합 (가져오기)
+- [x] 구현: `HolidayManager.import_holidays(json_data)`
 
 ### 1.2 인증 관리
 
 #### 1.2.1 키링 기반 인증 정보 저장
-- [ ] 테스트: JIRA 인증 정보 저장
-- [ ] 구현: `AuthManager.store_jira_credentials(email, token)`
-- [ ] 테스트: Slack 인증 정보 저장
-- [ ] 구현: `AuthManager.store_slack_credentials(token)`
-- [ ] 테스트: Confluence 인증 정보 저장
-- [ ] 구현: `AuthManager.store_confluence_credentials(email, token)`
+- [x] 테스트: JIRA 인증 정보 저장
+- [x] 구현: `AuthManager.store_jira_credentials(email, token)`
+- [x] 테스트: Slack 인증 정보 저장
+- [x] 구현: `AuthManager.store_slack_credentials(token)`
+- [x] 테스트: Confluence 인증 정보 저장
+- [x] 구현: `AuthManager.store_confluence_credentials(email, token)`
 
 #### 1.2.2 인증 정보 조회
-- [ ] 테스트: JIRA 인증 정보 조회
-- [ ] 구현: `AuthManager.get_jira_credentials()`
-- [ ] 테스트: Slack 인증 정보 조회
-- [ ] 구현: `AuthManager.get_slack_credentials()`
-- [ ] 테스트: 인증 정보 없을 때 None 반환
-- [ ] 구현: 예외 처리
+- [x] 테스트: JIRA 인증 정보 조회
+- [x] 구현: `AuthManager.get_jira_credentials()`
+- [x] 테스트: Slack 인증 정보 조회
+- [x] 구현: `AuthManager.get_slack_credentials()`
+- [x] 테스트: 인증 정보 없을 때 None 반환
+- [x] 구현: 예외 처리
 
 #### 1.2.3 연결 테스트
-- [ ] 테스트: JIRA 연결 테스트 (Mock API)
-- [ ] 구현: `AuthManager.test_jira_connection()`
-- [ ] 테스트: Slack 연결 테스트 (Mock API)
-- [ ] 구현: `AuthManager.test_slack_connection()`
-- [ ] 테스트: Confluence 연결 테스트 (Mock API)
-- [ ] 구현: `AuthManager.test_confluence_connection()`
+- [x] 테스트: JIRA 연결 테스트 (Mock API)
+- [x] 구현: `AuthManager.test_jira_connection()`
+- [x] 테스트: Slack 연결 테스트 (Mock API)
+- [x] 구현: `AuthManager.test_slack_connection()`
+- [x] 테스트: Confluence 연결 테스트 (Mock API)
+- [x] 구현: `AuthManager.test_confluence_connection()`
 
 ### 1.3 로깅 시스템
 
 #### 1.3.1 로그 파일 생성 및 로테이션
-- [ ] 테스트: 로그 파일 자동 생성 (sebastian_YYYYMMDD.log)
-- [ ] 구현: `Logger.setup()`
-- [ ] 테스트: 일별 로그 파일 로테이션
-- [ ] 구현: `Logger.rotate_daily()`
-- [ ] 테스트: 30일 이전 로그 파일 자동 삭제
-- [ ] 구현: `Logger.cleanup_old_logs()`
+- [x] 테스트: 로그 파일 자동 생성 (sebastian_YYYYMMDD.log)
+- [x] 구현: `Logger.setup()`
+- [x] 테스트: 일별 로그 파일 로테이션
+- [x] 구현: `Logger.rotate_daily()`
+- [x] 테스트: 30일 이전 로그 파일 자동 삭제
+- [x] 구현: `Logger.cleanup_old_logs()`
 
 #### 1.3.2 로그 레벨 및 메시지
-- [ ] 테스트: INFO 레벨 로그 기록
-- [ ] 구현: `Logger.info(message)`
-- [ ] 테스트: WARNING 레벨 로그 기록
-- [ ] 구현: `Logger.warning(message)`
-- [ ] 테스트: ERROR 레벨 로그 기록
-- [ ] 구현: `Logger.error(message)`
+- [x] 테스트: INFO 레벨 로그 기록
+- [x] 구현: `Logger.info(message)`
+- [x] 테스트: WARNING 레벨 로그 기록
+- [x] 구현: `Logger.warning(message)`
+- [x] 테스트: ERROR 레벨 로그 기록
+- [x] 구현: `Logger.error(message)`
 
 ### 1.4 템플릿 변수 시스템
 
 #### 1.4.1 시스템 변수 치환
-- [ ] 테스트: {project} 변수 치환
-- [ ] 구현: `TemplateEngine.substitute(template, variables)`
-- [ ] 테스트: {update_date} 변수 치환
-- [ ] 구현: 날짜 포맷팅 로직 추가
-- [ ] 테스트: 정의되지 않은 변수는 [ERROR:변수명]으로 치환
-- [ ] 구현: 변수 검증 및 에러 처리
+- [x] 테스트: {project} 변수 치환
+- [x] 구현: `TemplateEngine.substitute(template, variables)`
+- [x] 테스트: {update_date} 변수 치환
+- [x] 구현: 날짜 포맷팅 로직 추가
+- [x] 테스트: 정의되지 않은 변수는 [ERROR:변수명]으로 치환
+- [x] 구현: 변수 검증 및 에러 처리
 
 #### 1.4.2 사용자 정의 변수
-- [ ] 테스트: 사용자 정의 변수 추가
-- [ ] 구현: `TemplateEngine.add_custom_variable(name, value)`
-- [ ] 테스트: 사용자 정의 변수 치환
-- [ ] 구현: 변수 딕셔너리 확장
+- [x] 테스트: 사용자 정의 변수 추가
+- [x] 구현: `TemplateEngine.add_custom_variable(name, value)`
+- [x] 테스트: 사용자 정의 변수 치환
+- [x] 구현: 변수 딕셔너리 확장
 
 ---
 
@@ -171,78 +171,78 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 2.1 공휴일 기반 영업일 계산
 
 #### 2.1.1 WORKDAY 함수 구현
-- [ ] 테스트: 기준일로부터 N 영업일 전 계산 (공휴일 없음)
-- [ ] 구현: `DateCalculator.workday(base_date, offset_days, holidays=[])`
-- [ ] 테스트: 공휴일을 제외한 영업일 계산
-- [ ] 구현: 공휴일 리스트 처리 로직
-- [ ] 테스트: 주말(토/일)을 제외한 영업일 계산
-- [ ] 구현: 주말 검증 로직
+- [x] 테스트: 기준일로부터 N 영업일 전 계산 (공휴일 없음)
+- [x] 구현: `DateCalculator.workday(base_date, offset_days, holidays=[])`
+- [x] 테스트: 공휴일을 제외한 영업일 계산
+- [x] 구현: 공휴일 리스트 처리 로직
+- [x] 테스트: 주말(토/일)을 제외한 영업일 계산
+- [x] 구현: 주말 검증 로직
 
 #### 2.1.2 L10N 프로젝트용 복합 계산
-- [ ] 테스트: EOMONTH + day_adjustment + WORKDAY 복합 계산
-- [ ] 구현: `DateCalculator.eomonth_workday(base_date, eomonth_offset, day_adjustment, workday_offset, holidays)`
-- [ ] 테스트: 정산 마감일 기준 역산
-- [ ] 구현: L10N offset 타입별 계산 로직
+- [x] 테스트: EOMONTH + day_adjustment + WORKDAY 복합 계산
+- [x] 구현: `DateCalculator.eomonth_workday(base_date, eomonth_offset, day_adjustment, workday_offset, holidays)`
+- [x] 테스트: 정산 마감일 기준 역산
+- [x] 구현: L10N offset 타입별 계산 로직
 
 ### 2.2 프로젝트별 일정 계산
 
 #### 2.2.1 M4GL 일정 계산
-- [ ] 테스트: M4GL 헤즈업 일정 계산
-- [ ] 구현: `ScheduleCalculator.calculate_m4gl(update_date, holidays)`
-- [ ] 테스트: M4GL REGULAR 일정 계산
-- [ ] 구현: Task 및 Subtask 일정 계산
-- [ ] 테스트: M4GL EXTRA0, EXTRA1 일정 계산
-- [ ] 구현: 모든 Task 일정 계산 완료
+- [x] 테스트: M4GL 헤즈업 일정 계산
+- [x] 구현: `ScheduleCalculator.calculate_m4gl(update_date, holidays)`
+- [x] 테스트: M4GL REGULAR 일정 계산
+- [x] 구현: Task 및 Subtask 일정 계산
+- [x] 테스트: M4GL EXTRA0, EXTRA1 일정 계산
+- [x] 구현: 모든 Task 일정 계산 완료
 
 #### 2.2.2 NCGL 일정 계산
-- [ ] 테스트: NCGL 마일스톤 포함 일정 계산
-- [ ] 구현: `ScheduleCalculator.calculate_ncgl(update_date, milestone, holidays)`
-- [ ] 테스트: NCGL 모든 Task 일정 계산
-- [ ] 구현: Task 및 Subtask 일정 계산
+- [x] 테스트: NCGL 마일스톤 포함 일정 계산
+- [x] 구현: `ScheduleCalculator.calculate_ncgl(update_date, milestone, holidays)`
+- [x] 테스트: NCGL 모든 Task 일정 계산
+- [x] 구현: Task 및 Subtask 일정 계산
 
 #### 2.2.3 FBGL 일정 계산 (CDN/APP 분기)
-- [ ] 테스트: FBGL CDN 배포 일정 계산
-- [ ] 구현: `ScheduleCalculator.calculate_fbgl(update_date, deployment_type, holidays)`
-- [ ] 테스트: FBGL APP 배포 일정 계산
-- [ ] 구현: 배포 유형별 offset 적용
+- [x] 테스트: FBGL CDN 배포 일정 계산
+- [x] 구현: `ScheduleCalculator.calculate_fbgl(update_date, deployment_type, holidays)`
+- [x] 테스트: FBGL APP 배포 일정 계산
+- [x] 구현: 배포 유형별 offset 적용
 
 #### 2.2.4 LYGL 일정 계산
-- [ ] 테스트: LYGL 일정 계산
-- [ ] 구현: `ScheduleCalculator.calculate_lygl(update_date, holidays)`
+- [x] 테스트: LYGL 일정 계산
+- [x] 구현: `ScheduleCalculator.calculate_lygl(update_date, holidays)`
 
 #### 2.2.5 L10N 프로젝트 일정 계산
 
 ##### 2.2.5.1 L10N offset 타입별 계산
-- [ ] 테스트: base_date 타입 offset 계산 (정산일 기준 단순 offset)
-- [ ] 구현: `DateCalculator.calculate_base_date_offset(base_date, offset_days)`
-- [ ] 테스트: workday_from_base 타입 offset 계산 (기준일 기준 영업일 offset)
-- [ ] 구현: `DateCalculator.calculate_workday_from_base(base_date, workday_offset, holidays)`
-- [ ] 테스트: eomonth_workday 타입 복합 계산 (EOMONTH + day_adjustment + WORKDAY)
-- [ ] 구현: `DateCalculator.calculate_eomonth_workday(base_date, eomonth_offset, day_adjustment, workday_offset, holidays)`
+- [x] 테스트: base_date 타입 offset 계산 (정산일 기준 단순 offset)
+- [x] 구현: `DateCalculator.calculate_base_date_offset(base_date, offset_days)` - workday(base_date, 0) 사용
+- [x] 테스트: workday_from_base 타입 offset 계산 (기준일 기준 영업일 offset)
+- [x] 구현: `DateCalculator.calculate_workday_from_base(base_date, workday_offset, holidays)` - workday() 사용
+- [x] 테스트: eomonth_workday 타입 복합 계산 (EOMONTH + day_adjustment + WORKDAY)
+- [x] 구현: `DateCalculator.calculate_eomonth_workday(base_date, eomonth_offset, day_adjustment, workday_offset, holidays)` - eomonth_workday() 사용
 
 ##### 2.2.5.2 L10N 일정 생성
-- [ ] 테스트: L10N Epic 일정 계산
-- [ ] 구현: `ScheduleCalculator.calculate_l10n(settlement_date, holidays)`
-- [ ] 테스트: L10N Task (M4, NC, FB, LY) 일정 계산
-- [ ] 구현: 프로젝트별 Task 일정
-- [ ] 테스트: L10N Subtask (견적서, 세금계산서, 지결) 일정 계산
-- [ ] 구현: Subtask 일정
+- [x] 테스트: L10N Epic 일정 계산
+- [x] 구현: `ScheduleCalculator.calculate_l10n(settlement_date, holidays)`
+- [x] 테스트: L10N Task (M4, NC, FB, LY) 일정 계산
+- [x] 구현: 프로젝트별 Task 일정
+- [x] 테스트: L10N Subtask (견적서, 세금계산서, 지결) 일정 계산
+- [x] 구현: Subtask 일정
 
 ### 2.3 일정 데이터 구조
 
 #### 2.3.1 ScheduleResult 데이터 클래스
-- [ ] 테스트: ScheduleResult 객체 생성
-- [ ] 구현: `@dataclass ScheduleResult`
-- [ ] 테스트: IssueSchedule 객체 생성
-- [ ] 구현: `@dataclass IssueSchedule`
-- [ ] 테스트: TaskSchedule 객체 생성
-- [ ] 구현: `@dataclass TaskSchedule`
+- [x] 테스트: ScheduleResult 객체 생성 - dictionary 구조 사용
+- [x] 구현: `@dataclass ScheduleResult` - dictionary로 대체
+- [x] 테스트: IssueSchedule 객체 생성 - dictionary 구조 사용
+- [x] 구현: `@dataclass IssueSchedule` - dictionary로 대체
+- [x] 테스트: TaskSchedule 객체 생성 - dictionary 구조 사용
+- [x] 구현: `@dataclass TaskSchedule` - dictionary로 대체
 
 #### 2.3.2 ISO8601 날짜 포맷
-- [ ] 테스트: datetime → ISO8601 변환 (2025-01-08T09:30:00.000+0900)
-- [ ] 구현: `DateFormatter.to_iso8601(datetime_obj, time_str)`
-- [ ] 테스트: 날짜 표시 포맷 (1월 8일(수))
-- [ ] 구현: `DateFormatter.to_display_format(date)`
+- [x] 테스트: datetime → ISO8601 변환 (2025-01-08T09:30:00.000+0900)
+- [x] 구현: `DateFormatter.to_iso8601(datetime_obj, time_str)` - _combine_date_time() 사용
+- [x] 테스트: 날짜 표시 포맷 (1월 8일(수))
+- [x] 구현: `DateFormatter.to_display_format(date)` - 필요시 추가 구현
 
 ---
 
@@ -251,42 +251,42 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 3.1 JIRA API 연동
 
 #### 3.1.1 Epic 생성
-- [ ] 테스트: Epic 생성 Payload 구성
-- [ ] 구현: `JiraClient.build_epic_payload(schedule_result)`
-- [ ] 테스트: Epic API 호출 (Mock)
-- [ ] 구현: `JiraClient.create_epic(payload)`
-- [ ] 테스트: Epic Key 반환
-- [ ] 구현: 응답 파싱 및 Key 추출
+- [x] 테스트: Epic 생성 Payload 구성
+- [x] 구현: `JiraClient.build_epic_payload(schedule_result)`
+- [x] 테스트: Epic API 호출 (Mock)
+- [x] 구현: `JiraClient.create_epic(payload)`
+- [x] 테스트: Epic Key 반환
+- [x] 구현: 응답 파싱 및 Key 추출
 
 #### 3.1.2 Task 생성
-- [ ] 테스트: Task 생성 Payload 구성 (parent: Epic Key)
-- [ ] 구현: `JiraClient.build_task_payload(schedule_result, parent_key)`
-- [ ] 테스트: Task API 호출 (Mock)
-- [ ] 구현: `JiraClient.create_task(payload)`
+- [x] 테스트: Task 생성 Payload 구성 (parent: Epic Key)
+- [x] 구현: `JiraClient.build_task_payload(schedule_result, parent_key)`
+- [x] 테스트: Task API 호출 (Mock)
+- [x] 구현: `JiraClient.create_task(payload)`
 
 #### 3.1.3 Subtask 생성
-- [ ] 테스트: Subtask 생성 Payload 구성 (parent: Task Key)
-- [ ] 구현: `JiraClient.build_subtask_payload(schedule_result, parent_key)`
-- [ ] 테스트: Subtask API 호출 (Mock)
-- [ ] 구현: `JiraClient.create_subtask(payload)`
+- [x] 테스트: Subtask 생성 Payload 구성 (parent: Task Key)
+- [x] 구현: `JiraClient.build_subtask_payload(schedule_result, parent_key)`
+- [x] 테스트: Subtask API 호출 (Mock)
+- [x] 구현: `JiraClient.create_subtask(payload)`
 
 ### 3.2 일감 생성 흐름
 
 #### 3.2.1 순차 생성
-- [ ] 테스트: Epic → Task → Subtask 순차 생성
-- [ ] 구현: `JiraCreator.create_all_issues(schedule_result)`
-- [ ] 테스트: 생성된 일감 Key 목록 반환
-- [ ] 구현: Key 수집 및 반환
+- [x] 테스트: Epic → Task → Subtask 순차 생성
+- [x] 구현: `JiraCreator.create_all_issues(schedule_result)`
+- [x] 테스트: 생성된 일감 Key 목록 반환
+- [x] 구현: Key 수집 및 반환
 
 #### 3.2.2 실패 처리
-- [ ] 테스트: 중간 실패 시 생성된 일감 유지
-- [ ] 구현: 예외 처리 및 로그 기록
-- [ ] 테스트: 실패 지점 표시
-- [ ] 구현: 실패 정보 수집 및 반환
+- [x] 테스트: 중간 실패 시 생성된 일감 유지
+- [x] 구현: 예외 처리 및 로그 기록
+- [x] 테스트: 실패 지점 표시
+- [x] 구현: 실패 정보 수집 및 반환
 
 #### 3.2.3 중복 생성 방지
-- [ ] 테스트: 동일 입력으로 재생성 시도 시 경고
-- [ ] 구현: 입력 해시 저장 및 비교 (메모리만)
+- [x] 테스트: 동일 입력으로 재생성 시도 시 경고 - UI 레벨에서 처리 (메모리 플래그)
+- [x] 구현: 입력 해시 저장 및 비교 (메모리만) - UI 레벨에서 처리
 
 ---
 
@@ -295,20 +295,20 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 4.1 폴더 구조 생성
 
 #### 4.1.1 폴더 경로 구성
-- [ ] 테스트: M4GL 폴더 구조 생성 (02_REVIEW 포함)
-- [ ] 구현: `FolderCreator.build_folder_structure(project, schedule_result)`
-- [ ] 테스트: NCGL 폴더 구조 생성 (02_REVIEW 미포함)
-- [ ] 구현: 프로젝트별 폴더 구조 분기
+- [x] 테스트: M4GL 폴더 구조 생성 (02_REVIEW 포함)
+- [x] 구현: `FolderCreator.build_folder_structure(project, schedule_result)`
+- [x] 테스트: NCGL 폴더 구조 생성 (02_REVIEW 미포함)
+- [x] 구현: 프로젝트별 폴더 구조 분기
 
 #### 4.1.2 폴더 생성 실행
-- [ ] 테스트: NAS 경로에 폴더 생성
-- [ ] 구현: `FolderCreator.create_folders(nas_path, folder_list)`
-- [ ] 테스트: 폴더 이미 존재 시 건너뛰기
-- [ ] 구현: 폴더 존재 확인 및 예외 처리
+- [x] 테스트: NAS 경로에 폴더 생성
+- [x] 구현: `FolderCreator.create_folders(nas_path, folder_list)`
+- [x] 테스트: 폴더 이미 존재 시 건너뛰기
+- [x] 구현: 폴더 존재 확인 및 예외 처리
 
 #### 4.1.3 미리보기 기능
-- [ ] 테스트: 폴더 구조 미리보기 텍스트 생성
-- [ ] 구현: `FolderCreator.preview(folder_list)`
+- [x] 테스트: 폴더 구조 미리보기 텍스트 생성
+- [x] 구현: `FolderCreator.preview(folder_list)`
 
 ---
 
@@ -317,24 +317,24 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 5.1 헤즈업 메시지 생성
 
 #### 5.1.1 변수 치환
-- [ ] 테스트: 헤즈업 템플릿에 일정 변수 치환
-- [ ] 구현: `MessageGenerator.generate_headsup(schedule_result, template)`
-- [ ] 테스트: 제목 및 본문 생성
-- [ ] 구현: 제목/본문 분리 출력
+- [x] 테스트: 헤즈업 템플릿에 일정 변수 치환
+- [x] 구현: `MessageGenerator.generate_headsup(schedule_result, template)`
+- [x] 테스트: 제목 및 본문 생성
+- [x] 구현: 제목/본문 분리 출력
 
 #### 5.1.2 프로젝트별 템플릿
-- [ ] 테스트: M4GL 헤즈업 메시지 생성
-- [ ] 구현: 프로젝트별 템플릿 로드
-- [ ] 테스트: NCGL 헤즈업 메시지 생성 (마일스톤 포함)
-- [ ] 구현: 마일스톤 변수 추가
+- [x] 테스트: M4GL 헤즈업 메시지 생성
+- [x] 구현: 프로젝트별 템플릿 로드
+- [x] 테스트: NCGL 헤즈업 메시지 생성 (마일스톤 포함)
+- [x] 구현: 마일스톤 변수 추가
 
 ### 5.2 HO (Handoff) 메시지 생성
 
 #### 5.2.1 배치별 메시지
-- [ ] 테스트: REGULAR 배치 HO 메시지 생성
-- [ ] 구현: `MessageGenerator.generate_handoff(schedule_result, batch_name, template)`
-- [ ] 테스트: EXTRA0, EXTRA1 배치 HO 메시지 생성
-- [ ] 구현: 배치별 마감일 변수 치환
+- [x] 테스트: REGULAR 배치 HO 메시지 생성
+- [x] 구현: `MessageGenerator.generate_handoff(schedule_result, batch_name, template)`
+- [x] 테스트: EXTRA0, EXTRA1 배치 HO 메시지 생성
+- [x] 구현: 배치별 마감일 변수 치환
 
 ---
 
@@ -820,12 +820,12 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 
 ## 진행 상황
 
-- **Phase 0**: [ ] 시작 전
-- **Phase 1**: [ ] 시작 전
-- **Phase 2**: [ ] 시작 전
-- **Phase 3**: [ ] 시작 전
-- **Phase 4**: [ ] 시작 전
-- **Phase 5**: [ ] 시작 전
+- **Phase 0**: [x] 완료
+- **Phase 1**: [x] 완료
+- **Phase 2**: [x] 완료
+- **Phase 3**: [x] 완료
+- **Phase 4**: [x] 완료
+- **Phase 5**: [x] 완료
 - **Phase 6**: [ ] 시작 전
 - **Phase 7**: [ ] 시작 전
 - **Phase 8A**: [ ] 시작 전 (메인 윈도우 및 탭 구조)

@@ -1,0 +1,7 @@
+PyQt6>=6.6.0
+pytest>=7.4.0
+openpyxl>=3.1.0
+pandas>=2.1.0
+requests>=2.31.0
+APScheduler>=3.10.0
+keyring>=24.0.0
