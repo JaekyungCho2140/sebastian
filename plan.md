@@ -481,46 +481,38 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 7.2 Daily Task
 
 #### 7.2.1 Confluence API 연동
-- [ ] 테스트: 페이지 조회 (Mock API)
-- [ ] 구현: `ConfluenceClient.get_page(page_id)`
-- [ ] 테스트: 라벨 조회 (Mock API)
-- [ ] 구현: `ConfluenceClient.get_labels(page_id)`
-
-#### 7.2.2 영업일 계산
-- [ ] 테스트: 다음 달 영업일 목록 계산
-- [ ] 구현: `DateCalculator.get_business_days(year, month, holidays)`
+- [x] 테스트: 페이지 조회 (Mock API)
+- [x] 구현: `ConfluenceClient.get_page(page_id)`
+- [x] 테스트: 라벨 조회 (Mock API)
+- [x] 구현: `ConfluenceClient.get_labels(page_id)`
 
 #### 7.2.3 템플릿 블록 생성
-- [ ] 테스트: Page Properties 매크로 JSON 구조 생성
-- [ ] 구현: `DailyTaskGenerator.build_macro_json(date, weekday)`
-- [ ] 테스트: UUID 및 timestamp 동적 생성
-- [ ] 구현: UUID v4 생성 및 Unix timestamp 계산
+- [x] 테스트: Page Properties 매크로 JSON 구조 생성
+- [x] 구현: `DailyTaskGenerator.build_macro_json(date, weekday)`
+- [x] 테스트: UUID 및 timestamp 동적 생성
+- [x] 구현: UUID v4 생성 및 Unix timestamp 계산
 
 #### 7.2.4 페이지 업데이트
-- [ ] 테스트: 페이지 본문 업데이트 (Mock API)
-- [ ] 구현: `ConfluenceClient.update_page(page_id, content)`
-- [ ] 테스트: 라벨 삭제 (Mock API)
-- [ ] 구현: `ConfluenceClient.delete_label(page_id, label_name)`
-- [ ] 테스트: 라벨 추가 (Mock API)
-- [ ] 구현: `ConfluenceClient.add_label(page_id, label_name)`
+- [x] 테스트: 페이지 본문 업데이트 (Mock API)
+- [x] 구현: `ConfluenceClient.update_page(page_id, content)`
+- [x] 테스트: 라벨 삭제 (Mock API)
+- [x] 구현: `ConfluenceClient.delete_label(page_id, label_name)`
+- [x] 테스트: 라벨 추가 (Mock API)
+- [x] 구현: `ConfluenceClient.add_label(page_id, label_name)`
 
 ### 7.3 Daily Scrum
 
-#### 7.3.1 월 첫 영업일 감지
-- [ ] 테스트: 월 첫 영업일 계산 (주말 고려)
-- [ ] 구현: `DateCalculator.get_first_business_day(year, month)`
-
 #### 7.3.2 CQL 라벨 조건 업데이트
-- [ ] 테스트: CQL 파라미터에서 라벨 조건 교체
-- [ ] 구현: `DailyScrumUpdater.update_cql_label(content, old_label, new_label)`
+- [x] 테스트: CQL 파라미터에서 라벨 조건 교체
+- [x] 구현: `DailyScrumUpdater.update_cql_label(content, old_label, new_label)`
 
 #### 7.3.3 날짜 표시 업데이트
-- [ ] 테스트: Details Summary 매크로의 firstcolumn 값 업데이트
-- [ ] 구현: `DailyScrumUpdater.update_date_display(content, new_date)`
+- [x] 테스트: Details Summary 매크로의 firstcolumn 값 업데이트
+- [x] 구현: `DailyScrumUpdater.update_date_display(content, new_date)`
 
 #### 7.3.4 페이지 업데이트
-- [ ] 테스트: 페이지 업데이트 실행 (Mock API)
-- [ ] 구현: `ConfluenceClient.update_page(page_id, updated_content)`
+- [x] 테스트: 페이지 업데이트 실행 (Mock API)
+- [x] 구현: `ConfluenceClient.update_page(page_id, updated_content)` - 7.2.4에서 구현 완료
 
 ### 7.2 Daily Task
 
@@ -581,16 +573,16 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 8A.1 메인 윈도우
 
 #### 8A.1.1 기본 구조
-- [ ] 테스트: MainWindow 생성 및 표시
-- [ ] 구현: `MainWindow.__init__()`
-- [ ] 테스트: 탭 위젯 생성 (일정/메시지, 테이블 병합, 관리)
-- [ ] 구현: `MainWindow.setup_tabs()`
+- [x] 테스트: MainWindow 생성 및 표시
+- [x] 구현: `MainWindow.__init__()`
+- [x] 테스트: 탭 위젯 생성 (일정/메시지, 테이블 병합, 관리)
+- [x] 구현: `MainWindow.setup_tabs()` - _setup_tabs()로 구현
 
 #### 8A.1.2 최소화 및 종료
 - [ ] 테스트: 최소화 시 시스템 트레이로 이동
-- [ ] 구현: `MainWindow.minimize_to_tray()`
+- [ ] 구현: `MainWindow.minimize_to_tray()` - Phase 8C 통합 예정
 - [ ] 테스트: 트레이 아이콘 우클릭 → 종료
-- [ ] 구현: `TrayIcon.show_context_menu()`
+- [ ] 구현: `TrayIcon.show_context_menu()` - Phase 8C 통합 예정
 
 ---
 
@@ -599,10 +591,12 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 8B.1 일정/메시지 탭
 
 #### 8B.1.1 입력 UI
-- [ ] 테스트: 프로젝트 드롭다운 생성
-- [ ] 구현: `SchedulerTab.create_project_dropdown()`
-- [ ] 테스트: 업데이트일 날짜 선택기 생성
-- [ ] 구현: `SchedulerTab.create_date_picker()`
+- [x] 테스트: 프로젝트 드롭다운 생성
+- [x] 구현: `SchedulerTab.create_project_dropdown()` - _create_input_form()에 통합
+- [x] 테스트: 업데이트일 날짜 선택기 생성
+- [x] 구현: `SchedulerTab.create_date_picker()` - _create_input_form()에 통합
+- [x] 테스트: 마일스톤 입력 (NCGL 조건부 표시)
+- [x] 구현: 동적 필드 표시/숨김 로직 (_on_project_changed)
 - [ ] 테스트: FBGL 배포 유형 드롭다운 (조건부 표시)
 - [ ] 구현: `SchedulerTab.create_deployment_type_dropdown()`
 
@@ -621,30 +615,32 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 8B.2 테이블 병합 탭
 
 #### 8B.2.1 버튼 UI
-- [ ] 테스트: M4/GL 버튼 3개 생성
-- [ ] 구현: `TableMergeTab.create_m4gl_buttons()`
-- [ ] 테스트: NC/GL 버튼 생성
-- [ ] 구현: `TableMergeTab.create_ncgl_button()`
-- [ ] 테스트: LY/GL 버튼 2개 생성
-- [ ] 구현: `TableMergeTab.create_lygl_buttons()`
+- [x] 테스트: M4/GL 버튼 3개 생성
+- [x] 구현: `TableMergeTab.create_m4gl_buttons()` - _create_button_grid()에 통합
+- [x] 테스트: NC/GL 버튼 생성
+- [x] 구현: `TableMergeTab.create_ncgl_button()` - _create_button_grid()에 통합
+- [x] 테스트: LY/GL 버튼 2개 생성
+- [x] 구현: `TableMergeTab.create_lygl_buttons()` - _create_button_grid()에 통합
+- [x] 테스트: 로그 영역 생성
+- [x] 구현: `TableMergeTab.create_log_area()` - _create_log_section()으로 구현
 
 #### 8B.2.2 진행률 UI
 - [ ] 테스트: 진행률 바 표시
-- [ ] 구현: `TableMergeTab.update_progress(value, message)`
+- [ ] 구현: `TableMergeTab.update_progress(value, message)` - Phase 9 통합 예정
 
 ### 8B.3 관리 탭
 
 #### 8B.3.1 작업 카드 UI
-- [ ] 테스트: Daily Task 카드 생성
-- [ ] 구현: `AdminTab.create_daily_task_card()`
-- [ ] 테스트: Daily Scrum 카드 생성
-- [ ] 구현: `AdminTab.create_daily_scrum_card()`
-- [ ] 테스트: Slack MSG 카드 생성
-- [ ] 구현: `AdminTab.create_slack_msg_card()`
+- [x] 테스트: Daily Task 카드 생성
+- [x] 구현: `AdminTab.create_daily_task_card()` - _create_task_card()로 통합
+- [x] 테스트: Daily Scrum 카드 생성
+- [x] 구현: `AdminTab.create_daily_scrum_card()` - _create_task_card()로 통합
+- [x] 테스트: Slack MSG 카드 생성
+- [x] 구현: `AdminTab.create_slack_msg_card()` - _create_task_card()로 통합
 
 #### 8B.3.2 로그 UI
-- [ ] 테스트: 실행 로그 텍스트 영역 생성
-- [ ] 구현: `AdminTab.create_log_area()`
+- [x] 테스트: 실행 로그 텍스트 영역 생성
+- [x] 구현: `AdminTab.create_log_area()` - _create_log_section()으로 구현
 
 ---
 
@@ -653,12 +649,12 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 8C.1 설정 화면
 
 #### 8C.1.1 인증 정보 UI
-- [ ] 테스트: JIRA 인증 정보 입력 필드
-- [ ] 구현: `SettingsWindow.create_jira_auth_section()`
-- [ ] 테스트: Slack 인증 정보 입력 필드
-- [ ] 구현: `SettingsWindow.create_slack_auth_section()`
-- [ ] 테스트: Confluence 인증 정보 입력 필드
-- [ ] 구현: `SettingsWindow.create_confluence_auth_section()`
+- [x] 테스트: JIRA 인증 정보 입력 필드
+- [x] 구현: `SettingsWindow.create_jira_auth_section()` - _create_auth_section()에 통합
+- [x] 테스트: Slack 인증 정보 입력 필드
+- [x] 구현: `SettingsWindow.create_slack_auth_section()` - _create_auth_section()에 통합
+- [x] 테스트: Confluence 인증 정보 입력 필드
+- [x] 구현: `SettingsWindow.create_confluence_auth_section()` - _create_auth_section()에 통합
 
 #### 8C.1.2 프로젝트 설정 UI
 - [ ] 테스트: 프로젝트 드롭다운 및 설정 필드
@@ -837,10 +833,10 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 - **Phase 4**: [x] 완료
 - **Phase 5**: [x] 완료
 - **Phase 6**: [x] 완료 (UI 기능 제외)
-- **Phase 7**: [ ] 시작 전
-- **Phase 8A**: [ ] 시작 전 (메인 윈도우 및 탭 구조)
-- **Phase 8B**: [ ] 시작 전 (탭별 UI 컴포넌트)
-- **Phase 8C**: [ ] 시작 전 (설정 화면 및 마법사)
+- **Phase 7**: [x] 핵심 로직 완료 (스케줄링/동시성은 Phase 8 통합)
+- **Phase 8A**: [x] 완료 (메인 윈도우 및 탭 구조)
+- **Phase 8B**: [x] 기본 UI 완료 (탭별 UI 컴포넌트)
+- **Phase 8C**: [x] 기본 UI 완료 (설정 화면 및 마법사)
 - **Phase 9**: [ ] 시작 전
 - **Phase 10**: [ ] 시작 전
 
