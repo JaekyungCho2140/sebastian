@@ -45,7 +45,7 @@ class DateCalculator:
         return current_date
 
     def _is_business_day(self, check_date, holiday_dates):
-        """영업일 여부 확인
+        """영업일 여부 확인 (내부용)
 
         Args:
             check_date: 확인할 날짜
@@ -64,6 +64,98 @@ class DateCalculator:
             return False
 
         return True
+
+    def is_weekend(self, check_date):
+        """주말 여부 확인
+
+        Args:
+            check_date: 확인할 날짜 (date 객체)
+
+        Returns:
+            bool: 주말이면 True
+        """
+        # 토요일=5, 일요일=6
+        return check_date.weekday() in [5, 6]
+
+    def is_holiday(self, check_date, holidays):
+        """공휴일 여부 확인
+
+        Args:
+            check_date: 확인할 날짜 (date 객체)
+            holidays: 공휴일 리스트 (dict의 리스트, 각 dict는 'date' 키 포함)
+
+        Returns:
+            bool: 공휴일이면 True
+        """
+        date_str = check_date.strftime("%Y-%m-%d")
+        return date_str in [h["date"] for h in holidays]
+
+    def is_business_day(self, check_date, holidays):
+        """영업일 여부 확인 (공개 메서드)
+
+        Args:
+            check_date: 확인할 날짜 (date 객체)
+            holidays: 공휴일 리스트 (dict의 리스트, 각 dict는 'date' 키 포함)
+
+        Returns:
+            bool: 영업일이면 True (주말도 아니고 공휴일도 아님)
+        """
+        # 주말 확인
+        if self.is_weekend(check_date):
+            return False
+
+        # 공휴일 확인
+        if self.is_holiday(check_date, holidays):
+            return False
+
+        return True
+
+    def get_first_business_day(self, year, month):
+        """월 첫 영업일 계산 (주말 고려)
+
+        Args:
+            year: 연도
+            month: 월
+
+        Returns:
+            date: 월 첫 영업일
+        """
+        first_day = date(year, month, 1)
+        weekday = first_day.weekday()
+
+        # PRD 4.4: 월 첫 영업일 감지
+        if weekday == 5:  # 토요일
+            return first_day + timedelta(days=2)  # 월요일
+        elif weekday == 6:  # 일요일
+            return first_day + timedelta(days=1)  # 월요일
+        else:
+            return first_day
+
+    def get_business_days(self, year, month, holidays):
+        """특정 월의 모든 영업일 목록 반환
+
+        Args:
+            year: 연도
+            month: 월
+            holidays: 공휴일 리스트 (dict의 리스트, 각 dict는 'date' 키 포함)
+
+        Returns:
+            list[date]: 영업일 목록 (정렬됨)
+        """
+        business_days = []
+
+        # 해당 월의 마지막 날 구하기
+        last_day = monthrange(year, month)[1]
+
+        # 1일부터 마지막 날까지 반복
+        for day in range(1, last_day + 1):
+            current_date = date(year, month, day)
+
+            # 영업일인지 확인
+            if self.is_business_day(current_date, holidays):
+                business_days.append(current_date)
+
+        return business_days
 
     def eomonth_workday(self, base_date, eomonth_offset, day_adjustment, workday_offset, holidays=None):
         """EOMONTH + day_adjustment + WORKDAY 복합 계산

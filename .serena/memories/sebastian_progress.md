@@ -139,30 +139,124 @@
 
 ## 전체 통계
 
-**총 구현 모듈**: 14개
-**총 테스트**: 113개 ✓
-**총 코드 라인**: ~4,859줄
-**PRD 준수율**: 100%
+**총 구현 모듈**: 26개
+**총 테스트**: 162개 ✓
+**총 코드 라인**: ~8,100줄
+**PRD 준수율**: 100% (Phase 0-6.1 검증 완료)
 **TDD 준수**: 모든 테스트에서 Red → Green → Refactor 사이클 완료
 
 ## Git 커밋 이력
 
 - **689054d**: Initial commit + PRD 문서
 - **5af529a**: Phase 0-5 구현 완료 (113 tests passing)
+- **df9a05b**: Phase 6.1, 6.7 추가 (118 tests passing)
+
+### ✅ Phase 6: 테이블 병합 (완료)
+
+**완료된 모듈** (8개):
+
+1. **ExcelFormatter** (src/excel_formatter.py) - Phase 6.7 공통 서식
+   - apply_header_format() - 맑은 고딕 12pt Bold, #FFEB9C 배경, #9C5700 글자
+   - apply_data_format() - 맑은 고딕 10pt, Thin 테두리
+   - freeze_panes() - A2 틀 고정
+   - 테스트: 3개 ✓
+
+2. **BaseLanguageMerger** (src/base_language_merger.py) - 언어 병합 베이스 클래스
+   - _validate_field_consistency() - 필드 검증
+   - _extract_en_row_values() - EN 행 값 추출
+   - _validate_row_fields() - 모든 필드 검증
+   - _get_target_value() - Target 값 추출
+   - _clean_dataframe() - NaN/inf 처리
+   - _save_with_format() - Excel 저장 및 서식
+
+3. **DialogueMerger** (src/dialogue_merger.py) - Phase 6.1 DIALOGUE 병합
+   - merge_dialogue() - CINEMATIC/SMALLTALK/NPC 병합
+   - EN (M) 필터링 (빈 값/0/"미사용" 제거)
+   - NPC ID → Speaker Name 매핑
+   - 인덱스 재정렬 (# 열 추가)
+   - 서식 적용 및 저장
+   - 테스트: 2개 ✓
+
+4. **StringMerger** (src/string_merger.py) - Phase 6.2 STRING 병합
+   - merge_string() - 8개 STRING 파일 병합
+   - 파일별 열 매핑 (SEQUENCE_DIALOGUE, STRING_BUILTIN, etc.)
+   - Table Name 생성, Table/ID 생성
+   - 필수 파일 검증
+   - 서식 적용 및 저장
+   - 테스트: 4개 ✓
+
+5. **M4GLMerger** (src/m4gl_merger.py) - Phase 6.3 통합 병합
+   - merge_all() - DIALOGUE + STRING 순차 실행
+   - 중간 실패 처리 (생성된 파일 유지)
+   - 총 행 수 반환
+   - 테스트: 3개 ✓
+
+6. **NCGLMerger** (src/ncgl_merger.py) - Phase 6.4 NC/GL 병합
+   - merge_ncgl() - 8개 언어 파일 병합
+   - EN 마스터 기반, 필드 검증
+   - 파일명: {YYMMDD}_M{milestone}_StringALL.xlsx
+   - BaseLanguageMerger 상속 (리팩토링)
+   - 테스트: 6개 ✓
+
+7. **LYGLMerger** (src/lygl_merger.py) - Phase 6.5 LY/GL 병합
+   - merge_lygl() - 7개 언어 파일 병합
+   - glob 패턴으로 동적 탐색
+   - 날짜 접두사 자동 감지
+   - KEY 일치 검증 (EN 마스터)
+   - BaseLanguageMerger 상속 (리팩토링)
+   - 테스트: 6개 ✓
+
+8. **LYGLSplitter** (src/lygl_splitter.py) - Phase 6.6 LY/GL 분할
+   - split_lygl() - 1개 → 7개 언어 파일 분할
+   - 날짜 자동 추출 / 사용자 지정
+   - 열 매핑 (Target_{lang} → Target)
+   - 사용자 지정 출력 폴더
+   - 테스트: 6개 ✓
+
+**Phase 6 테스트**: 30/30 통과 ✓
+**PRD 준수율**: 100% (UI 기능 제외)
+
+
+
+### ✅ Phase 7: L10N Admin (부분 완료)
+
+**완료된 모듈** (3개):
+
+1. **SlackMsgGenerator** (src/slack_msg_generator.py)
+   - format_message_1() - "MM/dd(요일) 업무 출근은 찍었나요?"
+   - format_message_2() - "MM/dd(요일) ## 잡담"
+   - 한글 요일 매핑
+   - 테스트: 3개 ✓
+
+2. **SlackClient** (src/slack_client.py)
+   - post_message() - Slack API 메시지 발송
+   - Bearer 토큰 인증
+   - chat.postMessage 엔드포인트
+   - 에러 처리
+   - 테스트: 4개 ✓
+
+3. **DateCalculator 확장** (src/date_calculator.py)
+   - is_weekend() - 주말 확인
+   - is_holiday() - 공휴일 확인
+   - is_business_day() - 영업일 확인 (PRD 5.3 코드 100% 일치)
+   - get_first_business_day() - 월 첫 영업일 (PRD 4.4 코드 100% 일치)
+   - get_business_days() - 월별 영업일 목록
+   - 테스트: 12개 ✓
+
+**Phase 7 완료 테스트**: 19/19 통과 ✓
+**PRD 준수율**: 100% (핵심 로직)
+
+### 🔜 Phase 7 남은 작업 (GUI/스케줄링 연동)
+
+- Daily Task Confluence API (JSON 구조, 템플릿 생성)
+- Daily Scrum CQL 업데이트
+- 스케줄링 시스템 (APScheduler, Cron)
+- 동시성 처리 (뮤텍스, 파일 잠금)
+- 관리 탭 UI
+
+→ Phase 8 (GUI)에서 통합 구현 예정
 
 ## 남은 Phase
-
-### 🔜 Phase 6: 테이블 병합 (시작 전)
-- M4/GL DIALOGUE 병합
-- M4/GL STRING 병합
-- NC/GL 병합
-- LY/GL 병합/분할
-
-### 🔜 Phase 7: L10N Admin (시작 전)
-- Daily Task (Confluence 월간 템플릿)
-- Daily Scrum (Confluence 일일 업데이트)
-- Slack MSG (평일 출근 알림)
-- 스케줄링 시스템
 
 ### 🔜 Phase 8A/B/C: PyQt6 GUI (시작 전)
 - 메인 윈도우 및 탭 구조

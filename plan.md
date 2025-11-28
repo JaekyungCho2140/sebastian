@@ -371,72 +371,72 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 6.2 M4/GL STRING 병합
 
 #### 6.2.1 파일 읽기
-- [ ] 테스트: 8개 STRING 파일 병렬 읽기
-- [ ] 구현: `StringMerger.read_all_files(file_paths)`
+- [x] 테스트: 8개 STRING 파일 병렬 읽기
+- [x] 구현: `StringMerger.read_all_files(file_paths)` - merge_string()에 통합
 
 #### 6.2.2 데이터 병합
-- [ ] 테스트: 8개 파일 순차 병합
-- [ ] 구현: `StringMerger.merge(dataframes)`
+- [x] 테스트: 8개 파일 순차 병합
+- [x] 구현: `StringMerger.merge(dataframes)` - merge_string()에 통합
 
 #### 6.2.3 출력 파일 생성
-- [ ] 테스트: 헤더 구조 생성 및 저장
-- [ ] 구현: `StringMerger.build_output(df)`
+- [x] 테스트: 헤더 구조 생성 및 저장
+- [x] 구현: `StringMerger.build_output(df)` - merge_string()에 통합
 
 ### 6.3 M4/GL 통합 병합
 
 #### 6.3.1 순차 실행
-- [ ] 테스트: DIALOGUE 병합 → STRING 병합 순차 실행
-- [ ] 구현: `M4GLMerger.merge_all(folder_path)`
+- [x] 테스트: DIALOGUE 병합 → STRING 병합 순차 실행
+- [x] 구현: `M4GLMerger.merge_all(folder_path)`
 
 ### 6.4 NC/GL 병합
 
 #### 6.4.1 8개 언어 파일 병합
-- [ ] 테스트: 8개 언어 파일 병렬 읽기
-- [ ] 구현: `NCGLMerger.read_all_files(folder_path)`
-- [ ] 테스트: EN 파일을 마스터로 병합
-- [ ] 구현: `NCGLMerger.merge(dataframes)`
+- [x] 테스트: 8개 언어 파일 병렬 읽기
+- [x] 구현: `NCGLMerger.read_all_files(folder_path)` - merge_ncgl()에 통합
+- [x] 테스트: EN 파일을 마스터로 병합
+- [x] 구현: `NCGLMerger.merge(dataframes)` - merge_ncgl()에 통합
 
 #### 6.4.2 필드 검증
-- [ ] 테스트: Table, Source, Status, NOTE 일치 검증
-- [ ] 구현: `NCGLMerger.validate_fields(dataframes)`
-- [ ] 테스트: 불일치 발견 시 작업 중단
-- [ ] 구현: 예외 발생 및 에러 메시지
+- [x] 테스트: Table, Source, Status, NOTE 일치 검증
+- [x] 구현: `NCGLMerger.validate_fields(dataframes)` - _validate_field_consistency()로 리팩토링
+- [x] 테스트: 불일치 발견 시 작업 중단
+- [x] 구현: 예외 발생 및 에러 메시지
 
 #### 6.4.3 출력 파일 생성
-- [ ] 테스트: 헤더 구조 생성 및 저장
-- [ ] 구현: `NCGLMerger.build_output(df, yymmdd, milestone)`
+- [x] 테스트: 헤더 구조 생성 및 저장
+- [x] 구현: `NCGLMerger.build_output(df, yymmdd, milestone)` - merge_ncgl()에 통합
 
 ### 6.5 LY/GL 병합
 
 #### 6.5.1 7개 언어 파일 병합
-- [ ] 테스트: 7개 언어 파일 읽기
-- [ ] 구현: `LYGLMerger.read_all_files(folder_path)`
-- [ ] 테스트: EN 파일을 마스터로 병합
-- [ ] 구현: `LYGLMerger.merge(dataframes)`
+- [x] 테스트: 7개 언어 파일 읽기
+- [x] 구현: `LYGLMerger.read_all_files(folder_path)` - merge_lygl()에 통합
+- [x] 테스트: EN 파일을 마스터로 병합
+- [x] 구현: `LYGLMerger.merge(dataframes)` - merge_lygl()에 통합
 
 #### 6.5.2 검증 규칙
-- [ ] 테스트: 정확히 7개 파일 검증
-- [ ] 구현: `LYGLMerger.validate_file_count(file_paths)`
-- [ ] 테스트: KEY 일치 검증
-- [ ] 구현: `LYGLMerger.validate_keys(dataframes)`
+- [x] 테스트: 정확히 7개 파일 검증
+- [x] 구현: `LYGLMerger.validate_file_count(file_paths)` - merge_lygl()에 통합
+- [x] 테스트: KEY 일치 검증
+- [x] 구현: `LYGLMerger.validate_keys(dataframes)` - merge_lygl()에 통합
 
 #### 6.5.3 출력 파일 생성
-- [ ] 테스트: 헤더 구조 생성 및 저장
-- [ ] 구현: `LYGLMerger.build_output(df)`
+- [x] 테스트: 헤더 구조 생성 및 저장
+- [x] 구현: `LYGLMerger.build_output(df)` - merge_lygl()에 통합
 
 ### 6.6 LY/GL 분할
 
 #### 6.6.1 통합 파일 읽기
-- [ ] 테스트: 병합 파일 읽기
-- [ ] 구현: `LYGLSplitter.read_merged_file(file_path)`
+- [x] 테스트: 병합 파일 읽기
+- [x] 구현: `LYGLSplitter.read_merged_file(file_path)` - split_lygl()에 통합
 
 #### 6.6.2 언어별 분할
-- [ ] 테스트: 7개 언어별 파일로 분할
-- [ ] 구현: `LYGLSplitter.split(merged_df, output_folder, date_prefix)`
+- [x] 테스트: 7개 언어별 파일로 분할
+- [x] 구현: `LYGLSplitter.split(merged_df, output_folder, date_prefix)` - split_lygl()에 통합
 
 #### 6.6.3 출력 파일 생성
-- [ ] 테스트: 언어별 파일 저장
-- [ ] 구현: 언어 코드별 파일명 생성 및 저장
+- [x] 테스트: 언어별 파일 저장
+- [x] 구현: 언어 코드별 파일명 생성 및 저장 - _extract_language_data(), _save_language_file()로 리팩토링
 
 ### 6.7 공통 기능
 
@@ -522,27 +522,37 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 - [ ] 테스트: 페이지 업데이트 실행 (Mock API)
 - [ ] 구현: `ConfluenceClient.update_page(page_id, updated_content)`
 
+### 7.2 Daily Task
+
+#### 7.2.2 영업일 계산
+- [x] 테스트: 다음 달 영업일 목록 계산
+- [x] 구현: `DateCalculator.get_business_days(year, month, holidays)`
+
+### 7.3 Daily Scrum
+
+#### 7.3.1 월 첫 영업일 감지
+- [x] 테스트: 월 첫 영업일 계산 (주말 고려)
+- [x] 구현: `DateCalculator.get_first_business_day(year, month)`
+
 ### 7.4 Slack MSG
 
 #### 7.4.1 공휴일 확인
-- [ ] 테스트: 오늘이 주말인지 확인
-- [ ] 구현: `DateCalculator.is_weekend(date)`
-- [ ] 테스트: 오늘이 공휴일인지 확인
-- [ ] 구현: `DateCalculator.is_holiday(date, holidays)`
-- [ ] 테스트: 영업일 확인 (주말 + 공휴일)
-- [ ] 구현: `DateCalculator.is_business_day(date, holidays)`
+- [x] 테스트: 오늘이 주말인지 확인
+- [x] 구현: `DateCalculator.is_weekend(date)`
+- [x] 테스트: 오늘이 공휴일인지 확인
+- [x] 구현: `DateCalculator.is_holiday(date, holidays)`
+- [x] 테스트: 영업일 확인 (주말 + 공휴일)
+- [x] 구현: `DateCalculator.is_business_day(date, holidays)`
 
 #### 7.4.2 Slack API 연동
-- [ ] 테스트: Slack 메시지 발송 (Mock API)
-- [ ] 구현: `SlackClient.post_message(channel_id, text)`
-- [ ] 테스트: 2개 메시지 순차 발송
-- [ ] 구현: 메시지 2개 발송 로직
+- [x] 테스트: Slack 메시지 발송 (Mock API)
+- [x] 구현: `SlackClient.post_message(channel_id, text)`
 
 #### 7.4.3 메시지 포맷
-- [ ] 테스트: 메시지 1 포맷 생성 (MM/dd(요일) 업무 출근은 찍었나요?)
-- [ ] 구현: `SlackMsgGenerator.format_message_1(date)`
-- [ ] 테스트: 메시지 2 포맷 생성 (MM/dd(요일) ## 잡담)
-- [ ] 구현: `SlackMsgGenerator.format_message_2(date)`
+- [x] 테스트: 메시지 1 포맷 생성 (MM/dd(요일) 업무 출근은 찍었나요?)
+- [x] 구현: `SlackMsgGenerator.format_message_1(date)`
+- [x] 테스트: 메시지 2 포맷 생성 (MM/dd(요일) ## 잡담)
+- [x] 구현: `SlackMsgGenerator.format_message_2(date)`
 
 ### 7.5 동시성 처리
 
@@ -826,7 +836,7 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 - **Phase 3**: [x] 완료
 - **Phase 4**: [x] 완료
 - **Phase 5**: [x] 완료
-- **Phase 6**: [ ] 시작 전
+- **Phase 6**: [x] 완료 (UI 기능 제외)
 - **Phase 7**: [ ] 시작 전
 - **Phase 8A**: [ ] 시작 전 (메인 윈도우 및 탭 구조)
 - **Phase 8B**: [ ] 시작 전 (탭별 UI 컴포넌트)
