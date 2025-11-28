@@ -343,30 +343,30 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 6.1 M4/GL DIALOGUE 병합
 
 #### 6.1.1 파일 읽기
-- [ ] 테스트: CINEMATIC_DIALOGUE.xlsm 읽기
-- [ ] 구현: `ExcelReader.read_dialogue(file_path, sheet_index, header_row, data_start_row)`
-- [ ] 테스트: SMALLTALK_DIALOGUE.xlsm 읽기
-- [ ] 구현: 동일 함수 재사용
-- [ ] 테스트: NPC.xlsm 읽기 및 매핑 생성
-- [ ] 구현: `ExcelReader.read_npc_mapping(file_path)`
+- [x] 테스트: CINEMATIC_DIALOGUE.xlsm 읽기
+- [x] 구현: `ExcelReader.read_dialogue(file_path, sheet_index, header_row, data_start_row)` - DialogueMerger에 통합
+- [x] 테스트: SMALLTALK_DIALOGUE.xlsm 읽기
+- [x] 구현: 동일 함수 재사용
+- [x] 테스트: NPC.xlsm 읽기 및 매핑 생성
+- [x] 구현: `ExcelReader.read_npc_mapping(file_path)` - DialogueMerger에 통합
 
 #### 6.1.2 데이터 병합
-- [ ] 테스트: CINEMATIC + SMALLTALK 순차 병합
-- [ ] 구현: `DialogueMerger.merge(cinematic_df, smalltalk_df)`
-- [ ] 테스트: NPC ID → Speaker Name 매핑
-- [ ] 구현: `DialogueMerger.fill_speaker_names(merged_df, npc_map)`
+- [x] 테스트: CINEMATIC + SMALLTALK 순차 병합
+- [x] 구현: `DialogueMerger.merge(cinematic_df, smalltalk_df)` - pd.concat 사용
+- [x] 테스트: NPC ID → Speaker Name 매핑
+- [x] 구현: `DialogueMerger.fill_speaker_names(merged_df, npc_map)` - map().fillna() 사용
 
 #### 6.1.3 행 필터링
-- [ ] 테스트: EN (M) 빈 셀 행 제거
-- [ ] 구현: `DialogueMerger.filter_rows(df)`
-- [ ] 테스트: EN (M) '미사용' 행 제거
-- [ ] 구현: 필터링 조건 확장
+- [x] 테스트: EN (M) 빈 셀 행 제거
+- [x] 구현: `DialogueMerger.filter_rows(df)` - 필터링 조건 적용
+- [x] 테스트: EN (M) '미사용' 행 제거
+- [x] 구현: 필터링 조건 확장
 
 #### 6.1.4 출력 파일 생성
-- [ ] 테스트: 헤더 구조 생성
-- [ ] 구현: `DialogueMerger.build_output(df)`
-- [ ] 테스트: Excel 파일 저장 (서식 포함)
-- [ ] 구현: `ExcelWriter.save(df, file_path, apply_format=True)`
+- [x] 테스트: 헤더 구조 생성
+- [x] 구현: `DialogueMerger.build_output(df)` - # 열 추가, reset_index
+- [x] 테스트: Excel 파일 저장 (서식 포함)
+- [x] 구현: `ExcelWriter.save(df, file_path, apply_format=True)` - ExcelFormatter 사용
 
 ### 6.2 M4/GL STRING 병합
 
@@ -441,12 +441,12 @@ Phase 10 (통합 테스트 및 배포) ← 전체 Phase 완료 필요
 ### 6.7 공통 기능
 
 #### 6.7.1 Excel 서식 적용
-- [ ] 테스트: 헤더 서식 적용 (배경색, 폰트)
-- [ ] 구현: `ExcelFormatter.apply_header_format(worksheet)`
-- [ ] 테스트: 데이터 셀 서식 적용 (폰트, 테두리)
-- [ ] 구현: `ExcelFormatter.apply_data_format(worksheet)`
-- [ ] 테스트: 틀 고정 (A2)
-- [ ] 구현: `ExcelFormatter.freeze_panes(worksheet)`
+- [x] 테스트: 헤더 서식 적용 (배경색, 폰트)
+- [x] 구현: `ExcelFormatter.apply_header_format(worksheet)`
+- [x] 테스트: 데이터 셀 서식 적용 (폰트, 테두리)
+- [x] 구현: `ExcelFormatter.apply_data_format(worksheet)`
+- [x] 테스트: 틀 고정 (A2)
+- [x] 구현: `ExcelFormatter.freeze_panes(worksheet)`
 
 #### 6.7.2 진행률 표시
 - [ ] 테스트: 진행률 계산
