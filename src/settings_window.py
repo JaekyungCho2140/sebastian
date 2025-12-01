@@ -1,7 +1,7 @@
 """설정 화면"""
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QLabel, QPushButton, QLineEdit, QWidget, QScrollArea
+    QLabel, QPushButton, QLineEdit, QWidget, QScrollArea, QComboBox
 )
 from PyQt6.QtCore import Qt
 
@@ -39,9 +39,20 @@ class SettingsWindow(QDialog):
         content_layout.setSpacing(32)
 
         # PRD wireframes.md 2.2: 섹션들
-        # 인증 정보 섹션
         auth_section = self._create_auth_section()
         content_layout.addWidget(auth_section)
+
+        project_section = self._create_project_settings_section()
+        content_layout.addWidget(project_section)
+
+        template_section = self._create_template_section()
+        content_layout.addWidget(template_section)
+
+        holiday_section = self._create_holiday_section()
+        content_layout.addWidget(holiday_section)
+
+        schedule_section = self._create_schedule_section()
+        content_layout.addWidget(schedule_section)
 
         content_layout.addStretch()
 
@@ -178,4 +189,144 @@ class SettingsWindow(QDialog):
 
         layout.addLayout(form_layout)
 
+        return section
+
+    def _create_project_settings_section(self):
+        """프로젝트 설정 섹션 생성"""
+        section = QWidget()
+        section_layout = QVBoxLayout(section)
+        section_layout.setContentsMargins(0, 20, 0, 0)
+        section_layout.setSpacing(12)
+
+        title = QLabel("프로젝트 설정")
+        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #333333;")
+        section_layout.addWidget(title)
+
+        form_layout = QFormLayout()
+        form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        self.project_dropdown = QComboBox()
+        self.project_dropdown.setObjectName("project_settings_dropdown")
+        self.project_dropdown.addItems(["M4GL", "NCGL", "FBGL", "LYGL", "L10N"])
+        self.project_dropdown.setFixedWidth(200)
+        form_layout.addRow("프로젝트:", self.project_dropdown)
+
+        section_layout.addLayout(form_layout)
+        return section
+
+    def _create_template_section(self):
+        """템플릿 편집 섹션 생성"""
+        section = QWidget()
+        section_layout = QVBoxLayout(section)
+        section_layout.setContentsMargins(0, 20, 0, 0)
+        section_layout.setSpacing(12)
+
+        title = QLabel("메시지 템플릿")
+        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #333333;")
+        section_layout.addWidget(title)
+
+        self.template_edit_button = QPushButton("템플릿 편집")
+        self.template_edit_button.setObjectName("template_edit_button")
+        self.template_edit_button.setFixedSize(120, 36)
+        self.template_edit_button.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                color: #FFFFFF;
+                border: none;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+        """)
+        section_layout.addWidget(self.template_edit_button)
+        return section
+
+    def _create_holiday_section(self):
+        """공휴일 관리 섹션 생성"""
+        section = QWidget()
+        section_layout = QVBoxLayout(section)
+        section_layout.setContentsMargins(0, 20, 0, 0)
+        section_layout.setSpacing(12)
+
+        title = QLabel("공휴일 관리")
+        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #333333;")
+        section_layout.addWidget(title)
+
+        button_layout = QHBoxLayout()
+
+        self.holiday_import_button = QPushButton("가져오기")
+        self.holiday_import_button.setObjectName("holiday_import_button")
+        self.holiday_import_button.setFixedSize(100, 36)
+        self.holiday_import_button.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: #FFFFFF;
+                border: none;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+        """)
+        button_layout.addWidget(self.holiday_import_button)
+
+        self.holiday_export_button = QPushButton("내보내기")
+        self.holiday_export_button.setObjectName("holiday_export_button")
+        self.holiday_export_button.setFixedSize(100, 36)
+        self.holiday_export_button.setStyleSheet("""
+            QPushButton {
+                background-color: #FF9800;
+                color: #FFFFFF;
+                border: none;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+            QPushButton:hover {
+                background-color: #F57C00;
+            }
+        """)
+        button_layout.addWidget(self.holiday_export_button)
+
+        button_layout.addStretch()
+        section_layout.addLayout(button_layout)
+        return section
+
+    def _create_schedule_section(self):
+        """스케줄 설정 섹션 생성"""
+        from PyQt6.QtWidgets import QCheckBox
+
+        section = QWidget()
+        section_layout = QVBoxLayout(section)
+        section_layout.setContentsMargins(0, 20, 0, 0)
+        section_layout.setSpacing(12)
+
+        title = QLabel("스케줄 설정")
+        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #333333;")
+        section_layout.addWidget(title)
+
+        form_layout = QFormLayout()
+        form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        # Daily Task 체크박스
+        self.daily_task_checkbox = QCheckBox("활성화")
+        self.daily_task_checkbox.setObjectName("daily_task_enabled")
+        self.daily_task_checkbox.setChecked(True)
+        form_layout.addRow("Daily Task:", self.daily_task_checkbox)
+
+        # Daily Scrum 체크박스
+        self.daily_scrum_checkbox = QCheckBox("활성화")
+        self.daily_scrum_checkbox.setObjectName("daily_scrum_enabled")
+        self.daily_scrum_checkbox.setChecked(True)
+        form_layout.addRow("Daily Scrum:", self.daily_scrum_checkbox)
+
+        # Slack MSG 체크박스
+        self.slack_msg_checkbox = QCheckBox("활성화")
+        self.slack_msg_checkbox.setObjectName("slack_msg_enabled")
+        self.slack_msg_checkbox.setChecked(True)
+        form_layout.addRow("Slack MSG:", self.slack_msg_checkbox)
+
+        section_layout.addLayout(form_layout)
         return section

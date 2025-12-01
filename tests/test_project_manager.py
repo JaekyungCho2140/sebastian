@@ -58,7 +58,7 @@ class TestProjectManager:
 
         assert m4gl_config is not None, "M4GL 설정을 찾을 수 없습니다"
         assert m4gl_config["jira_key"] == "L10NM4", "M4GL의 jira_key가 올바르지 않습니다"
-        assert m4gl_config["nas_path"] == "\\\\nas\\m4gl\\l10n\\", "M4GL의 nas_path가 올바르지 않습니다"
+        assert m4gl_config["nas_path"] == "\\\\172.17.255.21\\nas_wm\\WM_L10n팀\\01_MIR4", "M4GL의 nas_path가 올바르지 않습니다"
 
     def test_get_project_returns_none_for_unknown_project(self, temp_config_dir):
         """존재하지 않는 프로젝트는 None을 반환해야 함"""

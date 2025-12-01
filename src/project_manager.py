@@ -22,7 +22,7 @@ class ProjectManager:
         default_projects = {
             "M4GL": {
                 "jira_key": "L10NM4",
-                "nas_path": "\\\\nas\\m4gl\\l10n\\",
+                "nas_path": "\\\\172.17.255.21\\nas_wm\\WM_L10n팀\\01_MIR4",
                 "folder_structure": ["00_SOURCE", "01_HB", "02_REVIEW", "03_DELIVERY"],
                 "languages": ["KO", "EN", "CT", "CS", "JA", "TH", "ES-LATAM", "PT-BR"],
                 "schedule": {
@@ -97,15 +97,15 @@ class ProjectManager:
             },
             "NCGL": {
                 "jira_key": "L10NNC",
-                "nas_path": "\\\\nas\\ncgl\\l10n\\",
+                "nas_path": "\\\\172.17.255.21\\nas_wm\\WM_L10n팀\\02_NIGHT CROWS",
                 "folder_structure": ["00_SOURCE", "01_HB", "02_DELIVERY"],
                 "languages": ["EN", "CT", "CS", "JA", "TH", "ES", "PT", "RU"],
                 "schedule": {},
-                "slack_channel": "C06BZA056E5"
+                "slack_channel": "C06BZA056E4"
             },
             "FBGL": {
                 "jira_key": "L10NFB",
-                "nas_path": "\\\\nas\\fbgl\\l10n\\",
+                "nas_path": "\\\\172.17.255.21\\nas_wm\\WM_L10n팀\\03_FANTASTIC BASEBALL",
                 "folder_structure": ["00_SOURCE", "01_HB", "02_DELIVERY"],
                 "regions": ["GL", "JP"],
                 "languages_by_region": {
@@ -117,15 +117,15 @@ class ProjectManager:
                     "CDN": {},
                     "APP": {}
                 },
-                "slack_channel": "C06BZA056E6"
+                "slack_channel": "C06BZA056E4"
             },
             "LYGL": {
                 "jira_key": "L10NLY",
-                "nas_path": "\\\\nas\\lygl\\l10n\\",
+                "nas_path": "\\\\172.17.255.21\\nas_wm\\WM_L10n팀\\07_LEGEND OF YMIR",
                 "folder_structure": ["00_SOURCE", "01_HB", "02_DELIVERY"],
                 "languages": ["EN", "CT", "CS", "JA", "TH", "PT-BR", "RU"],
                 "schedule": {},
-                "slack_channel": "C06BZA056E7"
+                "slack_channel": "C06BZA056E4"
             },
             "L10N": {
                 "type": "monthly_settlement",

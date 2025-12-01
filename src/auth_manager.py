@@ -54,6 +54,16 @@ class AuthManager:
         """
         return keyring.get_password(self.SERVICE_NAME, "slack_token")
 
+    def get_confluence_credentials(self):
+        """Confluence 인증 정보 조회
+
+        Returns:
+            tuple: (email, token) 또는 (None, None)
+        """
+        email = keyring.get_password(self.SERVICE_NAME, "confluence_email")
+        token = keyring.get_password(self.SERVICE_NAME, "confluence_token")
+        return (email, token)
+
     def test_jira_connection(self, email, token):
         """JIRA 연결 테스트
 

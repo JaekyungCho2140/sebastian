@@ -84,3 +84,13 @@ class TestMainWindow:
         settings_button = window.findChild(QPushButton, "settings_button")
         assert settings_button is not None, "설정 버튼이 있어야 합니다"
         assert "설정" in settings_button.text(), "버튼 텍스트에 '설정'이 있어야 합니다"
+
+    def test_main_window_has_tray_icon(self, qapp):
+        """메인 윈도우에 시스템 트레이 아이콘이 있어야 함"""
+        from src.main_window import MainWindow
+
+        window = MainWindow()
+
+        # PRD shared.md 2.3: 시스템 트레이
+        assert hasattr(window, 'tray_icon'), "시스템 트레이 아이콘이 있어야 합니다"
+        assert window.tray_icon is not None, "트레이 아이콘이 초기화되어야 합니다"

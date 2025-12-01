@@ -160,6 +160,40 @@ class TestAuthManagerRetrieval:
 
         assert token == "slack_secret", "Slack token이 올바르게 조회되지 않았습니다"
 
+    def test_e_get_confluence_credentials_returns_stored_data(self):
+        """저장된 Confluence 인증 정보를 조회할 수 있어야 함"""
+        from src.auth_manager import AuthManager
+
+        auth_manager = AuthManager()
+
+        # Confluence 인증 정보 저장
+        auth_manager.store_confluence_credentials("confluence@example.com", "confluence_secret")
+
+        # 조회
+        email, token = auth_manager.get_confluence_credentials()
+
+        assert email == "confluence@example.com", "Confluence email이 올바르게 조회되지 않았습니다"
+        assert token == "confluence_secret", "Confluence token이 올바르게 조회되지 않았습니다"
+
+    def test_f_get_confluence_credentials_returns_none_when_not_stored(self):
+        """저장되지 않은 Confluence 인증 정보 조회 시 (None, None)을 반환해야 함"""
+        from src.auth_manager import AuthManager
+
+        auth_manager = AuthManager()
+
+        # 명시적으로 삭제
+        try:
+            keyring.delete_password("Sebastian", "confluence_email")
+            keyring.delete_password("Sebastian", "confluence_token")
+        except:
+            pass
+
+        # 조회
+        email, token = auth_manager.get_confluence_credentials()
+
+        assert email is None, "저장되지 않은 email은 None이어야 합니다"
+        assert token is None, "저장되지 않은 token은 None이어야 합니다"
+
 
 class TestAuthManagerConnection:
     """AuthManager 연결 테스트"""

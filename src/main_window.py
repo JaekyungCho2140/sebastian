@@ -1,8 +1,9 @@
 """메인 윈도우"""
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QTabWidget, QPushButton, QLabel
+    QTabWidget, QPushButton, QLabel, QSystemTrayIcon, QMenu
 )
+from PyQt6.QtGui import QIcon, QAction
 from PyQt6.QtCore import Qt
 from src.scheduler_tab import SchedulerTab
 from src.table_merge_tab import TableMergeTab
@@ -42,6 +43,9 @@ class MainWindow(QMainWindow):
         # 푸터 추가
         footer = self._create_footer()
         main_layout.addWidget(footer)
+
+        # PRD shared.md 2.3: 시스템 트레이 아이콘
+        self._create_tray_icon()
 
     def _setup_tabs(self):
         """탭 설정"""
@@ -100,3 +104,60 @@ class MainWindow(QMainWindow):
         """설정 화면 열기"""
         settings = SettingsWindow(self)
         settings.exec()
+
+    def _create_tray_icon(self):
+        """시스템 트레이 아이콘 생성"""
+        # 트레이 아이콘 생성
+        self.tray_icon = QSystemTrayIcon(self)
+        
+        # 아이콘 설정 (기본 아이콘 사용, 실제로는 assets/icon.png 사용)
+        # self.tray_icon.setIcon(QIcon("assets/icon.png"))
+        
+        # 트레이 메뉴 생성
+        tray_menu = QMenu()
+        
+        # 열기 액션
+        show_action = QAction("열기", self)
+        show_action.triggered.connect(self.show)
+        tray_menu.addAction(show_action)
+        
+        tray_menu.addSeparator()
+        
+        # 종료 액션
+        quit_action = QAction("종료", self)
+        quit_action.triggered.connect(self.close)
+        tray_menu.addAction(quit_action)
+        
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+        
+        # 트레이 아이콘 클릭 시 윈도우 표시
+        self.tray_icon.activated.connect(self._on_tray_activated)
+    
+    def _on_tray_activated(self, reason):
+        """트레이 아이콘 클릭 시 처리"""
+        from PyQt6.QtWidgets import QSystemTrayIcon
+        
+        if reason == QSystemTrayIcon.ActivationReason.Trigger:
+            # 왼쪽 클릭: 윈도우 표시/숨김 토글
+            if self.isVisible():
+                self.hide()
+            else:
+                self.show()
+                self.activateWindow()
+    
+    def changeEvent(self, event):
+        """윈도우 상태 변경 이벤트"""
+        from PyQt6.QtCore import QEvent
+        
+        # PRD shared.md 2.3: 최소화 시 트레이로 숨김
+        if event.type() == QEvent.Type.WindowStateChange:
+            if self.isMinimized():
+                self.hide()
+                event.ignore()
+        
+        super().changeEvent(event)
+    
+    def hide_to_tray(self):
+        """트레이로 숨기기"""
+        self.hide()

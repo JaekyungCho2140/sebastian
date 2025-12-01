@@ -82,3 +82,55 @@ class TestSettingsWindow:
 
         assert jira_email is not None, "JIRA 이메일 필드가 있어야 합니다"
         assert jira_token is not None, "JIRA 토큰 필드가 있어야 합니다"
+
+    def test_settings_window_has_project_settings_section(self, qapp):
+        """프로젝트 설정 섹션이 있어야 함"""
+        from src.settings_window import SettingsWindow
+        from PyQt6.QtWidgets import QComboBox
+
+        window = SettingsWindow()
+
+        # PRD shared.md 3.1: 프로젝트 드롭다운
+        project_dropdown = window.findChild(QComboBox, "project_settings_dropdown")
+        assert project_dropdown is not None, "프로젝트 드롭다운이 있어야 합니다"
+
+    def test_settings_window_has_template_edit_button(self, qapp):
+        """템플릿 편집 버튼이 있어야 함"""
+        from src.settings_window import SettingsWindow
+        from PyQt6.QtWidgets import QPushButton
+
+        window = SettingsWindow()
+
+        # PRD messaging.md 3.2.3: 템플릿 편집 버튼
+        template_edit_btn = window.findChild(QPushButton, "template_edit_button")
+        assert template_edit_btn is not None, "템플릿 편집 버튼이 있어야 합니다"
+
+    def test_settings_window_has_holiday_buttons(self, qapp):
+        """공휴일 관리 버튼이 있어야 함"""
+        from src.settings_window import SettingsWindow
+        from PyQt6.QtWidgets import QPushButton
+
+        window = SettingsWindow()
+
+        # PRD scheduler.md 2.5: 공휴일 가져오기/내보내기
+        import_btn = window.findChild(QPushButton, "holiday_import_button")
+        export_btn = window.findChild(QPushButton, "holiday_export_button")
+
+        assert import_btn is not None, "공휴일 가져오기 버튼이 있어야 합니다"
+        assert export_btn is not None, "공휴일 내보내기 버튼이 있어야 합니다"
+
+    def test_settings_window_has_schedule_section(self, qapp):
+        """스케줄 설정 섹션이 있어야 함"""
+        from src.settings_window import SettingsWindow
+        from PyQt6.QtWidgets import QCheckBox
+
+        window = SettingsWindow()
+
+        # PRD l10n-admin.md 2.2: 스케줄 활성화 체크박스
+        daily_task_checkbox = window.findChild(QCheckBox, "daily_task_enabled")
+        daily_scrum_checkbox = window.findChild(QCheckBox, "daily_scrum_enabled")
+        slack_msg_checkbox = window.findChild(QCheckBox, "slack_msg_enabled")
+
+        assert daily_task_checkbox is not None, "Daily Task 활성화 체크박스가 있어야 합니다"
+        assert daily_scrum_checkbox is not None, "Daily Scrum 활성화 체크박스가 있어야 합니다"
+        assert slack_msg_checkbox is not None, "Slack MSG 활성화 체크박스가 있어야 합니다"

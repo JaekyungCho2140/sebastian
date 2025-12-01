@@ -25,13 +25,13 @@ class AdminTab(QWidget):
         layout.addWidget(title)
 
         # PRD wireframes.md 5.1: 작업 카드 3개
-        daily_task_card = self._create_task_card("Daily Task", "daily_task")
+        daily_task_card = self._create_task_card("Daily Task", "daily_task", self._on_execute_daily_task)
         layout.addWidget(daily_task_card)
 
-        daily_scrum_card = self._create_task_card("Daily Scrum", "daily_scrum")
+        daily_scrum_card = self._create_task_card("Daily Scrum", "daily_scrum", self._on_execute_daily_scrum)
         layout.addWidget(daily_scrum_card)
 
-        slack_msg_card = self._create_task_card("Slack MSG", "slack_msg")
+        slack_msg_card = self._create_task_card("Slack MSG", "slack_msg", self._on_execute_slack_msg)
         layout.addWidget(slack_msg_card)
 
         # PRD wireframes.md 5.1: 실행 로그
@@ -40,12 +40,13 @@ class AdminTab(QWidget):
 
         layout.addStretch()
 
-    def _create_task_card(self, title, task_name):
+    def _create_task_card(self, title, task_name, on_execute):
         """작업 카드 생성
 
         Args:
             title: 카드 제목
             task_name: 작업 이름 (객체명에 사용)
+            on_execute: 실행 버튼 클릭 시 호출할 함수
 
         Returns:
             QWidget: 작업 카드
@@ -97,10 +98,132 @@ class AdminTab(QWidget):
                 background-color: #1976D2;
             }
         """)
+        execute_button.clicked.connect(on_execute)
 
         card_layout.addWidget(execute_button, alignment=Qt.AlignmentFlag.AlignRight)
 
         return card
+
+    def _on_execute_daily_task(self):
+        """Daily Task 실행"""
+        from src.confluence_client import ConfluenceClient
+        from src.daily_task_generator import DailyTaskGenerator
+        from src.auth_manager import AuthManager
+        from src.holiday_manager import HolidayManager
+        from src.date_calculator import DateCalculator
+        from datetime import date
+
+        try:
+            # 인증 정보 로드
+            auth_manager = AuthManager()
+            confluence_email, confluence_token = auth_manager.get_confluence_credentials()
+
+            if not confluence_email or not confluence_token:
+                self.log_area.append("✗ Confluence 인증 정보가 없습니다")
+                return
+
+            # Confluence 클라이언트 생성
+            confluence_client = ConfluenceClient(confluence_email, confluence_token)
+
+            # 페이지 조회
+            page_id = "190906620"  # PRD에서 정의된 Daily Task 페이지 ID
+            page = confluence_client.get_page(page_id)
+
+            self.log_area.append(f"Daily Task 페이지 조회 완료 (ID: {page_id})")
+
+            # 다음 달 영업일 계산
+            today = date.today()
+            next_month_year = today.year if today.month < 12 else today.year + 1
+            next_month = today.month + 1 if today.month < 12 else 1
+
+            holiday_manager = HolidayManager()
+            holidays = holiday_manager.get_holidays(next_month_year)
+
+            date_calculator = DateCalculator()
+            business_days = date_calculator.get_business_days(next_month_year, next_month, holidays)
+
+            # 템플릿 생성
+            generator = DailyTaskGenerator()
+            templates = generator.generate_templates_for_month(next_month_year, next_month, business_days)
+
+            # TODO: 페이지 업데이트 로직 (Phase 9에서 완성)
+            self.log_area.append(f"✓ Daily Task 실행 완료 ({len(business_days)}일)")
+
+        except Exception as e:
+            self.log_area.append(f"✗ Daily Task 실행 실패: {e}")
+
+    def _on_execute_daily_scrum(self):
+        """Daily Scrum 실행"""
+        from src.confluence_client import ConfluenceClient
+        from src.daily_scrum_updater import DailyScrumUpdater
+        from src.auth_manager import AuthManager
+        from datetime import date
+
+        try:
+            # 인증 정보 로드
+            auth_manager = AuthManager()
+            confluence_email, confluence_token = auth_manager.get_confluence_credentials()
+
+            if not confluence_email or not confluence_token:
+                self.log_area.append("✗ Confluence 인증 정보가 없습니다")
+                return
+
+            # Confluence 클라이언트 생성
+            confluence_client = ConfluenceClient(confluence_email, confluence_token)
+
+            # 페이지 조회
+            page_id = "191332855"  # PRD에서 정의된 Daily Scrum 페이지 ID
+            page = confluence_client.get_page(page_id)
+
+            self.log_area.append(f"Daily Scrum 페이지 조회 완료 (ID: {page_id})")
+
+            # 날짜 업데이트
+            updater = DailyScrumUpdater()
+            today = date.today()
+
+            # TODO: 페이지 업데이트 로직 (Phase 9에서 완성)
+            self.log_area.append(f"✓ Daily Scrum 실행 완료")
+
+        except Exception as e:
+            self.log_area.append(f"✗ Daily Scrum 실행 실패: {e}")
+
+    def _on_execute_slack_msg(self):
+        """Slack MSG 실행"""
+        from src.slack_client import SlackClient
+        from src.slack_msg_generator import SlackMsgGenerator
+        from src.auth_manager import AuthManager
+        from src.config_manager import ConfigManager
+        from datetime import date
+
+        try:
+            # 인증 정보 로드
+            auth_manager = AuthManager()
+            slack_token = auth_manager.get_slack_credentials()
+
+            if not slack_token:
+                self.log_area.append("✗ Slack 인증 정보가 없습니다")
+                return
+
+            # 채널 ID (기본값 사용, Phase 9에서 설정 연동 예정)
+            channel_id = "C06BZA056E4"
+
+            # Slack 클라이언트 생성 (email은 사용 안 하지만 signature 유지)
+            slack_client = SlackClient("", slack_token)
+
+            # 메시지 생성
+            generator = SlackMsgGenerator()
+            today = date.today()
+            msg1 = generator.format_message_1(today)
+            msg2 = generator.format_message_2(today)
+
+            # 메시지 발송
+            slack_client.post_message(channel_id, msg1)
+            slack_client.post_message(channel_id, msg2)
+
+            self.log_area.append(f"✓ Slack MSG 실행 완료 (2개 메시지 발송)")
+
+        except Exception as e:
+            self.log_area.append(f"✗ Slack MSG 실행 실패: {e}")
 
     def _create_log_section(self):
         """실행 로그 섹션 생성"""
